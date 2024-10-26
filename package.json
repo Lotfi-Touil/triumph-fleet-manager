@@ -1,0 +1,21 @@
+{
+  "private": true,
+  "workspaces": [
+    "application",
+    "domain",
+    "infrastructure/adapters",
+    "infrastructure/platforms/nestjs",
+    "infrastructure/platforms/express"
+  ],
+  "scripts": {
+    "start:nest": "cd infrastructure/platforms/nestjs && npm run start:dev",
+    "start:express": "cd infrastructure/platforms/express && npm run start",
+    "start:frontend": "cd frontend && npm run serve"
+  },
+  "dependencies": {
+    "express": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0"
+  }
+}
