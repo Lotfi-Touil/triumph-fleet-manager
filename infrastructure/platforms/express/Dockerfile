@@ -8,6 +8,10 @@ RUN npm install
 
 COPY . .
 
+ENV NODE_ENV=production
+
 EXPOSE 3001
 
-CMD ["npm", "start"]
+RUN npm install -g nodemon
+
+CMD ["nodemon", "--exec", "ts-node", "src/app.ts"]
