@@ -17,8 +17,10 @@ import {
 import dashboardPreview from '@/assets/dashboard-preview.svg'
 import { ref, onMounted } from 'vue'
 import AnimatedCounter from '@/components/AnimatedCounter.vue'
+import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
+const authStore = useAuthStore()
 const isVisible = ref(false)
 
 onMounted(() => {
@@ -133,6 +135,10 @@ const toggleFaq = (index: number) => {
     expandedFaqs.value.splice(currentIndex, 1)
   }
 }
+
+const handleLogout = () => {
+  authStore.logout(router)
+}
 </script>
 
 <template>
@@ -147,26 +153,38 @@ const toggleFaq = (index: number) => {
           <span class="font-bold text-foreground">Triumph Fleet</span>
         </div>
         <div class="flex flex-1 items-center justify-end space-x-4">
-          <Button
-            variant="ghost"
-            @click="router.push('/about')"
-            class="text-foreground hover:bg-accent hover:text-accent-foreground"
-          >
-            À propos
-          </Button>
-          <Button
-            variant="ghost"
-            @click="router.push('/login')"
-            class="text-foreground hover:bg-accent hover:text-accent-foreground"
-          >
-            Se connecter
-          </Button>
-          <Button
-            @click="router.push('/signup')"
-            class="bg-primary text-primary-foreground hover:bg-primary/90"
-          >
-            Essai gratuit
-          </Button>
+          <template v-if="!authStore.token">
+            <Button
+              variant="ghost"
+              @click="router.push('/about')"
+              class="text-foreground hover:bg-accent hover:text-accent-foreground"
+            >
+              À propos
+            </Button>
+            <Button
+              variant="ghost"
+              @click="router.push('/login')"
+              class="text-foreground hover:bg-accent hover:text-accent-foreground"
+            >
+              Se connecter
+            </Button>
+            <Button
+              @click="router.push('/signup')"
+              class="bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              Essai gratuit
+            </Button>
+          </template>
+          <template v-else>
+            <span class="text-muted-foreground">Bienvenue, {{ authStore.user?.name }}</span>
+            <Button
+              variant="outline"
+              @click="handleLogout"
+              class="text-foreground hover:bg-accent hover:text-accent-foreground"
+            >
+              Se déconnecter
+            </Button>
+          </template>
         </div>
       </div>
     </nav>

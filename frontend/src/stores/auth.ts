@@ -2,21 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import axios from '@/services/axios'
 import type { Router } from 'vue-router'
-
-interface User {
-  id: number
-  email: string
-  name: string
-}
-
-interface LoginPayload {
-  email: string
-  password: string
-}
-
-interface SignupPayload extends LoginPayload {
-  name: string
-}
+import type { User, LoginPayload, SignupPayload, AuthResponse, AuthResult } from '@/types/auth'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
@@ -29,16 +15,16 @@ export const useAuthStore = defineStore('auth', () => {
     axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`
   }
 
-  const login = async ({ email, password }: LoginPayload, router: Router) => {
+  const login = async (payload: LoginPayload, router: Router): Promise<AuthResult> => {
     try {
-      const response = await axios.post('/auth/login', { email, password })
+      const response = await axios.post<AuthResponse>('/auth/login', payload)
       user.value = response.data.user
-      token.value = response.data.token
+      token.value = response.data.access_token
 
-      localStorage.setItem('token', response.data.token)
-      axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`
+      localStorage.setItem('token', response.data.access_token)
+      axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.access_token}`
 
-      router.push('/home')
+      router.push('/dashboard')
       return { success: true }
     } catch (error: any) {
       return {
@@ -48,17 +34,10 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  const signup = async ({ email, password, name }: SignupPayload, router: Router) => {
+  const signup = async (payload: SignupPayload, router: Router): Promise<AuthResult> => {
     try {
-      const response = await axios.post('/auth/signup', { email, password, name })
-      user.value = response.data.user
-      token.value = response.data.token
-
-      localStorage.setItem('token', response.data.token)
-      axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`
-
-      router.push('/home')
-      return { success: true }
+      await axios.post('/auth/register', payload)
+      return login({ email: payload.email, password: payload.password }, router)
     } catch (error: any) {
       return {
         success: false,

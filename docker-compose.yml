@@ -7,11 +7,12 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - DATABASE_URL=postgres://user:password@postgres:5432/triumphrental
       - NODE_ENV=development
     depends_on:
       postgres:
         condition: service_healthy
+    networks:
+      - app-network
     restart: unless-stopped
 
   express:
@@ -26,6 +27,8 @@ services:
     depends_on:
       mongo:
         condition: service_healthy
+    networks:
+      - app-network
     restart: unless-stopped
 
   frontend:
@@ -42,17 +45,24 @@ services:
     depends_on:
       - nest
       - express
+    networks:
+      - app-network
 
   postgres:
-    image: postgres:13
+    image: postgres:latest
+    container_name: triumph_fleet_db
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: triumphrental
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: triumph_fleet
+    ports:
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U user -d triumphrental"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d triumph_fleet"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -61,11 +71,17 @@ services:
     image: mongo:4.4
     volumes:
       - mongo_data:/data/db
+    networks:
+      - app-network
     healthcheck:
       test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
       interval: 10s
       timeout: 5s
       retries: 5
+
+networks:
+  app-network:
+    driver: bridge
 
 volumes:
   postgres_data:
