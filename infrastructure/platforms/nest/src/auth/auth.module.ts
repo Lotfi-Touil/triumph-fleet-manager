@@ -8,13 +8,20 @@ import { BcryptHashService } from '@infrastructure/adapters/services/BcryptHashS
 import { JwtAuthenticationService } from '@infrastructure/adapters/services/JwtAuthenticationService';
 import { PostgresUserRepository } from '@infrastructure/adapters/repositories/PostgresUserRepository';
 import { UserEntity } from '@infrastructure/adapters/repositories/typeorm/entities/UserEntity';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([UserEntity]),
-    JwtModule.register({
-      secret: 'your-secret-key',
-      signOptions: { expiresIn: '1h' },
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: {
+          expiresIn: configService.get<string>('JWT_EXPIRATION', '1h'),
+        },
+      }),
+      inject: [ConfigService],
     }),
   ],
   controllers: [AuthController],

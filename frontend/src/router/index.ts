@@ -21,6 +21,13 @@ const router = createRouter({
       name: 'dashboard',
       component: DashboardView,
       meta: { requiresAuth: true },
+      children: [
+        {
+          path: 'maintenance',
+          name: 'maintenance',
+          component: () => import('../views/MaintenanceView.vue'),
+        },
+      ],
     },
     {
       path: '/login',

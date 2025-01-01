@@ -1,25 +1,32 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
-import { UserEntity } from '../../../adapters/repositories/typeorm/entities/UserEntity';
+import { MaintenanceModule } from './maintenance/maintenance.module';
+import { ConfigModule } from '@nestjs/config';
+import { APP_FILTER } from '@nestjs/core';
+import { AllExceptionsFilter } from './filters/all-exceptions.filter';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'postgres',
-      port: 5432,
-      username: 'postgres',
-      password: 'postgres',
-      database: 'triumph_fleet',
-      entities: [UserEntity],
-      synchronize: true, // À désactiver en production
+      host: process.env.DB_HOST,
+      port: parseInt(process.env.DB_PORT || '5432'),
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+      autoLoadEntities: true,
+      synchronize: true,
     }),
     AuthModule,
+    MaintenanceModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
+    },
+  ],
 })
 export class AppModule {}
