@@ -1,53 +1,32 @@
 import {
+  Body,
   Controller,
   Post,
-  Body,
-  UseGuards,
-  Request,
-  Get,
-  HttpException,
-  HttpStatus,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { LocalAuthGuard } from './guards/local-auth.guard';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { AuthUser, LoginResponse } from './interfaces/auth.interface';
-import { LoginDto } from './dto/login.dto';
-import { RegisterDto } from './dto/register.dto';
+import { SignupUser } from '@application/usecases/SignupUser';
+import { LoginUser } from '@application/usecases/LoginUser';
+import { SignupDTO } from '@domain/dtos/auth/SignupDTO';
+import { LoginDTO } from '@domain/dtos/auth/LoginDTO';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private readonly signupUseCase: SignupUser,
+    private readonly loginUseCase: LoginUser,
+  ) {}
 
-  @UseGuards(LocalAuthGuard)
+  @Post('signup')
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async signup(@Body() data: SignupDTO) {
+    const user = await this.signupUseCase.execute(data);
+    return user.toJSON();
+  }
+
   @Post('login')
-  async login(
-    @Body() loginDto: LoginDto,
-    @Request() req,
-  ): Promise<LoginResponse> {
-    try {
-      return await this.authService.login(req.user);
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
-    }
-  }
-
-  @Post('register')
-  async register(@Body() registerDto: RegisterDto): Promise<AuthUser> {
-    try {
-      return await this.authService.register(
-        registerDto.email,
-        registerDto.password,
-        registerDto.name,
-      );
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-    }
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('profile')
-  getProfile(@Request() req): AuthUser {
-    return req.user;
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async login(@Body() data: LoginDTO) {
+    return this.loginUseCase.execute(data);
   }
 }

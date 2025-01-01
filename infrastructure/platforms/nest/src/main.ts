@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationFilter } from './filters/validation.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,13 +15,8 @@ async function bootstrap() {
   // Préfixe global pour l'API
   app.setGlobalPrefix('api');
 
-  // Validation globale
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      transform: true,
-    }),
-  );
+  // Filtre global pour les erreurs de validation
+  app.useGlobalFilters(new ValidationFilter());
 
   await app.listen(3000);
 }

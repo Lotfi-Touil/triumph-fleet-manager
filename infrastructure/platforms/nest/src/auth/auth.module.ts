@@ -1,32 +1,50 @@
 import { Module } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
-import { PassportModule } from '@nestjs/passport';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-
+import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
-import { JwtStrategy } from './strategies/jwt.strategy';
-import { LocalStrategy } from './strategies/local.strategy';
-import { User } from '../users/entities/user.entity';
-import { UsersModule } from '../users/users.module';
+import { SignupUser } from '@application/usecases/SignupUser';
+import { LoginUser } from '@application/usecases/LoginUser';
+import { BcryptHashService } from '@infrastructure/adapters/services/BcryptHashService';
+import { JwtAuthenticationService } from '@infrastructure/adapters/services/JwtAuthenticationService';
+import { PostgresUserRepository } from '@infrastructure/adapters/repositories/PostgresUserRepository';
+import { UserEntity } from '@infrastructure/adapters/repositories/typeorm/entities/UserEntity';
 
 @Module({
   imports: [
-    UsersModule,
-    PassportModule,
-    TypeOrmModule.forFeature([User]),
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'),
-        signOptions: { expiresIn: '1d' },
-      }),
-      inject: [ConfigService],
+    TypeOrmModule.forFeature([UserEntity]),
+    JwtModule.register({
+      secret: 'your-secret-key',
+      signOptions: { expiresIn: '1h' },
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, LocalStrategy],
-  exports: [AuthService],
+  providers: [
+    {
+      provide: 'IUserRepository',
+      useClass: PostgresUserRepository,
+    },
+    {
+      provide: 'IHashService',
+      useClass: BcryptHashService,
+    },
+    {
+      provide: 'IAuthenticationService',
+      useClass: JwtAuthenticationService,
+    },
+    {
+      provide: SignupUser,
+      useFactory: (userRepo, hashService) => {
+        return new SignupUser(userRepo, hashService);
+      },
+      inject: ['IUserRepository', 'IHashService'],
+    },
+    {
+      provide: LoginUser,
+      useFactory: (userRepo, hashService, authService) => {
+        return new LoginUser(userRepo, hashService, authService);
+      },
+      inject: ['IUserRepository', 'IHashService', 'IAuthenticationService'],
+    },
+  ],
 })
 export class AuthModule {}
