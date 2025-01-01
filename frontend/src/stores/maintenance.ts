@@ -1,12 +1,27 @@
 import { defineStore } from 'pinia'
-import maintenanceService from '../services/maintenance.service'
-import type { MaintenanceSchedule } from '../services/maintenance.service'
 import { ref } from 'vue'
+import maintenanceService from '../services/maintenance.service'
+import type { BikeModel, MaintenanceSchedule } from '../services/maintenance.service'
 
 export const useMaintenanceStore = defineStore('maintenance', () => {
   const dueMaintenances = ref<MaintenanceSchedule[]>([])
+  const bikeModels = ref<BikeModel[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
+
+  async function fetchBikeModels() {
+    try {
+      loading.value = true
+      error.value = null
+      bikeModels.value = await maintenanceService.getBikeModels()
+      return bikeModels.value
+    } catch (err) {
+      error.value = 'Erreur lors de la récupération des modèles'
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
 
   async function createBikeModel(data: {
     id: string
@@ -18,8 +33,9 @@ export const useMaintenanceStore = defineStore('maintenance', () => {
       loading.value = true
       error.value = null
       await maintenanceService.createBikeModel(data)
+      await fetchBikeModels()
     } catch (err) {
-      error.value = 'Erreur lors de la création du modèle de moto'
+      error.value = 'Erreur lors de la création du modèle'
       throw err
     } finally {
       loading.value = false
@@ -39,7 +55,7 @@ export const useMaintenanceStore = defineStore('maintenance', () => {
       await maintenanceService.createMaintenanceSchedule(data)
       await fetchDueMaintenances()
     } catch (err) {
-      error.value = "Erreur lors de la création de la planification d'entretien"
+      error.value = 'Erreur lors de la création de la planification'
       throw err
     } finally {
       loading.value = false
@@ -52,7 +68,7 @@ export const useMaintenanceStore = defineStore('maintenance', () => {
       error.value = null
       dueMaintenances.value = await maintenanceService.getDueMaintenances()
     } catch (err) {
-      error.value = 'Erreur lors de la récupération des entretiens à effectuer'
+      error.value = 'Erreur lors de la récupération des entretiens'
       throw err
     } finally {
       loading.value = false
@@ -61,8 +77,10 @@ export const useMaintenanceStore = defineStore('maintenance', () => {
 
   return {
     dueMaintenances,
+    bikeModels,
     loading,
     error,
+    fetchBikeModels,
     createBikeModel,
     createMaintenanceSchedule,
     fetchDueMaintenances,

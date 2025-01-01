@@ -1,102 +1,130 @@
 <template>
-  <div class="container mx-auto py-8">
-    <!-- Formulaire pour ajouter un modèle de moto -->
-    <Card class="mb-8">
-      <CardHeader>
-        <CardTitle>Ajouter un modèle de moto</CardTitle>
-        <CardDescription
-          >Créez un nouveau modèle de moto avec ses intervalles d'entretien</CardDescription
-        >
-      </CardHeader>
-      <CardContent>
-        <form @submit.prevent="handleBikeModelSubmit" class="space-y-4">
-          <div class="grid gap-4 sm:grid-cols-2">
-            <div class="space-y-2">
-              <Label for="bike-id">Identifiant</Label>
-              <Input id="bike-id" v-model="bikeModel.id" type="text" required />
+  <div class="container mx-auto py-8 space-y-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <!-- Formulaire pour ajouter un modèle de moto -->
+      <Card>
+        <CardHeader>
+          <CardTitle>Ajouter un modèle de moto</CardTitle>
+          <CardDescription
+            >Créez un nouveau modèle de moto avec ses intervalles d'entretien</CardDescription
+          >
+        </CardHeader>
+        <CardContent>
+          <form @submit.prevent="handleBikeModelSubmit" class="space-y-4">
+            <div class="grid gap-4">
+              <div class="space-y-2">
+                <Label for="bike-name">Nom du modèle</Label>
+                <Input
+                  id="bike-name"
+                  v-model="bikeModel.name"
+                  type="text"
+                  placeholder="Ex: Street Triple RS"
+                  required
+                />
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-2">
+                  <Label for="bike-km">Intervalle kilométrique</Label>
+                  <div class="flex items-center space-x-2">
+                    <Input
+                      id="bike-km"
+                      v-model.number="bikeModel.maintenanceKilometers"
+                      type="number"
+                      min="0"
+                      step="1000"
+                      required
+                    />
+                    <span class="text-muted-foreground">km</span>
+                  </div>
+                </div>
+                <div class="space-y-2">
+                  <Label for="bike-months">Intervalle en mois</Label>
+                  <div class="flex items-center space-x-2">
+                    <Input
+                      id="bike-months"
+                      v-model.number="bikeModel.maintenanceMonths"
+                      type="number"
+                      min="0"
+                      required
+                    />
+                    <span class="text-muted-foreground">mois</span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="space-y-2">
-              <Label for="bike-name">Nom du modèle</Label>
-              <Input id="bike-name" v-model="bikeModel.name" type="text" required />
-            </div>
-            <div class="space-y-2">
-              <Label for="bike-km">Intervalle kilométrique</Label>
-              <Input
-                id="bike-km"
-                v-model.number="bikeModel.maintenanceKilometers"
-                type="number"
-                required
-              />
-            </div>
-            <div class="space-y-2">
-              <Label for="bike-months">Intervalle en mois</Label>
-              <Input
-                id="bike-months"
-                v-model.number="bikeModel.maintenanceMonths"
-                type="number"
-                required
-              />
-            </div>
-          </div>
-          <Button type="submit" class="w-full sm:w-auto"> Ajouter le modèle </Button>
-        </form>
-      </CardContent>
-    </Card>
+            <Button type="submit" class="w-full">Ajouter le modèle</Button>
+          </form>
+        </CardContent>
+      </Card>
 
-    <!-- Formulaire pour planifier un entretien -->
-    <Card class="mb-8">
-      <CardHeader>
-        <CardTitle>Planifier un entretien</CardTitle>
-        <CardDescription>Enregistrez un nouvel entretien pour un modèle de moto</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form @submit.prevent="handleMaintenanceScheduleSubmit" class="space-y-4">
-          <div class="grid gap-4 sm:grid-cols-2">
-            <div class="space-y-2">
-              <Label for="maintenance-id">Identifiant</Label>
-              <Input id="maintenance-id" v-model="maintenanceSchedule.id" type="text" required />
+      <!-- Formulaire pour planifier un entretien -->
+      <Card>
+        <CardHeader>
+          <CardTitle>Planifier un entretien</CardTitle>
+          <CardDescription>Enregistrez un nouvel entretien pour un modèle de moto</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form @submit.prevent="handleMaintenanceScheduleSubmit" class="space-y-4">
+            <div class="space-y-4">
+              <div class="space-y-2">
+                <Label for="maintenance-bike-model">Modèle de moto</Label>
+                <Select v-model="maintenanceSchedule.bikeModelId">
+                  <SelectTrigger class="w-full">
+                    <SelectValue placeholder="Sélectionnez un modèle" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Modèles disponibles</SelectLabel>
+                      <SelectItem v-for="model in bikeModels" :key="model.id" :value="model.id">
+                        {{ model.name }}
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div class="space-y-2">
+                <Label for="maintenance-date">Date du dernier entretien</Label>
+                <Input
+                  id="maintenance-date"
+                  v-model="maintenanceSchedule.lastMaintenanceDate"
+                  type="date"
+                  required
+                />
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-2">
+                  <Label for="maintenance-last-km">Kilométrage au dernier entretien</Label>
+                  <div class="flex items-center space-x-2">
+                    <Input
+                      id="maintenance-last-km"
+                      v-model.number="maintenanceSchedule.lastMaintenanceKilometers"
+                      type="number"
+                      min="0"
+                      required
+                    />
+                    <span class="text-muted-foreground">km</span>
+                  </div>
+                </div>
+                <div class="space-y-2">
+                  <Label for="maintenance-current-km">Kilométrage actuel</Label>
+                  <div class="flex items-center space-x-2">
+                    <Input
+                      id="maintenance-current-km"
+                      v-model.number="maintenanceSchedule.currentKilometers"
+                      type="number"
+                      min="0"
+                      required
+                    />
+                    <span class="text-muted-foreground">km</span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="space-y-2">
-              <Label for="maintenance-bike-model">Modèle de moto</Label>
-              <Input
-                id="maintenance-bike-model"
-                v-model="maintenanceSchedule.bikeModelId"
-                type="text"
-                required
-              />
-            </div>
-            <div class="space-y-2">
-              <Label for="maintenance-date">Date du dernier entretien</Label>
-              <Input
-                id="maintenance-date"
-                v-model="maintenanceSchedule.lastMaintenanceDate"
-                type="date"
-                required
-              />
-            </div>
-            <div class="space-y-2">
-              <Label for="maintenance-last-km">Kilométrage au dernier entretien</Label>
-              <Input
-                id="maintenance-last-km"
-                v-model.number="maintenanceSchedule.lastMaintenanceKilometers"
-                type="number"
-                required
-              />
-            </div>
-            <div class="space-y-2 sm:col-span-2">
-              <Label for="maintenance-current-km">Kilométrage actuel</Label>
-              <Input
-                id="maintenance-current-km"
-                v-model.number="maintenanceSchedule.currentKilometers"
-                type="number"
-                required
-              />
-            </div>
-          </div>
-          <Button type="submit" class="w-full sm:w-auto"> Planifier l'entretien </Button>
-        </form>
-      </CardContent>
-    </Card>
+            <Button type="submit" class="w-full">Planifier l'entretien</Button>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
 
     <!-- Liste des entretiens à effectuer -->
     <Card>
@@ -127,34 +155,32 @@
           <div
             v-for="maintenance in maintenanceStore.dueMaintenances"
             :key="maintenance.id"
-            class="p-4 rounded-lg border bg-card hover:bg-accent/5 transition-colors"
+            class="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/5 transition-colors"
           >
-            <div class="flex items-center justify-between">
-              <div>
-                <h3 class="text-lg font-semibold text-card-foreground">
-                  {{ maintenance.bikeModel.name }}
-                </h3>
-                <div class="mt-2 space-y-1">
-                  <p class="text-sm text-muted-foreground">
-                    Dernier entretien :
-                    {{ new Date(maintenance.lastMaintenanceDate).toLocaleDateString() }}
-                  </p>
-                  <p class="text-sm text-muted-foreground">
-                    Kilométrage actuel :
-                    <span class="text-primary font-medium"
-                      >{{ maintenance.currentKilometers }} km</span
-                    >
-                  </p>
-                  <p class="text-sm text-muted-foreground">
-                    Prochain entretien prévu :
-                    {{ new Date(maintenance.getNextMaintenanceDate).toLocaleDateString() }}
-                  </p>
-                </div>
+            <div>
+              <h4 class="font-medium text-card-foreground">
+                {{ maintenance.bikeModel.name }}
+              </h4>
+              <div class="mt-1 space-y-1">
+                <p class="text-sm text-muted-foreground">
+                  Dernier entretien :
+                  {{ new Date(maintenance.lastMaintenanceDate).toLocaleDateString() }}
+                </p>
+                <p class="text-sm text-muted-foreground">
+                  Kilométrage actuel :
+                  <span class="text-primary font-medium"
+                    >{{ maintenance.currentKilometers }} km</span
+                  >
+                </p>
+                <p class="text-sm text-muted-foreground">
+                  Prochain entretien prévu :
+                  {{ new Date(maintenance.getNextMaintenanceDate).toLocaleDateString() }}
+                </p>
               </div>
-              <Button variant="outline" size="icon">
-                <Settings2 class="h-4 w-4" />
-              </Button>
             </div>
+            <Button variant="outline" size="icon">
+              <Settings2 class="h-4 w-4" />
+            </Button>
           </div>
         </div>
       </CardContent>
@@ -169,9 +195,21 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Settings2 } from 'lucide-vue-next'
+import { v4 as uuidv4 } from 'uuid'
 
 const maintenanceStore = useMaintenanceStore()
+
+const bikeModels = ref([])
 
 const bikeModel = ref({
   id: '',
@@ -188,9 +226,19 @@ const maintenanceSchedule = ref({
   currentKilometers: 0,
 })
 
+async function fetchBikeModels() {
+  try {
+    bikeModels.value = await maintenanceStore.fetchBikeModels()
+  } catch (error) {
+    console.error('Erreur lors de la récupération des modèles:', error)
+  }
+}
+
 async function handleBikeModelSubmit() {
   try {
+    bikeModel.value.id = uuidv4()
     await maintenanceStore.createBikeModel(bikeModel.value)
+    await fetchBikeModels()
     bikeModel.value = {
       id: '',
       name: '',
@@ -204,6 +252,7 @@ async function handleBikeModelSubmit() {
 
 async function handleMaintenanceScheduleSubmit() {
   try {
+    maintenanceSchedule.value.id = uuidv4()
     await maintenanceStore.createMaintenanceSchedule(maintenanceSchedule.value)
     maintenanceSchedule.value = {
       id: '',
@@ -217,7 +266,8 @@ async function handleMaintenanceScheduleSubmit() {
   }
 }
 
-onMounted(() => {
-  maintenanceStore.fetchDueMaintenances()
+onMounted(async () => {
+  await fetchBikeModels()
+  await maintenanceStore.fetchDueMaintenances()
 })
 </script>

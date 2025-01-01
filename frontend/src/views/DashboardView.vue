@@ -27,6 +27,22 @@
           <Settings2 class="h-5 w-5 mr-2" />
           <span>Gestion des entretiens</span>
         </router-link>
+        <router-link
+          :to="{ name: 'notifications' }"
+          active-class="bg-primary text-primary-foreground"
+          class="flex items-center justify-between px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+        >
+          <div class="flex items-center">
+            <Bell class="h-5 w-5 mr-2" />
+            <span>Notifications</span>
+          </div>
+          <div
+            v-if="notificationStore.pendingNotifications.length > 0"
+            class="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-medium"
+          >
+            {{ notificationStore.pendingNotifications.length }}
+          </div>
+        </router-link>
       </nav>
     </aside>
 
@@ -38,7 +54,15 @@
       >
         <div class="container flex h-16 items-center justify-between">
           <h1 class="text-2xl font-bold text-foreground">
-            {{ route.name === 'dashboard' ? 'Tableau de bord' : 'Gestion des entretiens' }}
+            {{
+              route.name === 'dashboard'
+                ? 'Tableau de bord'
+                : route.name === 'maintenance'
+                  ? 'Gestion des entretiens'
+                  : route.name === 'notifications'
+                    ? 'Notifications'
+                    : ''
+            }}
           </h1>
           <div class="flex items-center gap-4">
             <span class="text-muted-foreground">{{ authStore.user?.name }}</span>
@@ -49,61 +73,107 @@
 
       <!-- Content -->
       <main class="container py-8">
-        <router-view v-slot="{ Component }">
-          <transition name="fade" mode="out-in">
-            <component :is="Component">
-              <template v-if="route.name === 'dashboard'">
-                <!-- Dashboard default content -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  <!-- Statistiques -->
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Entretiens à venir</CardTitle>
-                      <CardDescription>Nombre total d'entretiens à effectuer</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div class="text-3xl font-bold text-primary">
-                        {{ maintenanceStore.dueMaintenances.length }}
-                      </div>
-                    </CardContent>
-                  </Card>
+        <template v-if="route.name === 'dashboard'">
+          <!-- Dashboard default content -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Statistiques -->
+            <Card>
+              <CardHeader>
+                <CardTitle>Entretiens à venir</CardTitle>
+                <CardDescription>Nombre total d'entretiens à effectuer</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div class="text-3xl font-bold text-primary">
+                  {{ maintenanceStore.dueMaintenances.length }}
                 </div>
+              </CardContent>
+            </Card>
 
-                <!-- Liste des derniers entretiens -->
-                <Card class="mt-8">
-                  <CardHeader>
-                    <CardTitle>Derniers entretiens planifiés</CardTitle>
-                    <CardDescription>Les 3 prochains entretiens à effectuer</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div class="space-y-4">
-                      <div
-                        v-for="maintenance in maintenanceStore.dueMaintenances.slice(0, 3)"
-                        :key="maintenance.id"
-                        class="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/5 transition-colors"
-                      >
-                        <div>
-                          <h4 class="font-medium text-card-foreground">
-                            {{ maintenance.bikeModel.name }}
-                          </h4>
-                          <p class="text-sm text-muted-foreground">
-                            Dernier entretien :
-                            {{ new Date(maintenance.lastMaintenanceDate).toLocaleDateString() }}
-                          </p>
-                        </div>
-                        <div class="text-right">
-                          <p class="text-sm font-medium text-primary">
-                            {{ maintenance.currentKilometers }} km
-                          </p>
-                        </div>
-                      </div>
+            <!-- Notifications -->
+            <Card>
+              <CardHeader>
+                <CardTitle>Notifications</CardTitle>
+                <CardDescription>Notifications en attente</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div class="text-3xl font-bold text-primary">
+                  {{ notificationStore.pendingNotifications.length }}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <!-- Liste des derniers entretiens -->
+          <Card class="mt-8">
+            <CardHeader>
+              <CardTitle>Derniers entretiens planifiés</CardTitle>
+              <CardDescription>Les 3 prochains entretiens à effectuer</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div class="space-y-4">
+                <div
+                  v-for="maintenance in maintenanceStore.dueMaintenances.slice(0, 3)"
+                  :key="maintenance.id"
+                  class="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/5 transition-colors"
+                >
+                  <div>
+                    <h4 class="font-medium text-card-foreground">
+                      {{ maintenance.bikeModel.name }}
+                    </h4>
+                    <p class="text-sm text-muted-foreground">
+                      Dernier entretien :
+                      {{ new Date(maintenance.lastMaintenanceDate).toLocaleDateString() }}
+                    </p>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-sm font-medium text-primary">
+                      {{ maintenance.currentKilometers }} km
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <!-- Liste des notifications -->
+          <Card class="mt-8">
+            <CardHeader>
+              <CardTitle>Notifications récentes</CardTitle>
+              <CardDescription>Les dernières notifications de maintenance</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div class="space-y-4">
+                <div
+                  v-for="notification in notificationStore.pendingNotifications.slice(0, 3)"
+                  :key="notification.id"
+                  class="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/5 transition-colors"
+                >
+                  <div class="flex items-start space-x-4">
+                    <div class="p-2 rounded-full bg-primary/10">
+                      <Bell class="h-4 w-4 text-primary" />
                     </div>
-                  </CardContent>
-                </Card>
-              </template>
-            </component>
-          </transition>
-        </router-view>
+                    <div>
+                      <p class="font-medium text-card-foreground">
+                        {{ notification.message }}
+                      </p>
+                      <p class="text-sm text-muted-foreground">
+                        {{ new Date(notification.createdAt).toLocaleDateString() }}
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    @click="notificationStore.acknowledgeNotification(notification.id)"
+                  >
+                    Acquitter
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </template>
+        <router-view v-else></router-view>
       </main>
     </div>
   </div>
@@ -113,15 +183,17 @@
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useMaintenanceStore } from '../stores/maintenance'
+import { useNotificationStore } from '../stores/notifications'
 import { onMounted } from 'vue'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Bike, LayoutDashboard, Settings2 } from 'lucide-vue-next'
+import { Bike, LayoutDashboard, Settings2, Bell } from 'lucide-vue-next'
 
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
 const maintenanceStore = useMaintenanceStore()
+const notificationStore = useNotificationStore()
 
 const handleLogout = () => {
   authStore.logout()
@@ -130,6 +202,7 @@ const handleLogout = () => {
 
 onMounted(() => {
   maintenanceStore.fetchDueMaintenances()
+  notificationStore.fetchPendingNotifications()
 })
 </script>
 
