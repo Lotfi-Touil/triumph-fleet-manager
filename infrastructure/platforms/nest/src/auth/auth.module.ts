@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
 import { AuthController } from './auth.controller';
 import { SignupUser } from '@application/usecases/SignupUser';
 import { LoginUser } from '@application/usecases/LoginUser';
@@ -9,16 +10,19 @@ import { JwtAuthenticationService } from '@infrastructure/adapters/services/JwtA
 import { PostgresUserRepository } from '@infrastructure/adapters/repositories/PostgresUserRepository';
 import { UserEntity } from '@infrastructure/adapters/repositories/typeorm/entities/UserEntity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtStrategy } from './jwt.strategy';
 
 @Module({
   imports: [
+    ConfigModule,
+    PassportModule,
     TypeOrmModule.forFeature([UserEntity]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
         signOptions: {
-          expiresIn: configService.get<string>('JWT_EXPIRATION', '1h'),
+          expiresIn: configService.get<string>('JWT_EXPIRATION', '24h'),
         },
       }),
       inject: [ConfigService],
@@ -26,6 +30,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
   ],
   controllers: [AuthController],
   providers: [
+    JwtStrategy,
     {
       provide: 'IUserRepository',
       useClass: PostgresUserRepository,
@@ -53,5 +58,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       inject: ['IUserRepository', 'IHashService', 'IAuthenticationService'],
     },
   ],
+  exports: ['IAuthenticationService', JwtStrategy, PassportModule],
 })
 export class AuthModule {}

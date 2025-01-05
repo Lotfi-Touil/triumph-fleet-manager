@@ -30,33 +30,50 @@ export const useAuthStore = defineStore('auth', () => {
   async function login(payload: LoginDTO, router: Router) {
     try {
       const response = await authService.login(payload)
-      token.value = response.token
+      setToken(response.token)
       user.value = response.user
-      localStorage.setItem('token', response.token)
       router.push('/dashboard')
-    } catch (error) {
+      return { success: true }
+    } catch (error: any) {
       console.error('Login error:', error)
-      throw error
+      return {
+        success: false,
+        error: error.response?.data?.message || 'An error occurred during login',
+      }
     }
   }
 
   async function signup(payload: SignupDTO, router: Router) {
     try {
       const response = await authService.signup(payload)
-      token.value = response.token
+      setToken(response.token)
       user.value = response.user
-      localStorage.setItem('token', response.token)
       router.push('/dashboard')
-    } catch (error) {
+      return { success: true }
+    } catch (error: any) {
       console.error('Signup error:', error)
-      throw error
+      return {
+        success: false,
+        error: error.response?.data?.message || 'An error occurred during signup',
+      }
     }
   }
 
-  function logout() {
+  function logout(router?: Router) {
     user.value = null
-    token.value = null
-    localStorage.removeItem('token')
+    setToken(null)
+    if (router) {
+      router.push('/login')
+    }
+  }
+
+  function setToken(newToken: string | null) {
+    token.value = newToken
+    if (newToken) {
+      localStorage.setItem('token', newToken)
+    } else {
+      localStorage.removeItem('token')
+    }
   }
 
   return {

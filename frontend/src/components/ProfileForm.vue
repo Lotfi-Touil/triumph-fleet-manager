@@ -1,6 +1,9 @@
 <template>
   <div class="space-y-6">
-    <div class="grid grid-cols-1 gap-6">
+    <div v-if="isLoading" class="flex justify-center items-center py-8">
+      <Loader2 class="h-8 w-8 animate-spin text-primary" />
+    </div>
+    <div v-else class="grid grid-cols-1 gap-6">
       <!-- Informations de base -->
       <Card>
         <CardHeader>
@@ -81,6 +84,7 @@ import { Loader2 } from 'lucide-vue-next'
 
 const authStore = useAuthStore()
 const loading = ref(false)
+const isLoading = ref(true)
 
 const form = ref<UpdateProfileDTO>({
   name: '',
@@ -90,19 +94,21 @@ const form = ref<UpdateProfileDTO>({
 })
 
 const loadProfile = async () => {
+  isLoading.value = true
   try {
-    // Utiliser d'abord les informations du store d'authentification
-    if (authStore.user) {
-      form.value.name = authStore.user.name
-      form.value.email = authStore.user.email
-    }
-
-    // Puis charger les informations complètes depuis l'API
     const profile = await profileService.getProfile()
     form.value.name = profile.name
     form.value.email = profile.email
+
+    // Mettre à jour le store d'authentification avec les données du profil
+    if (authStore.user) {
+      authStore.user.name = profile.name
+      authStore.user.email = profile.email
+    }
   } catch (error) {
     showError('Erreur lors du chargement du profil')
+  } finally {
+    isLoading.value = false
   }
 }
 

@@ -21,6 +21,13 @@
               >
                 Entretiens
               </router-link>
+              <router-link
+                v-if="authStore.isAuthenticated"
+                to="/dashboard"
+                class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+              >
+                Dashboard
+              </router-link>
             </div>
           </div>
         </div>

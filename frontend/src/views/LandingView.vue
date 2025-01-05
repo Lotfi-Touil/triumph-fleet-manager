@@ -25,6 +25,9 @@ const isVisible = ref(false)
 
 onMounted(() => {
   isVisible.value = true
+  if (authStore.isAuthenticated) {
+    router.push('/dashboard')
+  }
 })
 
 const features = [
@@ -137,7 +140,7 @@ const toggleFaq = (index: number) => {
 }
 
 const handleLogout = () => {
-  authStore.logout(router)
+  authStore.logout()
 }
 </script>
 
@@ -156,27 +159,27 @@ const handleLogout = () => {
           <template v-if="!authStore.token">
             <Button
               variant="ghost"
-              @click="router.push('/about')"
-              class="text-foreground hover:bg-accent hover:text-accent-foreground"
-            >
-              À propos
-            </Button>
-            <Button
-              variant="ghost"
               @click="router.push('/login')"
-              class="text-foreground hover:bg-accent hover:text-accent-foreground"
+              class="bg-primary text-primary-foreground hover:bg-primary/90"
             >
               Se connecter
             </Button>
             <Button
+              variant="outline"
               @click="router.push('/signup')"
-              class="bg-primary text-primary-foreground hover:bg-primary/90"
+              class="text-foreground hover:bg-accent hover:text-accent-foreground"
             >
               Essai gratuit
             </Button>
           </template>
           <template v-else>
-            <span class="text-muted-foreground">Bienvenue, {{ authStore.user?.name }}</span>
+            <Button
+              variant="default"
+              @click="router.push('/dashboard')"
+              class="bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              Dashboard
+            </Button>
             <Button
               variant="outline"
               @click="handleLogout"

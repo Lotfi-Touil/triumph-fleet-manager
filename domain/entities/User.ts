@@ -63,15 +63,15 @@ export class User {
     this.props.updatedAt = new Date();
   }
 
+  updateProfile(name: string, email: string): void {
+    this.props.name = name;
+    this.props.email = email;
+    this.props.updatedAt = new Date();
+  }
+
   toJSON(): UserProps {
     return {
-      id: this.id,
-      email: this.email,
-      password: this.password,
-      name: this.name,
-      role: this.role,
-      createdAt: this.createdAt,
-      updatedAt: this.updatedAt,
+      ...this.props,
     };
   }
 }

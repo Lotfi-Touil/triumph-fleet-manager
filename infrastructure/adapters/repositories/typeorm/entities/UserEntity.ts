@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from "typeorm";
 import { User, UserRole } from "../../../../../domain/entities/User";
 
 @Entity("users")
@@ -22,6 +28,12 @@ export class UserEntity {
   })
   role: UserRole;
 
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
   toDomain(): User {
     return new User({
       id: this.id,
@@ -29,6 +41,8 @@ export class UserEntity {
       password: this.password,
       name: this.name,
       role: this.role,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
     });
   }
 
@@ -40,6 +54,8 @@ export class UserEntity {
     entity.password = userData.password;
     entity.name = userData.name;
     entity.role = userData.role;
+    entity.createdAt = userData.createdAt;
+    entity.updatedAt = userData.updatedAt;
     return entity;
   }
 }

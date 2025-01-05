@@ -1,5 +1,12 @@
+import {
+  Injectable,
+  Inject,
+  UnauthorizedException,
+  NotFoundException,
+} from "@nestjs/common";
 import { User } from "../../domain/entities/User";
 import { UserRepository } from "../../domain/repositories/UserRepository";
+import * as bcrypt from "bcrypt";
 
 export interface UpdateUserProfileDTO {
   userId: string;
@@ -9,32 +16,46 @@ export interface UpdateUserProfileDTO {
   newPassword?: string;
 }
 
+@Injectable()
 export class UpdateUserProfile {
-  constructor(private userRepository: UserRepository) {}
+  constructor(
+    @Inject("UserRepository")
+    private userRepository: UserRepository
+  ) {}
 
   async execute(dto: UpdateUserProfileDTO): Promise<User> {
     const user = await this.userRepository.findById(dto.userId);
     if (!user) {
-      throw new Error("User not found");
+      throw new NotFoundException("User not found");
+    }
+
+    if (dto.email && dto.email !== user.email) {
+      const existingUser = await this.userRepository.findByEmail(dto.email);
+      if (existingUser) {
+        throw new UnauthorizedException("Email already in use");
+      }
     }
 
     if (dto.currentPassword && dto.newPassword) {
-      if (user.password !== dto.currentPassword) {
-        throw new Error("Current password is incorrect");
+      const isPasswordValid = await bcrypt.compare(
+        dto.currentPassword,
+        user.password
+      );
+      if (!isPasswordValid) {
+        throw new UnauthorizedException("Current password is incorrect");
       }
-      user.updatePassword(dto.newPassword);
+      const hashedPassword = await bcrypt.hash(dto.newPassword, 10);
+      user.updatePassword(hashedPassword);
     }
 
-    if (dto.name) {
-      user.props.name = dto.name;
+    if (dto.name || dto.email) {
+      user.updateProfile(dto.name || user.name, dto.email || user.email);
     }
 
-    if (dto.email) {
-      user.props.email = dto.email;
+    try {
+      return await this.userRepository.save(user);
+    } catch (error) {
+      throw new Error(`Failed to update user profile: ${error.message}`);
     }
-
-    user.props.updatedAt = new Date();
-
-    return this.userRepository.save(user);
   }
 }
