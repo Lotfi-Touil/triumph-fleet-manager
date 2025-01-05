@@ -43,6 +43,14 @@
             {{ notificationStore.pendingNotifications.length }}
           </div>
         </router-link>
+        <router-link
+          :to="{ name: 'profile' }"
+          active-class="bg-primary text-primary-foreground"
+          class="flex items-center px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+        >
+          <User class="h-5 w-5 mr-2" />
+          <span>Profil</span>
+        </router-link>
       </nav>
     </aside>
 
@@ -61,7 +69,9 @@
                   ? 'Gestion des entretiens'
                   : route.name === 'notifications'
                     ? 'Notifications'
-                    : ''
+                    : route.name === 'profile'
+                      ? 'Mon Profil'
+                      : ''
             }}
           </h1>
           <div class="flex items-center gap-4">
@@ -187,7 +197,7 @@ import { useNotificationStore } from '../stores/notifications'
 import { onMounted } from 'vue'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Bike, LayoutDashboard, Settings2, Bell } from 'lucide-vue-next'
+import { Bike, LayoutDashboard, Settings2, Bell, User } from 'lucide-vue-next'
 
 const router = useRouter()
 const route = useRoute()
