@@ -2,7 +2,12 @@
   <div class="min-h-screen bg-background">
     <!-- Sidebar -->
     <aside
-      class="fixed inset-y-0 left-0 w-64 border-r bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+      :class="[
+        'fixed inset-y-0 left-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60',
+        isSidebarOpen ? 'translate-x-0' : '-translate-x-full',
+        'lg:translate-x-0 lg:w-64 transition-transform duration-300 ease-in-out z-50'
+      ]"
+      class="border-r"
     >
       <div class="flex items-center h-16 px-6 border-b">
         <div class="flex items-center space-x-2">
@@ -54,11 +59,34 @@
       </nav>
     </aside>
 
+    <!-- Mobile sidebar overlay -->
+    <div
+      v-if="isSidebarOpen"
+      class="fixed inset-0 bg-black/50 lg:hidden z-40"
+      @click="isSidebarOpen = false"
+    ></div>
+
+    <!-- Mobile header -->
+    <div class="lg:hidden fixed top-0 left-0 right-0 h-16 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-40">
+      <div class="flex items-center justify-between h-full px-4">
+        <button
+          @click="isSidebarOpen = true"
+          class="p-2 rounded-md text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+        >
+          <Menu class="h-6 w-6" />
+        </button>
+        <div class="flex items-center space-x-2">
+          <Bike class="h-6 w-6 text-primary" />
+          <span class="font-bold text-foreground">Triumph Fleet</span>
+        </div>
+      </div>
+    </div>
+
     <!-- Main content -->
-    <div class="ml-64">
+    <div :class="['lg:ml-64 transition-all duration-300 ease-in-out', isSidebarOpen ? 'ml-0' : 'ml-0']">
       <!-- Header -->
       <header
-        class="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+        class="sticky top-0 z-30 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 mt-16 lg:mt-0"
       >
         <div class="container flex h-16 items-center justify-between">
           <h1 class="text-2xl font-bold text-foreground">
@@ -82,10 +110,10 @@
       </header>
 
       <!-- Content -->
-      <main class="container py-8">
+      <main class="container py-8 px-4 sm:px-6 lg:px-8">
         <template v-if="route.name === 'dashboard'">
           <!-- Dashboard default content -->
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <!-- Statistiques -->
             <Card>
               <CardHeader>
@@ -190,30 +218,26 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useMaintenanceStore } from '../stores/maintenance'
 import { useNotificationStore } from '../stores/notifications'
-import { onMounted } from 'vue'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Bike, LayoutDashboard, Settings2, Bell, User } from 'lucide-vue-next'
+
+import { Button } from '../components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
+import { Bike, LayoutDashboard, Settings2, Bell, User, Menu } from 'lucide-vue-next'
 
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
 const maintenanceStore = useMaintenanceStore()
 const notificationStore = useNotificationStore()
+const isSidebarOpen = ref(false)
 
 const handleLogout = () => {
   authStore.logout()
-  router.push('/login')
 }
-
-onMounted(() => {
-  maintenanceStore.fetchDueMaintenances()
-  notificationStore.fetchPendingNotifications()
-})
 </script>
 
 <style scoped>

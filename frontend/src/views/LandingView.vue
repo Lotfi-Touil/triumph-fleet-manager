@@ -1,23 +1,32 @@
 <script setup lang="ts">
-import { Button } from '@/components/ui/button'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { Button } from '../components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
+import { useAuthStore } from '../stores/auth'
+import AnimatedCounter from '../components/AnimatedCounter.vue'
 import {
-  ArrowRight,
-  Shield,
-  Gauge,
-  Settings2,
-  Users,
   Bike,
+  LayoutDashboard,
+  Settings2,
+  Bell,
+  User,
+  Shield,
+  LineChart,
+  Calendar,
+  Clock,
+  AlertTriangle,
+  CheckCircle2,
+  Wrench,
+  ArrowRight,
+  Gauge,
+  Users,
   ChevronRight,
   Star,
-  Clock,
   Zap,
-  BarChart,
+  BarChart
 } from 'lucide-vue-next'
-import dashboardPreview from '@/assets/dashboard-preview.svg'
-import { ref, onMounted } from 'vue'
-import AnimatedCounter from '@/components/AnimatedCounter.vue'
-import { useAuthStore } from '@/stores/auth'
+import dashboardPreview from '../assets/dashboard-preview.svg'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -253,8 +262,8 @@ const handleLogout = () => {
 
     <!-- Stats Section -->
     <div class="border-y bg-gradient-to-r from-accent via-background to-accent">
-      <div class="container py-12">
-        <div class="grid grid-cols-1 gap-8 sm:grid-cols-3">
+      <div class="container py-12 px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
           <div
             v-for="(stat, index) in benefits"
             :key="stat.title"
@@ -267,13 +276,13 @@ const handleLogout = () => {
                 <component :is="stat.icon" class="h-6 w-6 text-primary" />
               </div>
               <div>
-                <h3 class="text-2xl font-bold text-foreground">
+                <h3 class="text-xl sm:text-2xl font-bold text-foreground">
                   <AnimatedCounter
                     :end-value="parseInt(stat.title)"
                     :suffix="stat.title.includes('+') ? '+' : ''"
                   />
                 </h3>
-                <p class="text-muted-foreground">{{ stat.description }}</p>
+                <p class="text-sm sm:text-base text-muted-foreground">{{ stat.description }}</p>
               </div>
             </div>
           </div>
@@ -282,50 +291,46 @@ const handleLogout = () => {
     </div>
 
     <!-- Features Section -->
-    <div class="py-20 sm:py-32 bg-gradient-to-b from-background via-accent/5 to-background">
-      <div class="container px-4 sm:px-6 lg:px-8">
-        <div class="max-w-3xl mx-auto text-center mb-12 sm:mb-20">
-          <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-4">
-            Une suite complète d'outils pour votre flotte
-          </h2>
-          <p class="text-base sm:text-lg text-muted-foreground">
-            Découvrez comment notre plateforme révolutionne la gestion de flotte Triumph avec des
-            fonctionnalités innovantes
-          </p>
-        </div>
+    <div class="container py-16 px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-4">
+          Fonctionnalités principales
+        </h2>
+        <p class="text-muted-foreground max-w-2xl mx-auto text-sm sm:text-base">
+          Découvrez comment notre solution peut vous aider à gérer votre flotte de motos Triumph de manière
+          efficace et professionnelle.
+        </p>
+      </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-12">
-          <div
-            v-for="feature in features"
-            :key="feature.id"
-            class="group relative overflow-hidden rounded-xl border bg-card hover:shadow-xl transition-all duration-300"
-          >
-            <div
-              class="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
-            />
-
-            <div class="relative p-6 sm:p-8">
-              <div class="flex items-center gap-4 mb-6">
-                <div
-                  class="rounded-lg bg-primary/10 p-3 sm:p-4 group-hover:bg-primary/20 transition-colors"
-                >
-                  <component :is="feature.icon" class="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
-                </div>
-                <span class="text-sm font-medium text-muted-foreground">{{ feature.id }}</span>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div
+          v-for="(feature, index) in features"
+          :key="feature.id"
+          v-intersection-observer="'animate-fade-up'"
+          class="group relative bg-card rounded-lg border transition-all duration-300 hover:shadow-lg"
+          :style="{ animationDelay: `${index * 200}ms` }"
+        >
+          <div class="relative p-4 sm:p-6">
+            <div class="flex items-center gap-4 mb-4 sm:mb-6">
+              <div
+                class="rounded-lg bg-primary/10 p-2 sm:p-3 group-hover:bg-primary/20 transition-colors"
+              >
+                <component :is="feature.icon" class="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
               </div>
-
-              <h3 class="text-xl sm:text-2xl font-semibold text-card-foreground mb-3">
-                {{ feature.title }}
-              </h3>
-              <p class="text-base text-muted-foreground leading-relaxed">
-                {{ feature.description }}
-              </p>
+              <span class="text-xs sm:text-sm font-medium text-muted-foreground">{{ feature.id }}</span>
             </div>
 
-            <div
-              class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary/40 to-primary opacity-0 group-hover:opacity-100 transition-opacity"
-            />
+            <h3 class="text-lg sm:text-xl font-semibold text-card-foreground mb-2 sm:mb-3">
+              {{ feature.title }}
+            </h3>
+            <p class="text-sm sm:text-base text-muted-foreground leading-relaxed">
+              {{ feature.description }}
+            </p>
           </div>
+
+          <div
+            class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary/40 to-primary opacity-0 group-hover:opacity-100 transition-opacity"
+          />
         </div>
       </div>
     </div>
@@ -477,8 +482,8 @@ const handleLogout = () => {
 
     <!-- Footer -->
     <footer class="border-t bg-background">
-      <div class="container py-12 md:py-16">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div class="container py-8 sm:py-12 md:py-16 px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
           <!-- Logo and Description -->
           <div class="space-y-4">
             <div class="flex items-center space-x-2">
