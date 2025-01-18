@@ -4,10 +4,13 @@
     "@nestjs/config": "^3.3.0",
     "@nestjs/core": "^10.4.15",
     "@nestjs/typeorm": "^10.0.2",
+    "@vee-validate/zod": "^4.15.0",
     "bcrypt": "^5.1.1",
     "class-validator": "^0.14.1",
     "jsonwebtoken": "^9.0.2",
     "typeorm": "^0.3.20",
-    "uuid": "^11.0.5"
+    "uuid": "^11.0.5",
+    "vee-validate": "^4.15.0",
+    "zod": "^3.24.1"
   }
 }

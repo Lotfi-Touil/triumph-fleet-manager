@@ -26,7 +26,10 @@ instance.interceptors.response.use(
     if (error.response?.status === 401) {
       // Handle token expiration
       localStorage.removeItem('token')
-      window.location.href = '/login'
+      // Ne pas rediriger si on est déjà sur la page de login
+      if (!window.location.pathname.includes('/login')) {
+        window.location.href = '/login'
+      }
     }
     return Promise.reject(error)
   },

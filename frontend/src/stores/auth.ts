@@ -1,84 +1,75 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { Router } from 'vue-router'
-import authService from '../services/auth.service'
+import authService, { type User } from '../services/auth.service'
+import { AxiosError } from 'axios'
 
-interface User {
-  id: string
-  email: string
-  name: string
-  role: string
+interface AuthState {
+  user: User | null
+  error: string | null
 }
 
-interface LoginDTO {
-  email: string
-  password: string
+interface AuthResult {
+  success: boolean
+  message?: string
 }
 
-interface SignupDTO {
-  email: string
-  password: string
-  name: string
+interface ApiError {
+  statusCode: number
+  message: string
+  error: string
 }
 
 export const useAuthStore = defineStore('auth', () => {
-  const user = ref<User | null>(null)
+  const state = ref<AuthState>({
+    user: null,
+    error: null
+  })
   const token = ref<string | null>(localStorage.getItem('token'))
 
   const isAuthenticated = computed(() => !!token.value)
 
-  async function login(payload: LoginDTO, router: Router) {
+  async function login({ email, password }: { email: string; password: string }): Promise<AuthResult> {
     try {
-      const response = await authService.login(payload)
-      setToken(response.token)
-      user.value = response.user
-      router.push('/dashboard')
+      const response = await authService.login({ email, password })
+      authService.setToken(response.token)
+      state.value.user = response.user
       return { success: true }
-    } catch (error: any) {
-      console.error('Login error:', error)
-      return {
-        success: false,
-        error: error.response?.data?.message || 'An error occurred during login',
+    } catch (error) {
+      if (error instanceof AxiosError && error.response?.data) {
+        const apiError = error.response.data as ApiError
+        state.value.error = apiError.message
+        return { success: false, message: apiError.message }
       }
+      return { success: false, message: 'Une erreur est survenue' }
     }
   }
 
-  async function signup(payload: SignupDTO, router: Router) {
+  async function signup({ email, password, name }: { email: string; password: string; name: string }): Promise<AuthResult> {
     try {
-      const response = await authService.signup(payload)
-      setToken(response.token)
-      user.value = response.user
-      router.push('/dashboard')
+      const response = await authService.signup({ email, password, name })
+      authService.setToken(response.token)
+      state.value.user = response.user
       return { success: true }
-    } catch (error: any) {
-      console.error('Signup error:', error)
-      return {
-        success: false,
-        error: error.response?.data?.message || 'An error occurred during signup',
+    } catch (error) {
+      if (error instanceof AxiosError && error.response?.data) {
+        const apiError = error.response.data as ApiError
+        state.value.error = apiError.message
+        return { success: false, message: apiError.message }
       }
+      return { success: false, message: 'Une erreur est survenue' }
     }
   }
 
-  function logout(router?: Router) {
-    user.value = null
-    setToken(null)
-    if (router) {
-      router.push('/login')
-    }
-  }
-
-  function setToken(newToken: string | null) {
-    token.value = newToken
-    if (newToken) {
-      localStorage.setItem('token', newToken)
-    } else {
-      localStorage.removeItem('token')
-    }
+  function logout() {
+    state.value.user = null
+    state.value.error = null
+    authService.removeToken()
+    token.value = null
   }
 
   return {
-    user,
-    token,
+    user: computed(() => state.value.user),
+    error: computed(() => state.value.error),
     isAuthenticated,
     login,
     signup,

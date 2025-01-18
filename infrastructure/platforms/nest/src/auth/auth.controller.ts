@@ -4,6 +4,7 @@ import {
   Post,
   UsePipes,
   ValidationPipe,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { SignupUser } from '@application/usecases/SignupUser';
 import { LoginUser } from '@application/usecases/LoginUser';
@@ -27,6 +28,14 @@ export class AuthController {
   @Post('login')
   @UsePipes(new ValidationPipe({ transform: true }))
   async login(@Body() data: LoginDTO) {
-    return this.loginUseCase.execute(data);
+    try {
+      const result = await this.loginUseCase.execute(data);
+      return result;
+    } catch (error) {
+      if (error instanceof UnauthorizedException) {
+        throw error;
+      }
+      throw new UnauthorizedException('Identifiants incorrects');
+    }
   }
 }

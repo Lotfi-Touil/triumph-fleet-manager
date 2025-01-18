@@ -1,4 +1,5 @@
 import axios from './axios'
+import { AxiosError } from 'axios'
 
 export interface SignupDTO {
   email: string
@@ -11,13 +12,15 @@ export interface LoginDTO {
   password: string
 }
 
+export interface User {
+  id: string
+  email: string
+  name: string
+  role: string
+}
+
 export interface AuthResponse {
-  user: {
-    id: string
-    email: string
-    name: string
-    role: string
-  }
+  user: User
   token: string
 }
 
@@ -30,8 +33,21 @@ class AuthService {
   }
 
   async login(data: LoginDTO): Promise<AuthResponse> {
-    const response = await axios.post<AuthResponse>(`${this.BASE_URL}/login`, data)
-    return response.data
+    console.log('Tentative de login avec:', { email: data.email });
+    try {
+      const response = await axios.post<AuthResponse>(`${this.BASE_URL}/login`, data);
+      console.log('Réponse reçue:', response.data);
+      return response.data;
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        console.error('Erreur login:', {
+          status: error.response?.status,
+          data: error.response?.data,
+          message: error.message
+        });
+      }
+      throw error;
+    }
   }
 
   setToken(token: string): void {

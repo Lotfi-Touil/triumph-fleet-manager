@@ -2,6 +2,7 @@ import { User } from "../../domain/entities/User";
 import { IUserRepository } from "../ports/repositories/IUserRepository";
 import { IHashService } from "../ports/services/IHashService";
 import { IAuthenticationService } from "../ports/services/IAuthenticationService";
+import { UnauthorizedException } from "@nestjs/common";
 
 export interface LoginUserDTO {
   email: string;
@@ -23,7 +24,7 @@ export class LoginUser {
   async execute(data: LoginUserDTO): Promise<LoginResponse> {
     const user = await this.userRepository.findByEmail(data.email);
     if (!user) {
-      throw new Error("Invalid credentials");
+      throw new UnauthorizedException('Identifiants incorrects');
     }
 
     const isPasswordValid = await this.hashService.compare(
@@ -32,7 +33,7 @@ export class LoginUser {
     );
 
     if (!isPasswordValid) {
-      throw new Error("Invalid credentials");
+      throw new UnauthorizedException('Identifiants incorrects');
     }
 
     const token = this.authService.generateToken({

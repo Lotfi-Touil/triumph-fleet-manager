@@ -138,12 +138,22 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import { useToast } from '../components/ui/toast/use-toast'
 
 const authStore = useAuthStore()
+const router = useRouter()
+const { toast } = useToast()
 const isOpen = ref(false)
 
 const handleLogout = () => {
   authStore.logout()
+  router.push('/login')
+  toast({
+    title: 'Déconnexion réussie',
+    description: 'À bientôt !',
+    variant: 'default',
+  })
 }
 </script>

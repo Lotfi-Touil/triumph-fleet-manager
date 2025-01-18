@@ -237,6 +237,7 @@ const isSidebarOpen = ref(false)
 
 const handleLogout = () => {
   authStore.logout()
+  router.push('/')
 }
 </script>
 
