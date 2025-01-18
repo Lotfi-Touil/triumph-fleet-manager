@@ -174,7 +174,7 @@
                 </p>
                 <p class="text-sm text-muted-foreground">
                   Prochain entretien prévu :
-                  {{ new Date(maintenance.getNextMaintenanceDate).toLocaleDateString() }}
+                  {{ calculateNextMaintenanceDate(maintenance).toLocaleDateString() }}
                 </p>
               </div>
             </div>
@@ -191,10 +191,11 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useMaintenanceStore } from '../stores/maintenance'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import type { BikeModel, MaintenanceSchedule } from '../services/maintenance.service'
+import { Button } from '../components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
+import { Input } from '../components/ui/input'
+import { Label } from '../components/ui/label'
 import {
   Select,
   SelectContent,
@@ -203,15 +204,14 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
+} from '../components/ui/select'
 import { Settings2 } from 'lucide-vue-next'
 import { v4 as uuidv4 } from 'uuid'
 
 const maintenanceStore = useMaintenanceStore()
+const bikeModels = ref<BikeModel[]>([])
 
-const bikeModels = ref([])
-
-const bikeModel = ref({
+const bikeModel = ref<BikeModel>({
   id: '',
   name: '',
   maintenanceKilometers: 0,
@@ -264,6 +264,12 @@ async function handleMaintenanceScheduleSubmit() {
   } catch (error) {
     console.error('Erreur lors de la création de la planification:', error)
   }
+}
+
+function calculateNextMaintenanceDate(maintenance: MaintenanceSchedule): Date {
+  const lastDate = new Date(maintenance.lastMaintenanceDate)
+  const monthsToAdd = maintenance.bikeModel.maintenanceMonths
+  return new Date(lastDate.setMonth(lastDate.getMonth() + monthsToAdd))
 }
 
 onMounted(async () => {

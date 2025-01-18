@@ -4,7 +4,7 @@ import './assets/base.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { vIntersectionObserver } from './directives/intersectionObserver'
-import Toast, { type PluginOptions } from 'vue-toastification'
+import Toast, { type PluginOptions, POSITION } from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
 
 import App from './App.vue'
@@ -17,7 +17,7 @@ app.use(createPinia())
 app.use(router)
 
 const toastOptions: PluginOptions = {
-  position: 'top-right',
+  position: POSITION.TOP_RIGHT,
   timeout: 5000,
   closeOnClick: true,
   pauseOnFocusLoss: true,

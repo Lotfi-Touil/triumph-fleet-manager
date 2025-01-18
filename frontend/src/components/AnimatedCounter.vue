@@ -2,7 +2,7 @@
   import CountUp from 'vue-countup-v3'
   import type { CountUpOptions } from 'vue-countup-v3'
 
-  const props = defineProps<{
+  defineProps<{
     endValue: number
     suffix?: string
     options?: CountUpOptions
