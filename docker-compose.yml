@@ -24,13 +24,17 @@ services:
 
   express:
     build:
-      context: ./infrastructure/platforms/express
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: infrastructure/platforms/express/Dockerfile
     ports:
       - "3001:3001"
     environment:
-      - MONGO_URL=mongodb://mongo:27017/triumphrental
+      - MONGODB_URI=mongodb://admin:password123@mongo:27017/triumphrental?authSource=admin
       - NODE_ENV=development
+      - MONGO_INITDB_DATABASE=triumphrental
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
     depends_on:
       mongo:
         condition: service_healthy
@@ -75,16 +79,24 @@ services:
       retries: 5
 
   mongo:
-    image: mongo:4.4
+    image: mongo:5.0
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=triumphrental
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password123
     volumes:
       - mongo_data:/data/db
     networks:
       - app-network
     healthcheck:
-      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')", "--quiet"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
+    command: mongod --bind_ip_all
 
 networks:
   app-network:

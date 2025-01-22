@@ -1,12 +1,36 @@
 import express, { Request, Response, NextFunction } from "express";
+import { MongoClient } from 'mongodb';
+import { MongoSparePartRepository } from '../../../adapters/repositories/MongoSparePartRepository'
+import { createSparePartRouter } from './routes/sparePart.routes';
 
 const app = express();
 const port = process.env.PORT || 3001;
+const mongoUrl = process.env.MONGODB_URI || 'mongodb://mongo:27017/fleet-manager';
 
+app.use(express.json());
+
+// Health check endpoint
 app.get("/health", (req: Request, res: Response) => {
   res.json({ status: "ok" });
 });
 
+// Connect to MongoDB and initialize repositories
+let mongoClient: MongoClient;
+
+async function initializeMongo() {
+  try {
+    mongoClient = await MongoClient.connect(mongoUrl);
+    console.log('Connected to MongoDB');
+
+    const sparePartRepository = new MongoSparePartRepository(mongoClient);
+    app.use('/api/spare-parts', createSparePartRouter(sparePartRepository));
+  } catch (error) {
+    console.error('Failed to connect to MongoDB:', error);
+    process.exit(1);
+  }
+}
+
+// Error handling middleware
 app.use(
   (
     err: Error,
@@ -19,10 +43,25 @@ app.use(
   }
 );
 
-app
-  .listen(port, () => {
+// Initialize MongoDB connection and start server
+initializeMongo().then(() => {
+  app.listen(port, () => {
     console.log(`Express server running on port ${port}`);
-  })
-  .on("error", (err: Error) => {
+  }).on("error", (err: Error) => {
     console.error("Failed to start server:", err);
   });
+});
+
+// Graceful shutdown
+process.on('SIGINT', async () => {
+  try {
+    if (mongoClient) {
+      await mongoClient.close();
+      console.log('MongoDB connection closed');
+    }
+    process.exit(0);
+  } catch (error) {
+    console.error('Error during shutdown:', error);
+    process.exit(1);
+  }
+});
