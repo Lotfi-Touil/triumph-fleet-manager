@@ -57,10 +57,7 @@
                   Stock actuel: {{ part.quantity }} / Minimum requis: {{ part.minQuantity }}
                 </CardDescription>
               </div>
-              <Button
-                variant="outline"
-                @click="router.push(`/dashboard/spare-parts/${part.id}/edit`)"
-              >
+              <Button variant="outline" @click="router.push(`/dashboard/spare-parts/${part.id}`)">
                 Réapprovisionner
               </Button>
             </div>

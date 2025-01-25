@@ -27,11 +27,29 @@
         <router-link
           :to="{ name: 'spare-parts' }"
           active-class="bg-primary text-primary-foreground"
-          class="flex items-center px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+          class="flex items-center justify-between px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
         >
-          <Wrench class="h-5 w-5 mr-2" />
-          <span>Pièces détachées</span>
+          <div class="flex items-center">
+            <Wrench class="h-5 w-5 mr-2" />
+            <span>Pièces détachées</span>
+          </div>
         </router-link>
+        <div class="pl-6 space-y-1">
+          <router-link
+            :to="{ name: 'spare-parts' }"
+            exact-active-class="bg-primary text-primary-foreground"
+            class="flex items-center px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+          >
+            <span>Inventaire</span>
+          </router-link>
+          <router-link
+            :to="{ name: 'spare-part-orders' }"
+            exact-active-class="bg-primary text-primary-foreground"
+            class="flex items-center px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+          >
+            <span>Commandes</span>
+          </router-link>
+        </div>
         <router-link
           :to="{ name: 'maintenance' }"
           active-class="bg-primary text-primary-foreground"

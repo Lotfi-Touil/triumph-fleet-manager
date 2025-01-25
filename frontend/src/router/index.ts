@@ -29,18 +29,28 @@ const router = createRouter({
         },
         {
           path: 'spare-parts',
-          name: 'spare-parts',
-          component: () => import('../views/spare-parts/SparePartsList.vue'),
-        },
-        {
-          path: 'spare-parts/new',
-          name: 'spare-parts-new',
-          component: () => import('../views/spare-parts/SparePartForm.vue'),
-        },
-        {
-          path: 'spare-parts/:id',
-          name: 'spare-parts-edit',
-          component: () => import('../views/spare-parts/SparePartForm.vue'),
+          children: [
+            {
+              path: '',
+              name: 'spare-parts',
+              component: () => import('../views/spare-parts/SparePartsList.vue'),
+            },
+            {
+              path: 'orders',
+              name: 'spare-part-orders',
+              component: () => import('../views/spare-parts/SparePartOrders.vue'),
+            },
+            {
+              path: 'new',
+              name: 'new-spare-part',
+              component: () => import('../views/spare-parts/SparePartForm.vue'),
+            },
+            {
+              path: ':id',
+              name: 'edit-spare-part',
+              component: () => import('../views/spare-parts/SparePartForm.vue'),
+            },
+          ],
         },
         {
           path: 'notifications',

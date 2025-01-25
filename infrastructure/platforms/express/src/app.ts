@@ -3,6 +3,8 @@ import { MongoClient } from "mongodb";
 import cors from "cors";
 import { MongoSparePartRepository } from "../../../adapters/repositories/MongoSparePartRepository";
 import { createSparePartRouter } from "./routes/sparePart.routes";
+import { createSparePartOrderRouter } from "./routes/sparePartOrder.routes";
+import { MongoSparePartOrderRepository } from "../../../adapters/repositories/MongoSparePartOrderRepository";
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -26,7 +28,14 @@ async function initializeMongo() {
     console.log("Connected to MongoDB");
 
     const sparePartRepository = new MongoSparePartRepository(mongoClient);
+    const sparePartOrderRepository = new MongoSparePartOrderRepository(
+      mongoClient
+    );
     app.use("/api/spare-parts", createSparePartRouter(sparePartRepository));
+    app.use(
+      "/api/spare-part-orders",
+      createSparePartOrderRouter(sparePartOrderRepository, sparePartRepository)
+    );
   } catch (error) {
     console.error("Failed to connect to MongoDB:", error);
     process.exit(1);
