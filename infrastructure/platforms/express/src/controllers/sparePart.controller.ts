@@ -5,6 +5,7 @@ import { CheckLowStockAlert } from "../../../../../application/usecases/CheckLow
 
 export class SparePartController {
   private readonly checkLowStockAlert: CheckLowStockAlert;
+  private acknowledgedNotifications: Set<string> = new Set();
 
   constructor(private readonly sparePartRepository: SparePartRepository) {
     this.checkLowStockAlert = new CheckLowStockAlert(sparePartRepository);
@@ -121,4 +122,52 @@ export class SparePartController {
       res.status(500).json({ error: (error as Error).message });
     }
   };
+
+  async getLowStockNotifications(req: Request, res: Response) {
+    try {
+      const checkLowStockAlert = new CheckLowStockAlert(
+        this.sparePartRepository
+      );
+      const lowStockParts = await checkLowStockAlert.execute();
+
+      const notifications = lowStockParts
+        .filter((part) => !this.acknowledgedNotifications.has(part.id))
+        .map((part) => ({
+          id: `low-stock-${part.id}`,
+          sparePart: {
+            id: part.id,
+            name: part.name,
+            quantity: part.quantity,
+            minQuantity: part.minQuantity,
+          },
+          createdAt: new Date(),
+          status: "PENDING",
+          message: `Stock bas pour ${part.name} (${part.quantity}/${part.minQuantity})`,
+          type: "LOW_STOCK",
+        }));
+
+      res.json(notifications);
+    } catch (error) {
+      res.status(500).json({
+        message:
+          "Erreur lors de la récupération des notifications de stock bas",
+      });
+    }
+  }
+
+  async acknowledgeNotification(req: Request, res: Response) {
+    try {
+      const sparePart = await this.sparePartRepository.findById(req.params.id);
+      if (!sparePart) {
+        res.status(404).json({ error: "Spare part not found" });
+        return;
+      }
+      this.acknowledgedNotifications.add(req.params.id);
+      res.status(200).json({ message: "Notification acknowledged" });
+    } catch (error) {
+      res.status(500).json({
+        message: "Erreur lors de l'acquittement de la notification",
+      });
+    }
+  }
 }
