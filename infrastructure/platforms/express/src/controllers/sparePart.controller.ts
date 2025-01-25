@@ -1,9 +1,14 @@
 import { Request, Response } from "express";
 import { SparePartRepository } from "../../../../../application/ports/repositories/SparePartRepository";
 import { SparePart } from "../../../../../domain/entities/SparePart";
+import { CheckLowStockAlert } from "../../../../../application/usecases/CheckLowStockAlert";
 
 export class SparePartController {
-  constructor(private readonly sparePartRepository: SparePartRepository) {}
+  private readonly checkLowStockAlert: CheckLowStockAlert;
+
+  constructor(private readonly sparePartRepository: SparePartRepository) {
+    this.checkLowStockAlert = new CheckLowStockAlert(sparePartRepository);
+  }
 
   create = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -98,8 +103,20 @@ export class SparePartController {
 
   getLowStock = async (req: Request, res: Response): Promise<void> => {
     try {
-      const spareParts = await this.sparePartRepository.findLowStock();
-      res.json(spareParts);
+      const lowStockParts = await this.checkLowStockAlert.execute();
+      res.json(lowStockParts);
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  };
+
+  getLowStockAlerts = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const lowStockParts = await this.checkLowStockAlert.execute();
+      res.json({
+        count: lowStockParts.length,
+        parts: lowStockParts,
+      });
     } catch (error) {
       res.status(500).json({ error: (error as Error).message });
     }

@@ -28,6 +28,21 @@ const router = createRouter({
           component: () => import('../views/MaintenanceView.vue'),
         },
         {
+          path: 'spare-parts',
+          name: 'spare-parts',
+          component: () => import('../views/spare-parts/SparePartsList.vue'),
+        },
+        {
+          path: 'spare-parts/new',
+          name: 'spare-parts-new',
+          component: () => import('../views/spare-parts/SparePartForm.vue'),
+        },
+        {
+          path: 'spare-parts/:id',
+          name: 'spare-parts-edit',
+          component: () => import('../views/spare-parts/SparePartForm.vue'),
+        },
+        {
           path: 'notifications',
           name: 'notifications',
           component: () => import('../views/NotificationsView.vue'),

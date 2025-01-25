@@ -5,7 +5,7 @@
       :class="[
         'fixed inset-y-0 left-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60',
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full',
-        'lg:translate-x-0 lg:w-64 transition-transform duration-300 ease-in-out z-50'
+        'lg:translate-x-0 lg:w-64 transition-transform duration-300 ease-in-out z-50',
       ]"
       class="border-r"
     >
@@ -23,6 +23,14 @@
         >
           <LayoutDashboard class="h-5 w-5 mr-2" />
           <span>Tableau de bord</span>
+        </router-link>
+        <router-link
+          :to="{ name: 'spare-parts' }"
+          active-class="bg-primary text-primary-foreground"
+          class="flex items-center px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+        >
+          <Wrench class="h-5 w-5 mr-2" />
+          <span>Pièces détachées</span>
         </router-link>
         <router-link
           :to="{ name: 'maintenance' }"
@@ -67,7 +75,9 @@
     ></div>
 
     <!-- Mobile header -->
-    <div class="lg:hidden fixed top-0 left-0 right-0 h-16 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-40">
+    <div
+      class="lg:hidden fixed top-0 left-0 right-0 h-16 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-40"
+    >
       <div class="flex items-center justify-between h-full px-4">
         <button
           @click="isSidebarOpen = true"
@@ -83,7 +93,9 @@
     </div>
 
     <!-- Main content -->
-    <div :class="['lg:ml-64 transition-all duration-300 ease-in-out', isSidebarOpen ? 'ml-0' : 'ml-0']">
+    <div
+      :class="['lg:ml-64 transition-all duration-300 ease-in-out', isSidebarOpen ? 'ml-0' : 'ml-0']"
+    >
       <!-- Header -->
       <header
         class="sticky top-0 z-30 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 mt-16 lg:mt-0"
@@ -94,12 +106,14 @@
               route.name === 'dashboard'
                 ? 'Tableau de bord'
                 : route.name === 'maintenance'
-                  ? 'Gestion des entretiens'
-                  : route.name === 'notifications'
-                    ? 'Notifications'
-                    : route.name === 'profile'
-                      ? 'Mon Profil'
-                      : ''
+                ? 'Gestion des entretiens'
+                : route.name === 'notifications'
+                ? 'Notifications'
+                : route.name === 'profile'
+                ? 'Mon Profil'
+                : route.name === 'spare-parts'
+                ? 'Pièces détachées'
+                : ''
             }}
           </h1>
           <div class="flex items-center gap-4">
@@ -226,7 +240,7 @@ import { useNotificationStore } from '../stores/notifications'
 
 import { Button } from '../components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
-import { Bike, LayoutDashboard, Settings2, Bell, User, Menu } from 'lucide-vue-next'
+import { Bike, LayoutDashboard, Settings2, Bell, User, Menu, Wrench } from 'lucide-vue-next'
 
 const router = useRouter()
 const route = useRoute()

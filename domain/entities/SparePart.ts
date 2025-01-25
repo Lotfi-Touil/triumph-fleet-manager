@@ -1,3 +1,5 @@
+import { randomUUID } from "crypto";
+
 export class SparePart {
   constructor(
     public readonly id: string,
@@ -14,7 +16,7 @@ export class SparePart {
 
   static create(props: Omit<SparePart, "id"> & { id?: string }): SparePart {
     return new SparePart(
-      props.id || crypto.randomUUID(),
+      props.id || randomUUID(),
       props.name,
       props.category,
       props.quantity,
