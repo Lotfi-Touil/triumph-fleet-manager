@@ -1,12 +1,10 @@
-import { MaintenanceSchedule } from "../../domain/entities/MaintenanceSchedule";
-import { MaintenanceScheduleRepository } from "../../domain/repositories/MaintenanceScheduleRepository";
+import { Maintenance } from "../../domain/entities/Maintenance";
+import { MaintenanceRepository } from "../../domain/repositories/MaintenanceRepository";
 
 export class GetDueMaintenances {
-  constructor(
-    private readonly maintenanceScheduleRepository: MaintenanceScheduleRepository
-  ) {}
+  constructor(private readonly maintenanceRepository: MaintenanceRepository) {}
 
-  async execute(): Promise<MaintenanceSchedule[]> {
-    return this.maintenanceScheduleRepository.findDueMaintenances();
+  async execute(): Promise<Maintenance[]> {
+    return this.maintenanceRepository.findDueMaintenances();
   }
 }

@@ -1,4 +1,4 @@
-import { MaintenanceSchedule } from "./MaintenanceSchedule";
+import { Maintenance } from "./Maintenance";
 
 export enum NotificationStatus {
   PENDING = "PENDING",
@@ -9,7 +9,7 @@ export enum NotificationStatus {
 export class MaintenanceNotification {
   constructor(
     private readonly id: string,
-    private readonly maintenanceSchedule: MaintenanceSchedule,
+    private readonly maintenance: Maintenance,
     private readonly createdAt: Date,
     private status: NotificationStatus,
     private readonly message: string
@@ -19,8 +19,8 @@ export class MaintenanceNotification {
     return this.id;
   }
 
-  public getMaintenanceSchedule(): MaintenanceSchedule {
-    return this.maintenanceSchedule;
+  public getMaintenance(): Maintenance {
+    return this.maintenance;
   }
 
   public getCreatedAt(): Date {
@@ -36,10 +36,13 @@ export class MaintenanceNotification {
   }
 
   public acknowledge(): void {
+    if (this.status === NotificationStatus.ACKNOWLEDGED) {
+      throw new Error("Notification already acknowledged");
+    }
     this.status = NotificationStatus.ACKNOWLEDGED;
   }
 
-  public markAsSent(): void {
-    this.status = NotificationStatus.SENT;
+  public isPending(): boolean {
+    return this.status === NotificationStatus.PENDING;
   }
 }

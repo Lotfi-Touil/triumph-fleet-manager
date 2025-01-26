@@ -3,32 +3,31 @@ import {
   NotificationStatus,
 } from "../../domain/entities/MaintenanceNotification";
 import { MaintenanceNotificationRepository } from "../../domain/repositories/MaintenanceNotificationRepository";
-import { MaintenanceScheduleRepository } from "../../domain/repositories/MaintenanceScheduleRepository";
+import { MaintenanceRepository } from "../../domain/repositories/MaintenanceRepository";
 
 export interface CreateMaintenanceNotificationRequest {
   id: string;
-  maintenanceScheduleId: string;
+  maintenanceId: string;
   message: string;
 }
 
 export class CreateMaintenanceNotification {
   constructor(
     private readonly notificationRepository: MaintenanceNotificationRepository,
-    private readonly maintenanceScheduleRepository: MaintenanceScheduleRepository
+    private readonly maintenanceRepository: MaintenanceRepository
   ) {}
 
   async execute(request: CreateMaintenanceNotificationRequest): Promise<void> {
-    const schedule = await this.maintenanceScheduleRepository.findById(
-      request.maintenanceScheduleId
+    const maintenance = await this.maintenanceRepository.findById(
+      request.maintenanceId
     );
-
-    if (!schedule) {
-      throw new Error("Maintenance schedule not found");
+    if (!maintenance) {
+      throw new Error("Maintenance not found");
     }
 
     const notification = new MaintenanceNotification(
       request.id,
-      schedule,
+      maintenance,
       new Date(),
       NotificationStatus.PENDING,
       request.message

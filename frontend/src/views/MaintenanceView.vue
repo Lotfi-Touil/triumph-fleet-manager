@@ -10,13 +10,13 @@
           >
         </CardHeader>
         <CardContent>
-          <form @submit.prevent="handleBikeModelSubmit" class="space-y-4">
+          <form @submit.prevent="handleBikeSubmit" class="space-y-4">
             <div class="grid gap-4">
               <div class="space-y-2">
                 <Label for="bike-name">Nom du modèle</Label>
                 <Input
                   id="bike-name"
-                  v-model="bikeModel.name"
+                  v-model="bike.name"
                   type="text"
                   placeholder="Ex: Street Triple RS"
                   required
@@ -28,7 +28,7 @@
                   <div class="flex items-center space-x-2">
                     <Input
                       id="bike-km"
-                      v-model.number="bikeModel.maintenanceKilometers"
+                      v-model.number="bike.maintenanceKilometers"
                       type="number"
                       min="0"
                       step="1000"
@@ -42,7 +42,7 @@
                   <div class="flex items-center space-x-2">
                     <Input
                       id="bike-months"
-                      v-model.number="bikeModel.maintenanceMonths"
+                      v-model.number="bike.maintenanceMonths"
                       type="number"
                       min="0"
                       required
@@ -64,18 +64,18 @@
           <CardDescription>Enregistrez un nouvel entretien pour un modèle de moto</CardDescription>
         </CardHeader>
         <CardContent>
-          <form @submit.prevent="handleMaintenanceScheduleSubmit" class="space-y-4">
+          <form @submit.prevent="handleMaintenanceSubmit" class="space-y-4">
             <div class="space-y-4">
               <div class="space-y-2">
                 <Label for="maintenance-bike-model">Modèle de moto</Label>
-                <Select v-model="maintenanceSchedule.bikeModelId">
+                <Select v-model="maintenance.bikeId">
                   <SelectTrigger class="w-full">
                     <SelectValue placeholder="Sélectionnez un modèle" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
                       <SelectLabel>Modèles disponibles</SelectLabel>
-                      <SelectItem v-for="model in bikeModels" :key="model.id" :value="model.id">
+                      <SelectItem v-for="model in bikes" :key="model.id" :value="model.id">
                         {{ model.name }}
                       </SelectItem>
                     </SelectGroup>
@@ -86,7 +86,7 @@
                 <Label for="maintenance-date">Date du dernier entretien</Label>
                 <Input
                   id="maintenance-date"
-                  v-model="maintenanceSchedule.lastMaintenanceDate"
+                  v-model="maintenance.lastMaintenanceDate"
                   type="date"
                   required
                 />
@@ -97,7 +97,7 @@
                   <div class="flex items-center space-x-2">
                     <Input
                       id="maintenance-last-km"
-                      v-model.number="maintenanceSchedule.lastMaintenanceKilometers"
+                      v-model.number="maintenance.lastMaintenanceKilometers"
                       type="number"
                       min="0"
                       required
@@ -110,7 +110,7 @@
                   <div class="flex items-center space-x-2">
                     <Input
                       id="maintenance-current-km"
-                      v-model.number="maintenanceSchedule.currentKilometers"
+                      v-model.number="maintenance.currentKilometers"
                       type="number"
                       min="0"
                       required
@@ -159,7 +159,7 @@
           >
             <div>
               <h4 class="font-medium text-card-foreground">
-                {{ maintenance.bikeModel.name }}
+                {{ maintenance.bike.name }}
               </h4>
               <div class="mt-1 space-y-1">
                 <p class="text-sm text-muted-foreground">
@@ -191,7 +191,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useMaintenanceStore } from '../stores/maintenance'
-import type { BikeModel, MaintenanceSchedule } from '../services/maintenance.service'
+import type { Bike, Maintenance } from '../services/maintenance.service'
 import { Button } from '../components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Input } from '../components/ui/input'
@@ -209,71 +209,71 @@ import { Settings2 } from 'lucide-vue-next'
 import { v4 as uuidv4 } from 'uuid'
 
 const maintenanceStore = useMaintenanceStore()
-const bikeModels = ref<BikeModel[]>([])
+const bikes = ref<Bike[]>([])
 
-const bikeModel = ref<BikeModel>({
+const bike = ref<Bike>({
   id: '',
   name: '',
   maintenanceKilometers: 0,
   maintenanceMonths: 0,
 })
 
-const maintenanceSchedule = ref({
+const maintenance = ref({
   id: '',
-  bikeModelId: '',
+  bikeId: '',
   lastMaintenanceDate: '',
   lastMaintenanceKilometers: 0,
   currentKilometers: 0,
 })
 
-async function fetchBikeModels() {
+async function fetchBikes() {
   try {
-    bikeModels.value = await maintenanceStore.fetchBikeModels()
+    bikes.value = await maintenanceStore.fetchBikes()
   } catch (error) {
-    console.error('Erreur lors de la récupération des modèles:', error)
+    console.error('Erreur lors de la récupération des motos:', error)
   }
 }
 
-async function handleBikeModelSubmit() {
+async function handleBikeSubmit() {
   try {
-    bikeModel.value.id = uuidv4()
-    await maintenanceStore.createBikeModel(bikeModel.value)
-    await fetchBikeModels()
-    bikeModel.value = {
+    bike.value.id = uuidv4()
+    await maintenanceStore.createBike(bike.value)
+    await fetchBikes()
+    bike.value = {
       id: '',
       name: '',
       maintenanceKilometers: 0,
       maintenanceMonths: 0,
     }
   } catch (error) {
-    console.error('Erreur lors de la création du modèle:', error)
+    console.error('Erreur lors de la création de la moto:', error)
   }
 }
 
-async function handleMaintenanceScheduleSubmit() {
+async function handleMaintenanceSubmit() {
   try {
-    maintenanceSchedule.value.id = uuidv4()
-    await maintenanceStore.createMaintenanceSchedule(maintenanceSchedule.value)
-    maintenanceSchedule.value = {
+    maintenance.value.id = uuidv4()
+    await maintenanceStore.createMaintenance(maintenance.value)
+    maintenance.value = {
       id: '',
-      bikeModelId: '',
+      bikeId: '',
       lastMaintenanceDate: '',
       lastMaintenanceKilometers: 0,
       currentKilometers: 0,
     }
   } catch (error) {
-    console.error('Erreur lors de la création de la planification:', error)
+    console.error('Erreur lors de la création de la maintenance:', error)
   }
 }
 
-function calculateNextMaintenanceDate(maintenance: MaintenanceSchedule): Date {
+function calculateNextMaintenanceDate(maintenance: Maintenance): Date {
   const lastDate = new Date(maintenance.lastMaintenanceDate)
-  const monthsToAdd = maintenance.bikeModel.maintenanceMonths
+  const monthsToAdd = maintenance.bike.maintenanceMonths
   return new Date(lastDate.setMonth(lastDate.getMonth() + monthsToAdd))
 }
 
 onMounted(async () => {
-  await fetchBikeModels()
+  await fetchBikes()
   await maintenanceStore.fetchDueMaintenances()
 })
 </script>

@@ -1,17 +1,17 @@
 import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { BikeModelEntity } from './bike-model.entity';
+import { BikeEntity } from './bike.entity';
 
-@Entity('maintenance_schedules')
-export class MaintenanceScheduleEntity {
+@Entity('maintenances')
+export class MaintenanceEntity {
   @PrimaryColumn()
   id: string;
 
-  @Column({ name: 'bike_model_id' })
-  bikeModelId: string;
+  @Column({ name: 'bike_id' })
+  bikeId: string;
 
-  @ManyToOne(() => BikeModelEntity)
-  @JoinColumn({ name: 'bike_model_id' })
-  bikeModel: BikeModelEntity;
+  @ManyToOne(() => BikeEntity)
+  @JoinColumn({ name: 'bike_id' })
+  bike: BikeEntity;
 
   @Column({ name: 'last_maintenance_date' })
   lastMaintenanceDate: Date;
@@ -21,4 +21,4 @@ export class MaintenanceScheduleEntity {
 
   @Column({ name: 'current_kilometers' })
   currentKilometers: number;
-}
+} 

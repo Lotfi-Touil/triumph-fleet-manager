@@ -1,42 +1,31 @@
-import { MaintenanceScheduleRepository } from "../../domain/repositories/MaintenanceScheduleRepository";
+import { MaintenanceRepository } from "../../domain/repositories/MaintenanceRepository";
 import { MaintenanceNotificationRepository } from "../../domain/repositories/MaintenanceNotificationRepository";
 import { CreateMaintenanceNotification } from "./CreateMaintenanceNotification";
 import { v4 as uuidv4 } from "uuid";
 
 export class CheckAndCreateMaintenanceNotifications {
   constructor(
-    private readonly maintenanceScheduleRepository: MaintenanceScheduleRepository,
+    private readonly maintenanceRepository: MaintenanceRepository,
     private readonly notificationRepository: MaintenanceNotificationRepository,
-    private readonly createNotificationUseCase: CreateMaintenanceNotification
+    private readonly createNotification: CreateMaintenanceNotification
   ) {}
 
   async execute(): Promise<void> {
-    const dueMaintenances =
-      await this.maintenanceScheduleRepository.findDueMaintenances();
+    const dueMaintenances = await this.maintenanceRepository.findDueMaintenances();
 
-    for (const schedule of dueMaintenances) {
-      // Vérifier si une notification en attente existe déjà
-      const existingNotifications =
-        await this.notificationRepository.findByMaintenanceScheduleId(
-          schedule.getId()
-        );
-
-      const hasPendingNotification = existingNotifications.some(
-        (notification) => notification.getStatus() === "PENDING"
+    for (const maintenance of dueMaintenances) {
+      const existingNotifications = await this.notificationRepository.findAll();
+      const hasNotification = existingNotifications.some(
+        (notification) =>
+          notification.getMaintenance().getId() === maintenance.getId() &&
+          notification.isPending()
       );
 
-      if (!hasPendingNotification) {
-        const nextMaintenanceDate = schedule.getNextMaintenanceDate();
-        const nextMaintenanceKm = schedule.getNextMaintenanceKilometers();
-        const message =
-          `L'entretien de votre ${schedule.getBikeModel().getName()} est dû. ` +
-          `Prochain entretien prévu le ${nextMaintenanceDate.toLocaleDateString()} ` +
-          `ou à ${nextMaintenanceKm} km.`;
-
-        await this.createNotificationUseCase.execute({
+      if (!hasNotification) {
+        await this.createNotification.execute({
           id: uuidv4(),
-          maintenanceScheduleId: schedule.getId(),
-          message,
+          maintenanceId: maintenance.getId(),
+          message: `La maintenance de la moto ${maintenance.getBike().getName()} est requise.`,
         });
       }
     }

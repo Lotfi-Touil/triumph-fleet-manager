@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { MaintenanceScheduleEntity } from './maintenance-schedule.entity';
+import { MaintenanceEntity } from './maintenance.entity';
 import { NotificationStatus } from '@domain/entities/MaintenanceNotification';
 
 @Entity('maintenance_notifications')
@@ -7,15 +7,12 @@ export class MaintenanceNotificationEntity {
   @PrimaryColumn()
   id: string;
 
-  @Column({ name: 'maintenance_schedule_id' })
-  maintenanceScheduleId: string;
+  @Column({ name: 'maintenance_id' })
+  maintenanceId: string;
 
-  @ManyToOne(() => MaintenanceScheduleEntity)
-  @JoinColumn({ name: 'maintenance_schedule_id' })
-  maintenanceSchedule: MaintenanceScheduleEntity;
-
-  @Column()
-  message: string;
+  @ManyToOne(() => MaintenanceEntity)
+  @JoinColumn({ name: 'maintenance_id' })
+  maintenance: MaintenanceEntity;
 
   @Column({
     type: 'enum',
@@ -23,6 +20,9 @@ export class MaintenanceNotificationEntity {
     default: NotificationStatus.PENDING,
   })
   status: NotificationStatus;
+
+  @Column()
+  message: string;
 
   @Column({ name: 'created_at' })
   createdAt: Date;

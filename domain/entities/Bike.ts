@@ -1,6 +1,6 @@
 import { MaintenanceInterval } from "../value-objects/MaintenanceInterval";
 
-export class BikeModel {
+export class Bike {
   constructor(
     private readonly id: string,
     private readonly name: string,
@@ -18,4 +18,4 @@ export class BikeModel {
   public getMaintenanceInterval(): MaintenanceInterval {
     return this.maintenanceInterval;
   }
-}
+} 

@@ -188,7 +188,7 @@
                 >
                   <div>
                     <h4 class="font-medium text-card-foreground">
-                      {{ maintenance.bikeModel.name }}
+                      {{ maintenance.bike.name }}
                     </h4>
                     <p class="text-sm text-muted-foreground">
                       Dernier entretien :

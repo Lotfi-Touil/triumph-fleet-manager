@@ -7,7 +7,7 @@ import {
 } from "../../../domain/entities/MaintenanceNotification";
 import { MaintenanceNotificationRepository } from "../../../domain/repositories/MaintenanceNotificationRepository";
 import { MaintenanceNotificationEntity } from "../../platforms/nest/src/entities/maintenance-notification.entity";
-import { MaintenanceScheduleRepository } from "../../../domain/repositories/MaintenanceScheduleRepository";
+import { MaintenanceRepository } from "../../../domain/repositories/MaintenanceRepository";
 
 @Injectable()
 export class PostgresMaintenanceNotificationRepository
@@ -16,17 +16,15 @@ export class PostgresMaintenanceNotificationRepository
   constructor(
     @InjectRepository(MaintenanceNotificationEntity)
     private readonly repository: Repository<MaintenanceNotificationEntity>,
-    private readonly maintenanceScheduleRepository: MaintenanceScheduleRepository
+    private readonly maintenanceRepository: MaintenanceRepository
   ) {}
 
   async save(notification: MaintenanceNotification): Promise<void> {
     const entity = new MaintenanceNotificationEntity();
     entity.id = notification.getId();
-    entity.maintenanceScheduleId = notification
-      .getMaintenanceSchedule()
-      .getId();
-    entity.message = notification.getMessage();
+    entity.maintenanceId = notification.getMaintenance().getId();
     entity.status = notification.getStatus();
+    entity.message = notification.getMessage();
     entity.createdAt = notification.getCreatedAt();
 
     await this.repository.save(entity);
@@ -41,25 +39,25 @@ export class PostgresMaintenanceNotificationRepository
     return this.toDomain(entity);
   }
 
-  async findByMaintenanceScheduleId(
-    scheduleId: string
-  ): Promise<MaintenanceNotification[]> {
-    const entities = await this.repository.find({
-      where: { maintenanceScheduleId: scheduleId },
-    });
+  async findAll(): Promise<MaintenanceNotification[]> {
+    const entities = await this.repository.find();
     return Promise.all(entities.map((entity) => this.toDomain(entity)));
   }
 
-  async findPendingNotifications(): Promise<MaintenanceNotification[]> {
+  async findPending(): Promise<MaintenanceNotification[]> {
     const entities = await this.repository.find({
       where: { status: NotificationStatus.PENDING },
     });
     return Promise.all(entities.map((entity) => this.toDomain(entity)));
   }
 
-  async findAll(): Promise<MaintenanceNotification[]> {
-    const entities = await this.repository.find();
-    return Promise.all(entities.map((entity) => this.toDomain(entity)));
+  async acknowledge(id: string): Promise<void> {
+    const notification = await this.findById(id);
+    if (!notification) {
+      throw new Error("Notification not found");
+    }
+    notification.acknowledge();
+    await this.save(notification);
   }
 
   async delete(id: string): Promise<void> {
@@ -69,16 +67,16 @@ export class PostgresMaintenanceNotificationRepository
   private async toDomain(
     entity: MaintenanceNotificationEntity
   ): Promise<MaintenanceNotification> {
-    const schedule = await this.maintenanceScheduleRepository.findById(
-      entity.maintenanceScheduleId
+    const maintenance = await this.maintenanceRepository.findById(
+      entity.maintenanceId
     );
-    if (!schedule) {
-      throw new Error("Maintenance schedule not found");
+    if (!maintenance) {
+      throw new Error("Maintenance not found");
     }
 
     return new MaintenanceNotification(
       entity.id,
-      schedule,
+      maintenance,
       entity.createdAt,
       entity.status,
       entity.message

@@ -9,16 +9,16 @@ const sparePartsAxios = axios.create({
   }
 })
 
-export interface BikeModel {
+export interface Bike {
   id: string
   name: string
   maintenanceKilometers: number
   maintenanceMonths: number
 }
 
-export interface MaintenanceSchedule {
+export interface Maintenance {
   id: string
-  bikeModel: BikeModel
+  bike: Bike
   lastMaintenanceDate: Date
   lastMaintenanceKilometers: number
   currentKilometers: number
@@ -33,6 +33,7 @@ export interface MaintenanceNotification {
     quantity: number
     minQuantity: number
   }
+  maintenance: Maintenance
   createdAt: Date
   status: 'PENDING' | 'SENT' | 'ACKNOWLEDGED'
   message: string
@@ -42,31 +43,31 @@ export interface MaintenanceNotification {
 class MaintenanceService {
   private readonly baseUrl = '/maintenance'
 
-  async getBikeModels(): Promise<BikeModel[]> {
-    const response = await mainAxios.get(`${this.baseUrl}/bike-models`)
+  async getBikes(): Promise<Bike[]> {
+    const response = await axios.get(`${this.baseUrl}/bikes`)
     return response.data
   }
 
-  async createBikeModel(data: {
+  async createBike(data: {
     id: string
     name: string
     maintenanceKilometers: number
     maintenanceMonths: number
   }): Promise<void> {
-    await mainAxios.post(`${this.baseUrl}/bike-models`, data)
+    await mainAxios.post(`${this.baseUrl}/bikes`, data)
   }
 
-  async createMaintenanceSchedule(data: {
+  async createMaintenance(data: {
     id: string
-    bikeModelId: string
+    bikeId: string
     lastMaintenanceDate: string
     lastMaintenanceKilometers: number
     currentKilometers: number
   }): Promise<void> {
-    await mainAxios.post(`${this.baseUrl}/schedules`, data)
+    await mainAxios.post(`${this.baseUrl}/maintenances`, data)
   }
 
-  async getDueMaintenances(): Promise<MaintenanceSchedule[]> {
+  async getDueMaintenances(): Promise<Maintenance[]> {
     const response = await mainAxios.get(`${this.baseUrl}/due`)
     return response.data
   }
