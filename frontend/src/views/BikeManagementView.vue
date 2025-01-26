@@ -1,147 +1,268 @@
 <template>
-  <div class="container mx-auto py-8 space-y-8">
-    <!-- Formulaire pour ajouter un modèle de moto -->
-    <Card>
-      <CardHeader>
-        <CardTitle>Ajouter un modèle de moto</CardTitle>
-        <CardDescription>Créez un nouveau modèle de moto avec ses intervalles d'entretien</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form @submit.prevent="handleBikeSubmit" class="space-y-4">
-          <div class="grid gap-4">
-            <div class="space-y-2">
-              <Label for="bike-name">Nom du modèle</Label>
-              <Input
-                id="bike-name"
-                v-model="bike.name"
+  <div class="container mx-auto py-8">
+    <!-- En-tête -->
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold text-foreground">Gestion du parc moto</h1>
+      <button
+        @click="showCreateModal = true"
+        class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+      >
+        Ajouter une moto
+      </button>
+    </div>
+
+    <!-- Loading state -->
+    <div v-if="loading" class="flex justify-center py-8">
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+    </div>
+
+    <!-- Error state -->
+    <div v-else-if="error" class="p-4 rounded-lg bg-destructive/15 text-destructive">
+      {{ error }}
+    </div>
+
+    <!-- Table -->
+    <div v-else class="bg-card rounded-lg shadow overflow-hidden">
+      <table class="min-w-full divide-y divide-border">
+        <thead class="bg-muted">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              Nom
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              Intervalle kilométrique
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              Intervalle mensuel
+            </th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-card divide-y divide-border">
+          <tr v-for="bike in bikes" :key="bike.id" class="hover:bg-muted/50">
+            <td class="px-6 py-4 whitespace-nowrap text-foreground">{{ bike.name }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-foreground">
+              {{ bike.maintenanceInterval.kilometers }} km
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-foreground">
+              {{ bike.maintenanceInterval.monthInterval }} mois
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+              <button
+                @click="editBike(bike)"
+                class="text-primary hover:text-primary/80 transition-colors"
+              >
+                Modifier
+              </button>
+              <button
+                @click="confirmDelete(bike)"
+                class="text-destructive hover:text-destructive/80 transition-colors"
+              >
+                Supprimer
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Create/Edit Modal -->
+    <div v-if="showCreateModal || showEditModal" class="fixed inset-0 z-50">
+      <div class="fixed inset-0 bg-background/80 backdrop-blur-sm" />
+      <div class="fixed inset-0 flex items-center justify-center">
+        <div class="bg-card rounded-lg p-6 w-full max-w-md shadow-lg border">
+          <h2 class="text-xl font-bold mb-4 text-foreground">
+            {{ showEditModal ? 'Modifier la moto' : 'Ajouter une moto' }}
+          </h2>
+          <form @submit.prevent="handleSubmit" class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-foreground">Nom</label>
+              <input
+                v-model="form.name"
                 type="text"
-                placeholder="Ex: Street Triple RS"
+                class="mt-1 block w-full rounded-md border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:ring-primary"
                 required
               />
             </div>
-            <div class="grid grid-cols-2 gap-4">
-              <div class="space-y-2">
-                <Label for="bike-km">Intervalle kilométrique</Label>
-                <div class="flex items-center space-x-2">
-                  <Input
-                    id="bike-km"
-                    v-model.number="bike.maintenanceInterval.kilometerInterval"
-                    type="number"
-                    min="0"
-                    step="1000"
-                    required
-                  />
-                  <span class="text-muted-foreground">km</span>
-                </div>
-              </div>
-              <div class="space-y-2">
-                <Label for="bike-months">Intervalle en mois</Label>
-                <div class="flex items-center space-x-2">
-                  <Input
-                    id="bike-months"
-                    v-model.number="bike.maintenanceInterval.monthInterval"
-                    type="number"
-                    min="0"
-                    required
-                  />
-                  <span class="text-muted-foreground">mois</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <Button type="submit" class="w-full">Ajouter le modèle</Button>
-        </form>
-      </CardContent>
-    </Card>
-
-    <!-- Liste des motos -->
-    <Card>
-      <CardHeader>
-        <CardTitle>Parc moto</CardTitle>
-        <CardDescription>Liste des modèles de moto enregistrés</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div v-if="maintenanceStore.loading" class="text-center py-4">
-          <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent"></div>
-          <p class="mt-2 text-muted-foreground">Chargement...</p>
-        </div>
-        <div v-else-if="maintenanceStore.error" class="p-4 rounded-lg bg-destructive/10 text-destructive">
-          {{ maintenanceStore.error }}
-        </div>
-        <div v-else-if="bikes.length === 0" class="text-center py-8 text-muted-foreground">
-          Aucune moto enregistrée.
-        </div>
-        <div v-else class="space-y-4">
-          <div
-            v-for="bike in bikes"
-            :key="bike.id"
-            class="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/5 transition-colors"
-          >
             <div>
-              <h4 class="font-medium text-card-foreground">{{ bike.name }}</h4>
-              <div class="mt-1 space-y-1">
-                <p class="text-sm text-muted-foreground">
-                  Intervalle : {{ bike.maintenanceInterval.kilometerInterval }} km / 
-                  {{ bike.maintenanceInterval.monthInterval }} mois
-                </p>
-              </div>
+              <label class="block text-sm font-medium text-foreground">Intervalle kilométrique</label>
+              <input
+                v-model.number="form.maintenanceInterval.kilometers"
+                type="number"
+                min="0"
+                step="1000"
+                class="mt-1 block w-full rounded-md border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:ring-primary"
+                required
+              />
             </div>
+            <div>
+              <label class="block text-sm font-medium text-foreground">Intervalle mensuel</label>
+              <input
+                v-model.number="form.maintenanceInterval.monthInterval"
+                type="number"
+                min="0"
+                class="mt-1 block w-full rounded-md border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:ring-primary"
+                required
+              />
+            </div>
+            <div class="flex justify-end space-x-2">
+              <button
+                type="button"
+                @click="closeModal"
+                class="px-4 py-2 border border-border rounded-lg hover:bg-muted transition-colors text-foreground"
+              >
+                Annuler
+              </button>
+              <button
+                type="submit"
+                class="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+              >
+                {{ showEditModal ? 'Modifier' : 'Ajouter' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div v-if="showDeleteModal" class="fixed inset-0 z-50">
+      <div class="fixed inset-0 bg-background/80 backdrop-blur-sm" />
+      <div class="fixed inset-0 flex items-center justify-center">
+        <div class="bg-card rounded-lg p-6 w-full max-w-md shadow-lg border">
+          <h2 class="text-xl font-bold mb-4 text-foreground">Confirmer la suppression</h2>
+          <p class="text-muted-foreground mb-4">
+            Êtes-vous sûr de vouloir supprimer cette moto ? Cette action est irréversible.
+          </p>
+          <div class="flex justify-end space-x-2">
+            <button
+              @click="showDeleteModal = false"
+              class="px-4 py-2 border border-border rounded-lg hover:bg-muted transition-colors text-foreground"
+            >
+              Annuler
+            </button>
+            <button
+              @click="handleDelete"
+              class="px-4 py-2 bg-destructive text-destructive-foreground rounded-lg hover:bg-destructive/90 transition-colors"
+            >
+              Supprimer
+            </button>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useMaintenanceStore } from '../stores/maintenance'
-import type { Bike } from '../services/maintenance.service'
+import { ref, onMounted, computed } from 'vue'
+import { useBikeStore } from '../stores/bike'
+import type { Bike } from '../services/bike.service'
 import { Button } from '../components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Input } from '../components/ui/input'
 import { Label } from '../components/ui/label'
-import { v4 as uuidv4 } from 'uuid'
+import { Pencil, Trash } from 'lucide-vue-next'
 
-const maintenanceStore = useMaintenanceStore()
-const bikes = ref<Bike[]>([])
+const bikeStore = useBikeStore()
+const selectedBikeId = ref<string>('')
+const isEditModalOpen = ref(false)
+const isDeleteModalOpen = ref(false)
 
-const bike = ref<Bike>({
-  id: '',
+const bikes = computed(() => bikeStore.bikes)
+
+const loading = ref(false)
+const error = ref<string | null>(null)
+
+const showCreateModal = ref(false)
+const showEditModal = ref(false)
+const showDeleteModal = ref(false)
+
+const form = ref<Omit<Bike, 'id'>>({
   name: '',
   maintenanceInterval: {
-    kilometerInterval: 0,
-    monthInterval: 0
-  }
+    kilometers: 0,
+    monthInterval: 0,
+  },
 })
-
-async function fetchBikes() {
-  try {
-    bikes.value = await maintenanceStore.fetchBikes()
-  } catch (error) {
-    console.error('Erreur lors de la récupération des motos:', error)
-  }
-}
-
-async function handleBikeSubmit() {
-  try {
-    bike.value.id = uuidv4()
-    await maintenanceStore.createBike(bike.value)
-    await fetchBikes()
-    bike.value = {
-      id: '',
-      name: '',
-      maintenanceInterval: {
-        kilometerInterval: 0,
-        monthInterval: 0
-      }
-    }
-  } catch (error) {
-    console.error('Erreur lors de la création de la moto:', error)
-  }
-}
 
 onMounted(async () => {
-  await fetchBikes()
+  try {
+    loading.value = true
+    await bikeStore.fetchBikes()
+  } catch {
+    error.value = "Erreur lors du chargement des motos"
+  } finally {
+    loading.value = false
+  }
 })
+
+const editBike = (bike: Bike) => {
+  selectedBikeId.value = bike.id
+  form.value = {
+    name: bike.name,
+    maintenanceInterval: {
+      kilometers: bike.maintenanceInterval.kilometers,
+      monthInterval: bike.maintenanceInterval.monthInterval
+    }
+  }
+  showEditModal.value = true
+}
+
+const confirmDelete = (bike: Bike) => {
+  selectedBikeId.value = bike.id
+  showDeleteModal.value = true
+}
+
+const handleSubmit = async () => {
+  try {
+    loading.value = true
+    if (showEditModal.value && selectedBikeId.value) {
+      await bikeStore.updateBike({
+        id: selectedBikeId.value,
+        ...form.value
+      })
+    } else {
+      await bikeStore.createBike(form.value)
+    }
+    closeModal()
+    await bikeStore.fetchBikes()
+  } catch {
+    error.value = showEditModal.value
+      ? "Erreur lors de la modification de la moto"
+      : "Erreur lors de la création de la moto"
+  } finally {
+    loading.value = false
+  }
+}
+
+const handleDelete = async () => {
+  if (!selectedBikeId.value) return
+
+  try {
+    loading.value = true
+    await bikeStore.deleteBike(selectedBikeId.value)
+    showDeleteModal.value = false
+    await bikeStore.fetchBikes()
+  } catch {
+    error.value = "Erreur lors de la suppression de la moto"
+  } finally {
+    loading.value = false
+  }
+}
+
+const closeModal = () => {
+  showCreateModal.value = false
+  showEditModal.value = false
+  selectedBikeId.value = ''
+  form.value = {
+    name: '',
+    maintenanceInterval: {
+      kilometers: 0,
+      monthInterval: 0
+    }
+  }
+}
 </script> 

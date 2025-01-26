@@ -1,9 +1,9 @@
 import { Bike } from "@domain/entities/Bike";
 import { BikeRepository } from "@domain/repositories/BikeRepository";
 import { MaintenanceInterval } from "@domain/value-objects/MaintenanceInterval";
-import { v4 as uuidv4 } from 'uuid';
 
-export interface CreateBikeRequest {
+export interface UpdateBikeRequest {
+  id: string;
   name: string;
   maintenanceInterval: {
     kilometers: number;
@@ -11,21 +11,26 @@ export interface CreateBikeRequest {
   };
 }
 
-export class CreateBike {
+export class UpdateBike {
   constructor(private readonly bikeRepository: BikeRepository) {}
 
-  async execute(request: CreateBikeRequest): Promise<void> {
+  async execute(request: UpdateBikeRequest): Promise<void> {
+    const existingBike = await this.bikeRepository.findById(request.id);
+    if (!existingBike) {
+      throw new Error("Bike not found");
+    }
+
     const maintenanceInterval = new MaintenanceInterval(
       request.maintenanceInterval.kilometers,
       request.maintenanceInterval.monthInterval
     );
 
-    const bike = new Bike(
-      uuidv4(),
+    const updatedBike = new Bike(
+      request.id,
       request.name,
       maintenanceInterval
     );
 
-    await this.bikeRepository.save(bike);
+    await this.bikeRepository.save(updatedBike);
   }
 } 

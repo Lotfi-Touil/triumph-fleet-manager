@@ -20,14 +20,14 @@
           {{ maintenanceStore.error }}
         </div>
         <div
-          v-else-if="maintenanceStore.dueMaintenances.length === 0"
+          v-else-if="dueMaintenances.length === 0"
           class="text-center py-8 text-muted-foreground"
         >
           Aucun entretien à effectuer pour le moment.
         </div>
         <div v-else class="space-y-4">
           <div
-            v-for="maintenance in maintenanceStore.dueMaintenances"
+            v-for="maintenance in dueMaintenances"
             :key="maintenance.id"
             class="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/5 transition-colors"
           >
@@ -63,7 +63,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useMaintenanceStore } from '../stores/maintenance'
 import type { Maintenance } from '../services/maintenance.service'
 import { Button } from '../components/ui/button'
@@ -71,6 +71,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Settings2 } from 'lucide-vue-next'
 
 const maintenanceStore = useMaintenanceStore()
+const dueMaintenances = ref<Maintenance[]>([])
 
 function calculateNextMaintenanceDate(maintenance: Maintenance): Date {
   const lastDate = new Date(maintenance.lastMaintenanceDate)
@@ -79,6 +80,6 @@ function calculateNextMaintenanceDate(maintenance: Maintenance): Date {
 }
 
 onMounted(async () => {
-  await maintenanceStore.fetchDueMaintenances()
+  dueMaintenances.value = await maintenanceStore.getDueMaintenances()
 })
 </script> 

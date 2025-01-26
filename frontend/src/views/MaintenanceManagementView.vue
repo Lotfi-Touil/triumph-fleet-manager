@@ -26,40 +26,25 @@
               </Select>
             </div>
             <div class="space-y-2">
-              <Label for="maintenance-date">Date du dernier entretien</Label>
+              <Label for="maintenance-date">Date de l'entretien</Label>
               <Input
                 id="maintenance-date"
-                v-model="maintenance.lastMaintenanceDate"
+                v-model="maintenance.date"
                 type="date"
                 required
               />
             </div>
-            <div class="grid grid-cols-2 gap-4">
-              <div class="space-y-2">
-                <Label for="maintenance-last-km">Kilométrage au dernier entretien</Label>
-                <div class="flex items-center space-x-2">
-                  <Input
-                    id="maintenance-last-km"
-                    v-model.number="maintenance.lastMaintenanceKilometers"
-                    type="number"
-                    min="0"
-                    required
-                  />
-                  <span class="text-muted-foreground">km</span>
-                </div>
-              </div>
-              <div class="space-y-2">
-                <Label for="maintenance-current-km">Kilométrage actuel</Label>
-                <div class="flex items-center space-x-2">
-                  <Input
-                    id="maintenance-current-km"
-                    v-model.number="maintenance.currentKilometers"
-                    type="number"
-                    min="0"
-                    required
-                  />
-                  <span class="text-muted-foreground">km</span>
-                </div>
+            <div class="space-y-2">
+              <Label for="maintenance-current-km">Kilométrage actuel</Label>
+              <div class="flex items-center space-x-2">
+                <Input
+                  id="maintenance-current-km"
+                  v-model.number="maintenance.kilometers"
+                  type="number"
+                  min="0"
+                  required
+                />
+                <span class="text-muted-foreground">km</span>
               </div>
             </div>
           </div>
@@ -73,7 +58,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useMaintenanceStore } from '../stores/maintenance'
-import type { Bike } from '../services/maintenance.service'
+import { useBikeStore } from '../stores/bike'
+import type { Bike } from '../services/bike.service'
 import { Button } from '../components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Input } from '../components/ui/input'
@@ -87,22 +73,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../components/ui/select'
-import { v4 as uuidv4 } from 'uuid'
 
 const maintenanceStore = useMaintenanceStore()
+const bikeStore = useBikeStore()
 const bikes = ref<Bike[]>([])
 
 const maintenance = ref({
-  id: '',
   bikeId: '',
-  lastMaintenanceDate: '',
-  lastMaintenanceKilometers: 0,
-  currentKilometers: 0,
+  date: '',
+  kilometers: 0,
 })
 
 async function fetchBikes() {
   try {
-    bikes.value = await maintenanceStore.fetchBikes()
+    await bikeStore.fetchBikes()
+    bikes.value = bikeStore.bikes
   } catch (error) {
     console.error('Erreur lors de la récupération des motos:', error)
   }
@@ -110,14 +95,11 @@ async function fetchBikes() {
 
 async function handleMaintenanceSubmit() {
   try {
-    maintenance.value.id = uuidv4()
     await maintenanceStore.createMaintenance(maintenance.value)
     maintenance.value = {
-      id: '',
       bikeId: '',
-      lastMaintenanceDate: '',
-      lastMaintenanceKilometers: 0,
-      currentKilometers: 0,
+      date: '',
+      kilometers: 0,
     }
   } catch (error) {
     console.error('Erreur lors de la création de la maintenance:', error)

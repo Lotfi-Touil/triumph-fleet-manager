@@ -21,6 +21,11 @@ async function bootstrap() {
   // Filtre global pour les erreurs de validation
   app.useGlobalFilters(new ValidationFilter());
 
+  // Active le mode debug pour voir les erreurs détaillées
+  process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  });
+
   await app.listen(3000);
 }
 bootstrap();

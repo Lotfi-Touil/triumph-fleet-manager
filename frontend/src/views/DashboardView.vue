@@ -170,7 +170,7 @@
               </CardHeader>
               <CardContent>
                 <div class="text-3xl font-bold text-primary">
-                  {{ maintenanceStore.dueMaintenances.length }}
+                  {{ dueMaintenances.length }}
                 </div>
               </CardContent>
             </Card>
@@ -198,7 +198,7 @@
             <CardContent>
               <div class="space-y-4">
                 <div
-                  v-for="maintenance in maintenanceStore.dueMaintenances.slice(0, 3)"
+                  v-for="maintenance in dueMaintenances.slice(0, 3)"
                   :key="maintenance.id"
                   class="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/5 transition-colors"
                 >
@@ -266,11 +266,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useMaintenanceStore } from '../stores/maintenance'
 import { useNotificationStore } from '../stores/notifications'
+import type { Maintenance } from '../services/maintenance.service'
 
 import { Button } from '../components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
@@ -282,6 +283,11 @@ const authStore = useAuthStore()
 const maintenanceStore = useMaintenanceStore()
 const notificationStore = useNotificationStore()
 const isSidebarOpen = ref(false)
+const dueMaintenances = ref<Maintenance[]>([])
+
+onMounted(async () => {
+  dueMaintenances.value = await maintenanceStore.getDueMaintenances()
+})
 
 const handleLogout = () => {
   authStore.logout()

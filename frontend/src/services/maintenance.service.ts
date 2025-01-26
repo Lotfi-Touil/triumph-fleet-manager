@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import mainAxios from './axios'
 import axios from 'axios'
 
@@ -17,6 +18,10 @@ export interface Bike {
     monthInterval: number
   }
 }
+=======
+import axios from './axios'
+import type { Bike } from './bike.service'
+>>>>>>> f796959 (CRUD - Gestion du parc moto)
 
 export interface Maintenance {
   id: string
@@ -45,39 +50,16 @@ export interface MaintenanceNotification {
 class MaintenanceService {
   private readonly baseUrl = '/maintenance'
 
-  async getBikes(): Promise<Bike[]> {
-    const response = await axios.get(`${this.baseUrl}/bikes`)
-    return response.data
-  }
-
-  async createBike(data: {
-    id: string
-    name: string
-    maintenanceInterval: {
-      kilometerInterval: number
-      monthInterval: number
-    }
-  }): Promise<void> {
-    await mainAxios.post(`${this.baseUrl}/bikes`, {
-      id: data.id,
-      name: data.name,
-      maintenanceKilometers: data.maintenanceInterval.kilometerInterval,
-      maintenanceMonths: data.maintenanceInterval.monthInterval
-    })
-  }
-
   async createMaintenance(data: {
-    id: string
-    bikeId: string
-    lastMaintenanceDate: string
-    lastMaintenanceKilometers: number
-    currentKilometers: number
+    bikeId: string;
+    date: string;
+    kilometers: number;
   }): Promise<void> {
-    await mainAxios.post(`${this.baseUrl}/maintenances`, data)
+    await mainAxios.post(`${this.baseUrl}/create-maintenance`, data)
   }
 
   async getDueMaintenances(): Promise<Maintenance[]> {
-    const response = await mainAxios.get(`${this.baseUrl}/due`)
+    const response = await mainAxios.get(`${this.baseUrl}/get-due-maintenances`)
     return response.data
   }
 
@@ -109,4 +91,4 @@ class MaintenanceService {
   }
 }
 
-export default new MaintenanceService()
+export const maintenanceService = new MaintenanceService()

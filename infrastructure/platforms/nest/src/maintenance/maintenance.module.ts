@@ -9,6 +9,8 @@ import { PostgresBikeRepository } from '@infrastructure/adapters/repositories/Po
 import { PostgresMaintenanceRepository } from '@infrastructure/adapters/repositories/PostgresMaintenanceRepository';
 import { PostgresMaintenanceNotificationRepository } from '@infrastructure/adapters/repositories/PostgresMaintenanceNotificationRepository';
 import { CreateBike } from '@application/usecases/CreateBike';
+import { UpdateBike } from '@application/usecases/UpdateBike';
+import { DeleteBike } from '@application/usecases/DeleteBike';
 import { CreateMaintenance } from '@application/usecases/CreateMaintenance';
 import { GetDueMaintenances } from '@application/usecases/GetDueMaintenances';
 import { CreateMaintenanceNotification } from '@application/usecases/CreateMaintenanceNotification';
@@ -32,32 +34,33 @@ import {
     MaintenanceCheckService,
     {
       provide: BIKE_REPOSITORY,
-      useClass: PostgresBikeRepository,
+      useFactory: (repository) => new PostgresBikeRepository(repository),
+      inject: [getRepositoryToken(BikeEntity)],
     },
     {
       provide: MAINTENANCE_REPOSITORY,
-      useFactory: (bikeRepo, repository) => {
-        return new PostgresMaintenanceRepository(repository, bikeRepo);
-      },
-      inject: [BIKE_REPOSITORY, getRepositoryToken(MaintenanceEntity)],
+      useFactory: (repository, bikeRepo) => new PostgresMaintenanceRepository(repository, bikeRepo),
+      inject: [getRepositoryToken(MaintenanceEntity), BIKE_REPOSITORY],
     },
     {
       provide: MAINTENANCE_NOTIFICATION_REPOSITORY,
-      useFactory: (maintenanceRepo, repository) => {
-        return new PostgresMaintenanceNotificationRepository(
-          repository,
-          maintenanceRepo,
-        );
-      },
-      inject: [
-        MAINTENANCE_REPOSITORY,
-        getRepositoryToken(MaintenanceNotificationEntity),
-      ],
+      useFactory: (repository, maintenanceRepo) => new PostgresMaintenanceNotificationRepository(repository, maintenanceRepo),
+      inject: [getRepositoryToken(MaintenanceNotificationEntity), MAINTENANCE_REPOSITORY],
     },
     {
       provide: CreateBike,
       useFactory: (bikeRepo) => new CreateBike(bikeRepo),
       inject: [BIKE_REPOSITORY],
+    },
+    {
+      provide: UpdateBike,
+      useFactory: (bikeRepo) => new UpdateBike(bikeRepo),
+      inject: [BIKE_REPOSITORY],
+    },
+    {
+      provide: DeleteBike,
+      useFactory: (bikeRepo, maintenanceRepo) => new DeleteBike(bikeRepo, maintenanceRepo),
+      inject: [BIKE_REPOSITORY, MAINTENANCE_REPOSITORY],
     },
     {
       provide: CreateMaintenance,

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
-import { ref, computed, onUnmounted } from 'vue'
-import maintenanceService, { type MaintenanceNotification } from '../services/maintenance.service'
+import { ref } from 'vue'
+import { maintenanceService, type MaintenanceNotification } from '../services/maintenance.service'
 
 export const useNotificationStore = defineStore('notifications', () => {
   const notifications = ref<MaintenanceNotification[]>([])
@@ -71,7 +71,7 @@ export const useNotificationStore = defineStore('notifications', () => {
       error.value = null
       pendingNotifications.value = await maintenanceService.getPendingNotifications()
     } catch (err) {
-      error.value = 'Erreur lors de la récupération des notifications en attente'
+      error.value = 'Erreur lors de la récupération des notifications'
       throw err
     } finally {
       loading.value = false
@@ -85,7 +85,7 @@ export const useNotificationStore = defineStore('notifications', () => {
       await maintenanceService.acknowledgeNotification(id, type)
       await fetchAllNotifications()
     } catch (err) {
-      error.value = "Erreur lors de l'acquittement de la notification"
+      error.value = 'Erreur lors de la confirmation de la notification'
       throw err
     } finally {
       loading.value = false

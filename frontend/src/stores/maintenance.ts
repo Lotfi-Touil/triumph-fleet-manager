@@ -1,61 +1,21 @@
-import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import maintenanceService from '../services/maintenance.service'
-import type { Bike, Maintenance } from '../services/maintenance.service'
+import { defineStore } from 'pinia'
+import { maintenanceService, type Maintenance, type MaintenanceNotification } from '../services/maintenance.service'
 
 export const useMaintenanceStore = defineStore('maintenance', () => {
-  const dueMaintenances = ref<Maintenance[]>([])
-  const bikes = ref<Bike[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
-
-  async function fetchBikes() {
-    try {
-      loading.value = true
-      error.value = null
-      bikes.value = await maintenanceService.getBikes()
-      return bikes.value
-    } catch (err) {
-      error.value = 'Erreur lors de la récupération des motos'
-      throw err
-    } finally {
-      loading.value = false
-    }
-  }
-
-  async function createBike(data: {
-    id: string
-    name: string
-    maintenanceInterval: {
-      kilometerInterval: number
-      monthInterval: number
-    }
-  }) {
-    try {
-      loading.value = true
-      error.value = null
-      await maintenanceService.createBike(data)
-      await fetchBikes()
-    } catch (err) {
-      error.value = 'Erreur lors de la création de la moto'
-      throw err
-    } finally {
-      loading.value = false
-    }
-  }
+  const dueMaintenances = ref<Maintenance[]>([])
 
   async function createMaintenance(data: {
-    id: string
-    bikeId: string
-    lastMaintenanceDate: string
-    lastMaintenanceKilometers: number
-    currentKilometers: number
+    bikeId: string;
+    date: string;
+    kilometers: number;
   }) {
     try {
       loading.value = true
       error.value = null
       await maintenanceService.createMaintenance(data)
-      await fetchDueMaintenances()
     } catch (err) {
       error.value = 'Erreur lors de la création de la maintenance'
       throw err
@@ -64,13 +24,53 @@ export const useMaintenanceStore = defineStore('maintenance', () => {
     }
   }
 
-  async function fetchDueMaintenances() {
+  async function getDueMaintenances(): Promise<Maintenance[]> {
     try {
       loading.value = true
       error.value = null
       dueMaintenances.value = await maintenanceService.getDueMaintenances()
+      return dueMaintenances.value
     } catch (err) {
-      error.value = 'Erreur lors de la récupération des maintenances'
+      error.value = 'Erreur lors de la récupération des maintenances à prévoir'
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function getNotifications(): Promise<MaintenanceNotification[]> {
+    try {
+      loading.value = true
+      error.value = null
+      return await maintenanceService.getNotifications()
+    } catch (err) {
+      error.value = 'Erreur lors de la récupération des notifications'
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function getPendingNotifications(): Promise<MaintenanceNotification[]> {
+    try {
+      loading.value = true
+      error.value = null
+      return await maintenanceService.getPendingNotifications()
+    } catch (err) {
+      error.value = 'Erreur lors de la récupération des notifications en attente'
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function acknowledgeNotification(id: string): Promise<void> {
+    try {
+      loading.value = true
+      error.value = null
+      await maintenanceService.acknowledgeNotification(id)
+    } catch (err) {
+      error.value = 'Erreur lors de la confirmation de la notification'
       throw err
     } finally {
       loading.value = false
@@ -78,13 +78,13 @@ export const useMaintenanceStore = defineStore('maintenance', () => {
   }
 
   return {
-    dueMaintenances,
-    bikes,
     loading,
     error,
-    fetchBikes,
-    createBike,
+    dueMaintenances,
     createMaintenance,
-    fetchDueMaintenances,
+    getDueMaintenances,
+    getNotifications,
+    getPendingNotifications,
+    acknowledgeNotification,
   }
 })

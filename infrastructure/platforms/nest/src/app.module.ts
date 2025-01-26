@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthModule } from './auth/auth.module';
-import { MaintenanceModule } from './maintenance/maintenance.module';
-import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
-import { APP_FILTER } from '@nestjs/core';
-import { AllExceptionsFilter } from './filters/all-exceptions.filter';
+import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
+import { MaintenanceModule } from './maintenance/maintenance.module';
+import { BikeModule } from './bike/bike.module';
 
 @Module({
   imports: [
@@ -24,14 +23,9 @@ import { AllExceptionsFilter } from './filters/all-exceptions.filter';
       synchronize: true,
     }),
     AuthModule,
-    MaintenanceModule,
     UserModule,
-  ],
-  providers: [
-    {
-      provide: APP_FILTER,
-      useClass: AllExceptionsFilter,
-    },
+    MaintenanceModule,
+    BikeModule,
   ],
 })
 export class AppModule {}
