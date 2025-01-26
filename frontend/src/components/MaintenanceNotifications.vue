@@ -20,10 +20,11 @@
       >
         <div class="flex items-start justify-between">
           <div class="space-y-1">
-            <p class="font-medium">{{ notification.message }}</p>
+            <h3 class="font-medium text-foreground">{{ notification.maintenance.bike.name }}</h3>
             <p class="text-sm text-muted-foreground">
-              Créée le {{ new Date(notification.createdAt).toLocaleDateString() }}
+              Créée le {{ new Date(notification.maintenance.lastMaintenanceDate).toLocaleDateString() }}
             </p>
+            <p class="text-sm text-foreground">{{ notification.message }}</p>
           </div>
           <Button
             variant="outline"

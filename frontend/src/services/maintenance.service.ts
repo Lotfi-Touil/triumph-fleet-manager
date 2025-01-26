@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import mainAxios from './axios'
 import axios from 'axios'
 
@@ -18,15 +17,11 @@ export interface Bike {
     monthInterval: number
   }
 }
-=======
-import axios from './axios'
-import type { Bike } from './bike.service'
->>>>>>> f796959 (CRUD - Gestion du parc moto)
 
 export interface Maintenance {
   id: string
   bike: Bike
-  lastMaintenanceDate: Date
+  lastMaintenanceDate: string
   lastMaintenanceKilometers: number
   currentKilometers: number
 }
@@ -41,30 +36,46 @@ export interface MaintenanceNotification {
     minQuantity: number
   }
   maintenance: Maintenance
-  createdAt: Date
-  status: 'PENDING' | 'SENT' | 'ACKNOWLEDGED'
   message: string
   type: 'MAINTENANCE' | 'LOW_STOCK'
+  status: 'PENDING' | 'ACKNOWLEDGED'
 }
 
 class MaintenanceService {
   private readonly baseUrl = '/maintenance'
 
   async createMaintenance(data: {
-    bikeId: string;
-    date: string;
-    kilometers: number;
+    bikeId: string
+    date: string
+    kilometers: number
   }): Promise<void> {
     await mainAxios.post(`${this.baseUrl}/create-maintenance`, data)
   }
 
+  async updateMaintenance(data: {
+    id: string
+    bikeId: string
+    date: string
+    kilometers: number
+  }): Promise<void> {
+    await mainAxios.put(`${this.baseUrl}/update-maintenance/${data.id}`, {
+      bikeId: data.bikeId,
+      date: data.date,
+      kilometers: data.kilometers,
+    })
+  }
+
+  async deleteMaintenance(id: string): Promise<void> {
+    await mainAxios.delete(`${this.baseUrl}/delete-maintenance/${id}`)
+  }
+
   async getDueMaintenances(): Promise<Maintenance[]> {
-    const response = await mainAxios.get(`${this.baseUrl}/get-due-maintenances`)
+    const response = await mainAxios.get<Maintenance[]>(`${this.baseUrl}/due-maintenances`)
     return response.data
   }
 
   async getNotifications(): Promise<MaintenanceNotification[]> {
-    const response = await mainAxios.get(`${this.baseUrl}/notifications`)
+    const response = await mainAxios.get<MaintenanceNotification[]>(`${this.baseUrl}/notifications`)
     return response.data
   }
 

@@ -243,7 +243,7 @@
                         {{ notification.message }}
                       </p>
                       <p class="text-sm text-muted-foreground">
-                        {{ new Date(notification.createdAt).toLocaleDateString() }}
+                        {{ new Date(notification.maintenance.lastMaintenanceDate).toLocaleDateString() }}
                       </p>
                     </div>
                   </div>

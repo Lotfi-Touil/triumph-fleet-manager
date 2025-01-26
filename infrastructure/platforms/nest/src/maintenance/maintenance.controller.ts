@@ -7,9 +7,15 @@ import {
   Param,
   Put,
   BadRequestException,
+  Delete,
 } from '@nestjs/common';
 import { CreateMaintenance } from '@application/usecases/CreateMaintenance';
 import { GetDueMaintenances } from '@application/usecases/GetDueMaintenances';
+import { GetMaintenanceNotifications } from '@application/usecases/GetMaintenanceNotifications';
+import { GetPendingMaintenanceNotifications } from '@application/usecases/GetPendingMaintenanceNotifications';
+import { AcknowledgeMaintenanceNotification } from '@application/usecases/AcknowledgeMaintenanceNotification';
+import { UpdateMaintenance } from '@application/usecases/UpdateMaintenance';
+import { DeleteMaintenance } from '@application/usecases/DeleteMaintenance';
 import { Maintenance } from '@domain/entities/Maintenance';
 import { MaintenanceNotification } from '@domain/entities/MaintenanceNotification';
 import { MaintenanceNotificationRepository } from '@domain/repositories/MaintenanceNotificationRepository';
@@ -41,6 +47,16 @@ export class MaintenanceController {
     private readonly createMaintenanceUseCase: CreateMaintenance,
     @Inject(GetDueMaintenances)
     private readonly getDueMaintenancesUseCase: GetDueMaintenances,
+    @Inject(GetMaintenanceNotifications)
+    private readonly getMaintenanceNotificationsUseCase: GetMaintenanceNotifications,
+    @Inject(GetPendingMaintenanceNotifications)
+    private readonly getPendingMaintenanceNotificationsUseCase: GetPendingMaintenanceNotifications,
+    @Inject(AcknowledgeMaintenanceNotification)
+    private readonly acknowledgeMaintenanceNotificationUseCase: AcknowledgeMaintenanceNotification,
+    @Inject(UpdateMaintenance)
+    private readonly updateMaintenanceUseCase: UpdateMaintenance,
+    @Inject(DeleteMaintenance)
+    private readonly deleteMaintenanceUseCase: DeleteMaintenance,
     @Inject(MAINTENANCE_NOTIFICATION_REPOSITORY)
     private readonly notificationRepository: MaintenanceNotificationRepository,
     @Inject(BIKE_REPOSITORY)
@@ -91,23 +107,46 @@ export class MaintenanceController {
     }
   }
 
-  @Get('get-due-maintenances')
+  @Put('update-maintenance/:id')
+  async updateMaintenance(
+    @Param('id') id: string,
+    @Body()
+    request: {
+      bikeId: string
+      date: string
+      kilometers: number
+    },
+  ): Promise<void> {
+    await this.updateMaintenanceUseCase.execute({
+      id,
+      bikeId: request.bikeId,
+      maintenanceDate: new Date(request.date),
+      currentKilometers: request.kilometers,
+    });
+  }
+
+  @Delete('delete-maintenance/:id')
+  async deleteMaintenance(@Param('id') id: string): Promise<void> {
+    await this.deleteMaintenanceUseCase.execute(id);
+  }
+
+  @Get('due-maintenances')
   async getDueMaintenances(): Promise<Maintenance[]> {
     return this.getDueMaintenancesUseCase.execute();
   }
 
-  @Get('get-notifications')
+  @Get('notifications')
   async getNotifications(): Promise<MaintenanceNotification[]> {
-    return this.notificationRepository.findAll();
+    return this.getMaintenanceNotificationsUseCase.execute();
   }
 
-  @Get('get-pending-notifications')
+  @Get('notifications/pending')
   async getPendingNotifications(): Promise<MaintenanceNotification[]> {
-    return this.notificationRepository.findPending();
+    return this.getPendingMaintenanceNotificationsUseCase.execute();
   }
 
-  @Put('acknowledge-notification/:id')
+  @Post('notifications/:id/acknowledge')
   async acknowledgeNotification(@Param('id') id: string): Promise<void> {
-    await this.notificationRepository.acknowledge(id);
+    await this.acknowledgeMaintenanceNotificationUseCase.execute(id);
   }
 }

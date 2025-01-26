@@ -51,16 +51,25 @@
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
               <button
+                @click="viewBike(bike)"
+                class="text-primary hover:text-primary/80 transition-colors"
+                title="Voir les détails"
+              >
+                <Eye class="h-4 w-4" />
+              </button>
+              <button
                 @click="editBike(bike)"
                 class="text-primary hover:text-primary/80 transition-colors"
+                title="Modifier"
               >
-                Modifier
+                <Pencil class="h-4 w-4" />
               </button>
               <button
                 @click="confirmDelete(bike)"
                 class="text-destructive hover:text-destructive/80 transition-colors"
+                title="Supprimer"
               >
-                Supprimer
+                <Trash2 class="h-4 w-4" />
               </button>
             </td>
           </tr>
@@ -153,6 +162,40 @@
         </div>
       </div>
     </div>
+
+    <!-- View Modal -->
+    <div v-if="showViewModal" class="fixed inset-0 z-50">
+      <div class="fixed inset-0 bg-background/80 backdrop-blur-sm" />
+      <div class="fixed inset-0 flex items-center justify-center">
+        <div class="bg-card rounded-lg p-6 w-full max-w-md shadow-lg border">
+          <h2 class="text-xl font-bold mb-4 text-foreground">
+            Détails de la moto
+          </h2>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-muted-foreground">Nom</label>
+              <p class="mt-1 text-foreground">{{ selectedBike?.name }}</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-muted-foreground">Intervalle kilométrique</label>
+              <p class="mt-1 text-foreground">{{ selectedBike?.maintenanceInterval.kilometers }} km</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-muted-foreground">Intervalle mensuel</label>
+              <p class="mt-1 text-foreground">{{ selectedBike?.maintenanceInterval.monthInterval }} mois</p>
+            </div>
+            <div class="flex justify-end">
+              <button
+                @click="showViewModal = false"
+                class="px-4 py-2 border border-border rounded-lg hover:bg-muted transition-colors text-foreground"
+              >
+                Fermer
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -164,7 +207,7 @@ import { Button } from '../components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Input } from '../components/ui/input'
 import { Label } from '../components/ui/label'
-import { Pencil, Trash } from 'lucide-vue-next'
+import { Eye, Pencil, Trash2 } from 'lucide-vue-next'
 
 const bikeStore = useBikeStore()
 const selectedBikeId = ref<string>('')
@@ -179,6 +222,8 @@ const error = ref<string | null>(null)
 const showCreateModal = ref(false)
 const showEditModal = ref(false)
 const showDeleteModal = ref(false)
+const showViewModal = ref(false)
+const selectedBike = ref<Bike | null>(null)
 
 const form = ref<Omit<Bike, 'id'>>({
   name: '',
@@ -264,5 +309,12 @@ const closeModal = () => {
       monthInterval: 0
     }
   }
+  showViewModal.value = false
+  selectedBike.value = null
+}
+
+function viewBike(bike: Bike) {
+  selectedBike.value = bike
+  showViewModal.value = true
 }
 </script> 
