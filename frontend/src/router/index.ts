@@ -2,6 +2,10 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import LandingView from '../views/LandingView.vue'
 import DashboardView from '../views/DashboardView.vue'
+import BikeManagementView from '../views/BikeManagementView.vue'
+import MaintenanceManagementView from '../views/MaintenanceManagementView.vue'
+import DueMaintenancesView from '../views/DueMaintenancesView.vue'
+import BreakdownManagementView from '../views/BreakdownManagementView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -61,6 +65,11 @@ const router = createRouter({
               component: () => import('../views/spare-parts/SparePartForm.vue'),
             },
           ],
+        },
+        {
+          path: 'breakdowns',
+          name: 'breakdowns',
+          component: () => import('../views/BreakdownManagementView.vue'),
         },
         {
           path: 'notifications',

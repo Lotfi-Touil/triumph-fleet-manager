@@ -6,12 +6,12 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { MaintenanceModule } from './maintenance/maintenance.module';
 import { BikeModule } from './bike/bike.module';
+import { BreakdownModule } from './breakdown/breakdown.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -28,6 +28,7 @@ import { BikeModule } from './bike/bike.module';
     UserModule,
     MaintenanceModule,
     BikeModule,
+    BreakdownModule,
   ],
 })
 export class AppModule {}

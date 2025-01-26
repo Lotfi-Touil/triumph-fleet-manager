@@ -6,7 +6,6 @@ export interface CreateMaintenanceRequest {
   id: string;
   bikeId: string;
   lastMaintenanceDate: Date;
-  lastMaintenanceKilometers: number;
   currentKilometers: number;
 }
 
@@ -26,7 +25,7 @@ export class CreateMaintenance {
       request.id,
       bike,
       request.lastMaintenanceDate,
-      request.lastMaintenanceKilometers,
+      0, // On met 0 par défaut car ce n'est pas utilisé
       request.currentKilometers
     );
 

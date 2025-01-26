@@ -30,7 +30,7 @@ export class UpdateMaintenance {
       request.id,
       bike,
       request.maintenanceDate,
-      maintenance.getLastMaintenanceKilometers(),
+      0, // On met 0 par défaut car ce n'est pas utilisé
       request.currentKilometers,
     )
 
