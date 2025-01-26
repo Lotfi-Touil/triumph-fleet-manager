@@ -51,12 +51,28 @@
           </router-link>
         </div>
         <router-link
+        :to="{ name: 'bikes' }"
+          active-class="bg-primary text-primary-foreground"
+          class="flex items-center px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+        >
+          <Bike class="h-5 w-5 mr-2" />
+          <span>Gestion du parc moto</span>
+        </router-link>
+        <router-link
           :to="{ name: 'maintenance' }"
           active-class="bg-primary text-primary-foreground"
           class="flex items-center px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
         >
           <Settings2 class="h-5 w-5 mr-2" />
           <span>Gestion des entretiens</span>
+        </router-link>
+        <router-link
+          :to="{ name: 'due-maintenances' }"
+          active-class="bg-primary text-primary-foreground"
+          class="flex items-center px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+        >
+          <CalendarClock class="h-5 w-5 mr-2" />
+          <span>Entretiens à venir</span>
         </router-link>
         <router-link
           :to="{ name: 'notifications' }"
@@ -258,7 +274,7 @@ import { useNotificationStore } from '../stores/notifications'
 
 import { Button } from '../components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
-import { Bike, LayoutDashboard, Settings2, Bell, User, Menu, Wrench } from 'lucide-vue-next'
+import { Bike, LayoutDashboard, Settings2, Bell, User, Menu, Wrench, CalendarClock } from 'lucide-vue-next'
 
 const router = useRouter()
 const route = useRoute()

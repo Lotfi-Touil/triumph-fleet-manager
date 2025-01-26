@@ -26,8 +26,10 @@ export const useMaintenanceStore = defineStore('maintenance', () => {
   async function createBike(data: {
     id: string
     name: string
-    maintenanceKilometers: number
-    maintenanceMonths: number
+    maintenanceInterval: {
+      kilometerInterval: number
+      monthInterval: number
+    }
   }) {
     try {
       loading.value = true

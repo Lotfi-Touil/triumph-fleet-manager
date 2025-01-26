@@ -12,8 +12,10 @@ const sparePartsAxios = axios.create({
 export interface Bike {
   id: string
   name: string
-  maintenanceKilometers: number
-  maintenanceMonths: number
+  maintenanceInterval: {
+    kilometerInterval: number
+    monthInterval: number
+  }
 }
 
 export interface Maintenance {
@@ -51,10 +53,17 @@ class MaintenanceService {
   async createBike(data: {
     id: string
     name: string
-    maintenanceKilometers: number
-    maintenanceMonths: number
+    maintenanceInterval: {
+      kilometerInterval: number
+      monthInterval: number
+    }
   }): Promise<void> {
-    await mainAxios.post(`${this.baseUrl}/bikes`, data)
+    await mainAxios.post(`${this.baseUrl}/bikes`, {
+      id: data.id,
+      name: data.name,
+      maintenanceKilometers: data.maintenanceInterval.kilometerInterval,
+      maintenanceMonths: data.maintenanceInterval.monthInterval
+    })
   }
 
   async createMaintenance(data: {

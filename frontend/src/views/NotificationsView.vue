@@ -57,6 +57,13 @@
                 {{ notification.type === 'LOW_STOCK' ? notification.sparePart?.name : notification.maintenanceSchedule?.bikeModel.name }}
               </p>
             </div>
+            <Button
+              variant="outline"
+              size="sm"
+              @click="notificationStore.acknowledgeNotification(notification.id)"
+            >
+              Acquitter
+            </Button>
           </div>
         </div>
         <Button

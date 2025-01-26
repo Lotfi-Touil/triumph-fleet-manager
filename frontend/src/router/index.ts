@@ -23,9 +23,19 @@ const router = createRouter({
       meta: { requiresAuth: true },
       children: [
         {
+          path: 'bikes',
+          name: 'bikes',
+          component: () => import('../views/BikeManagementView.vue'),
+        },
+        {
           path: 'maintenance',
           name: 'maintenance',
-          component: () => import('../views/MaintenanceView.vue'),
+          component: () => import('../views/MaintenanceManagementView.vue'),
+        },
+        {
+          path: 'due-maintenances',
+          name: 'due-maintenances',
+          component: () => import('../views/DueMaintenancesView.vue'),
         },
         {
           path: 'spare-parts',

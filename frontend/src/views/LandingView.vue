@@ -103,7 +103,7 @@ const advantages = [
     title: 'Maintenance Prédictive',
     icon: Clock,
     description:
-      'Anticipez les besoins de maintenance et réduisez jusqu’à 40% les temps d’arrêt imprévus grâce à notre IA.',
+      'Anticipez les besoins de maintenance et réduisez jusqu\'à 40% les temps d\'arrêt imprévus grâce à notre IA.',
   },
   {
     title: 'Performance Optimisée',
@@ -165,7 +165,7 @@ const handleLogout = () => {
           <span class="font-bold text-foreground">Triumph Fleet</span>
         </div>
         <div class="flex flex-1 items-center justify-end space-x-4">
-          <template v-if="!authStore.token">
+          <template v-if="!authStore.isAuthenticated">
             <Button
               variant="ghost"
               @click="router.push('/login')"
