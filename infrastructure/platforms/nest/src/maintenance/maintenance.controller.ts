@@ -135,6 +135,11 @@ export class MaintenanceController {
     return this.getDueMaintenancesUseCase.execute();
   }
 
+  @Get('all-maintenances')
+  async getAllMaintenances(): Promise<Maintenance[]> {
+    return this.maintenanceRepository.findAll();
+  }
+
   @Get('notifications')
   async getNotifications(): Promise<MaintenanceNotification[]> {
     return this.getMaintenanceNotificationsUseCase.execute();

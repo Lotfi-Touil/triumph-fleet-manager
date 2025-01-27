@@ -94,10 +94,10 @@
     </div>
 
     <!-- Create/Edit Modal -->
-    <div v-if="showCreateModal || showEditModal" class="fixed inset-0 z-50">
-      <div class="fixed inset-0 bg-black bg-opacity-50" @click="closeModal"></div>
-      <div class="fixed inset-0 flex items-center justify-center">
-        <div class="bg-white rounded-lg p-6 w-full max-w-md shadow-lg">
+    <div v-if="showCreateModal || showEditModal" class="fixed inset-0 z-50 overflow-y-auto">
+      <div class="fixed inset-0 bg-background/80 backdrop-blur-sm" />
+      <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-card rounded-lg p-6 w-full max-w-md shadow-lg border relative">
           <h2 class="text-xl font-bold mb-4 text-foreground">
             {{ showEditModal ? 'Modifier la panne' : 'Signaler une panne' }}
           </h2>

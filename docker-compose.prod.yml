@@ -63,6 +63,14 @@ services:
       timeout: 5s
       retries: 5
 
+  adminer:
+    image: adminer:latest
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
 volumes:
   postgres_data:
   mongo_data:

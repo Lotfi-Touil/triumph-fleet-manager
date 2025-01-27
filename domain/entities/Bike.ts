@@ -4,6 +4,7 @@ export class Bike {
   constructor(
     private readonly id: string,
     private readonly name: string,
+    private readonly registrationNumber: string,
     private readonly maintenanceInterval: MaintenanceInterval
   ) {}
 
@@ -13,6 +14,10 @@ export class Bike {
 
   public getName(): string {
     return this.name;
+  }
+
+  public getRegistrationNumber(): string {
+    return this.registrationNumber;
   }
 
   public getMaintenanceInterval(): MaintenanceInterval {

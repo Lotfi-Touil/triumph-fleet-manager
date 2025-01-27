@@ -17,6 +17,7 @@ export class PostgresBikeRepository implements BikeRepository {
     const entity = new BikeEntity();
     entity.id = bike.getId();
     entity.name = bike.getName();
+    entity.registrationNumber = bike.getRegistrationNumber();
     entity.maintenanceKilometers = bike.getMaintenanceInterval().getKilometers();
     entity.maintenanceMonths = bike.getMaintenanceInterval().getMonthInterval();
 
@@ -46,6 +47,11 @@ export class PostgresBikeRepository implements BikeRepository {
       entity.maintenanceMonths
     );
 
-    return new Bike(entity.id, entity.name, maintenanceInterval);
+    return new Bike(
+      entity.id,
+      entity.name,
+      entity.registrationNumber,
+      maintenanceInterval
+    );
   }
 } 

@@ -25,7 +25,7 @@ export class CreateMaintenance {
       request.id,
       bike,
       request.lastMaintenanceDate,
-      0, // On met 0 par défaut car ce n'est pas utilisé
+      request.currentKilometers,
       request.currentKilometers
     );
 

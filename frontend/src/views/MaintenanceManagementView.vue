@@ -2,12 +2,12 @@
   <div class="container mx-auto py-8">
     <!-- En-tête -->
     <div class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-bold text-foreground">Gestion des entretiens</h1>
+      <h1 class="text-2xl font-bold text-foreground">Historique des entretiens</h1>
       <button
         @click="showCreateModal = true"
         class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
       >
-        Planifier un entretien
+        Enregistrer un entretien
       </button>
     </div>
 
@@ -42,7 +42,9 @@
         </thead>
         <tbody class="bg-card divide-y divide-border">
           <tr v-for="maintenance in maintenances" :key="maintenance.id" class="hover:bg-muted/50">
-            <td class="px-6 py-4 whitespace-nowrap text-foreground">{{ maintenance.bike.name }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-foreground">
+              {{ maintenance.bike.name }} - {{ maintenance.bike.registrationNumber }}
+            </td>
             <td class="px-6 py-4 whitespace-nowrap text-foreground">
               {{ new Date(maintenance.lastMaintenanceDate).toLocaleDateString() }}
             </td>
@@ -83,7 +85,7 @@
       <div class="fixed inset-0 flex items-center justify-center">
         <div class="bg-card rounded-lg p-6 w-full max-w-md shadow-lg border">
           <h2 class="text-xl font-bold mb-4 text-foreground">
-            {{ showEditModal ? 'Modifier l\'entretien' : 'Planifier un entretien' }}
+            {{ showEditModal ? 'Modifier l\'entretien' : 'Enregistrer un entretien' }}
           </h2>
           <form @submit.prevent="handleSubmit" class="space-y-4">
             <div>
@@ -96,7 +98,7 @@
                   <SelectGroup>
                     <SelectLabel class="text-foreground">Modèles disponibles</SelectLabel>
                     <SelectItem v-for="bike in bikes" :key="bike.id" :value="bike.id" class="text-foreground">
-                      {{ bike.name }}
+                      {{ bike.name }} - {{ bike.registrationNumber }}
                     </SelectItem>
                   </SelectGroup>
                 </SelectContent>
@@ -136,7 +138,7 @@
                 type="submit"
                 class="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
               >
-                {{ showEditModal ? 'Modifier' : 'Planifier' }}
+                {{ showEditModal ? 'Modifier' : 'Enregistrer' }}
               </button>
             </div>
           </form>
@@ -182,7 +184,9 @@
           <div class="space-y-4">
             <div>
               <label class="block text-sm font-medium text-muted-foreground">Moto</label>
-              <p class="mt-1 text-foreground">{{ selectedMaintenance?.bike.name }}</p>
+              <p class="mt-1 text-foreground">
+                {{ selectedMaintenance?.bike.name }} - {{ selectedMaintenance?.bike.registrationNumber }}
+              </p>
             </div>
             <div>
               <label class="block text-sm font-medium text-muted-foreground">Date d'entretien</label>
@@ -254,8 +258,8 @@ async function fetchData() {
     loading.value = true
     await bikeStore.fetchBikes()
     bikes.value = bikeStore.bikes
-    const dueMaintenances = await maintenanceStore.getDueMaintenances()
-    maintenances.value = dueMaintenances
+    const allMaintenances = await maintenanceStore.getAllMaintenances()
+    maintenances.value = allMaintenances
   } catch (err) {
     error.value = 'Erreur lors du chargement des données'
   } finally {

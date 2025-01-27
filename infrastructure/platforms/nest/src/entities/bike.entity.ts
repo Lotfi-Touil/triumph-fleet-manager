@@ -9,6 +9,9 @@ export class BikeEntity {
   @Column()
   name: string;
 
+  @Column({ nullable: false })
+  registrationNumber: string;
+
   @Column()
   maintenanceKilometers: number;
 

@@ -5,6 +5,7 @@ import { MaintenanceInterval } from "@domain/value-objects/MaintenanceInterval";
 export interface UpdateBikeRequest {
   id: string;
   name: string;
+  registrationNumber: string;
   maintenanceInterval: {
     kilometers: number;
     monthInterval: number;
@@ -28,6 +29,7 @@ export class UpdateBike {
     const updatedBike = new Bike(
       request.id,
       request.name,
+      request.registrationNumber,
       maintenanceInterval
     );
 

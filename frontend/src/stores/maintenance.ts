@@ -8,6 +8,7 @@ export const useMaintenanceStore = defineStore('maintenance', () => {
   const error = ref<string | null>(null)
   const dueMaintenances = ref<Maintenance[]>([])
   const notifications = ref<MaintenanceNotification[]>([])
+  const allMaintenances = ref<Maintenance[]>([])
 
   async function getDueMaintenances(): Promise<Maintenance[]> {
     try {
@@ -15,6 +16,21 @@ export const useMaintenanceStore = defineStore('maintenance', () => {
       error.value = null
       const maintenances = await maintenanceService.getDueMaintenances()
       dueMaintenances.value = maintenances
+      return maintenances
+    } catch (err) {
+      error.value = 'Erreur lors de la récupération des entretiens'
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function getAllMaintenances(): Promise<Maintenance[]> {
+    try {
+      loading.value = true
+      error.value = null
+      const maintenances = await maintenanceService.getAllMaintenances()
+      allMaintenances.value = maintenances
       return maintenances
     } catch (err) {
       error.value = 'Erreur lors de la récupération des entretiens'
@@ -124,7 +140,9 @@ export const useMaintenanceStore = defineStore('maintenance', () => {
     error,
     dueMaintenances,
     notifications,
+    allMaintenances,
     getDueMaintenances,
+    getAllMaintenances,
     createMaintenance,
     updateMaintenance,
     deleteMaintenance,

@@ -3,6 +3,7 @@ import axios from './axios'
 export interface Bike {
   id: string
   name: string
+  registrationNumber: string
   maintenanceInterval: {
     kilometers: number
     monthInterval: number
@@ -18,6 +19,7 @@ class BikeService {
   async create(data: Omit<Bike, 'id'>): Promise<void> {
     await axios.post(`/bikes/create`, {
       name: data.name,
+      registrationNumber: data.registrationNumber,
       maintenanceKilometers: data.maintenanceInterval.kilometers,
       maintenanceMonths: data.maintenanceInterval.monthInterval
     })
@@ -26,6 +28,7 @@ class BikeService {
   async update(data: Bike): Promise<void> {
     await axios.put(`/bikes/update/${data.id}`, {
       name: data.name,
+      registrationNumber: data.registrationNumber,
       maintenanceKilometers: data.maintenanceInterval.kilometers,
       maintenanceMonths: data.maintenanceInterval.monthInterval
     })

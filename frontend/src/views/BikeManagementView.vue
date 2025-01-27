@@ -30,6 +30,9 @@
               Nom
             </th>
             <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              Immatriculation
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
               Intervalle kilométrique
             </th>
             <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
@@ -43,6 +46,7 @@
         <tbody class="bg-card divide-y divide-border">
           <tr v-for="bike in bikes" :key="bike.id" class="hover:bg-muted/50">
             <td class="px-6 py-4 whitespace-nowrap text-foreground">{{ bike.name }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-foreground">{{ bike.registrationNumber }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-foreground">
               {{ bike.maintenanceInterval.kilometers }} km
             </td>
@@ -91,7 +95,16 @@
               <input
                 v-model="form.name"
                 type="text"
-                class="mt-1 block w-full rounded-md border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:ring-primary"
+                class="mt-1 block w-full rounded-md border border-black bg-background px-3 py-2 text-foreground focus:border-primary focus:ring-primary"
+                required
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-foreground">Immatriculation</label>
+              <input
+                v-model="form.registrationNumber"
+                type="text"
+                class="mt-1 block w-full rounded-md border border-black bg-background px-3 py-2 text-foreground focus:border-primary focus:ring-primary"
                 required
               />
             </div>
@@ -102,7 +115,7 @@
                 type="number"
                 min="0"
                 step="1000"
-                class="mt-1 block w-full rounded-md border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:ring-primary"
+                class="mt-1 block w-full rounded-md border border-black bg-background px-3 py-2 text-foreground focus:border-primary focus:ring-primary"
                 required
               />
             </div>
@@ -112,7 +125,7 @@
                 v-model.number="form.maintenanceInterval.monthInterval"
                 type="number"
                 min="0"
-                class="mt-1 block w-full rounded-md border-border bg-background px-3 py-2 text-foreground focus:border-primary focus:ring-primary"
+                class="mt-1 block w-full rounded-md border border-black bg-background px-3 py-2 text-foreground focus:border-primary focus:ring-primary"
                 required
               />
             </div>
@@ -177,6 +190,10 @@
               <p class="mt-1 text-foreground">{{ selectedBike?.name }}</p>
             </div>
             <div>
+              <label class="block text-sm font-medium text-muted-foreground">Immatriculation</label>
+              <p class="mt-1 text-foreground">{{ selectedBike?.registrationNumber }}</p>
+            </div>
+            <div>
               <label class="block text-sm font-medium text-muted-foreground">Intervalle kilométrique</label>
               <p class="mt-1 text-foreground">{{ selectedBike?.maintenanceInterval.kilometers }} km</p>
             </div>
@@ -227,6 +244,7 @@ const selectedBike = ref<Bike | null>(null)
 
 const form = ref<Omit<Bike, 'id'>>({
   name: '',
+  registrationNumber: '',
   maintenanceInterval: {
     kilometers: 0,
     monthInterval: 0,
@@ -248,6 +266,7 @@ const editBike = (bike: Bike) => {
   selectedBikeId.value = bike.id
   form.value = {
     name: bike.name,
+    registrationNumber: bike.registrationNumber,
     maintenanceInterval: {
       kilometers: bike.maintenanceInterval.kilometers,
       monthInterval: bike.maintenanceInterval.monthInterval
@@ -304,6 +323,7 @@ const closeModal = () => {
   selectedBikeId.value = ''
   form.value = {
     name: '',
+    registrationNumber: '',
     maintenanceInterval: {
       kilometers: 0,
       monthInterval: 0

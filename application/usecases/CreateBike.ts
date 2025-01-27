@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 export interface CreateBikeRequest {
   name: string;
+  registrationNumber: string;
   maintenanceInterval: {
     kilometers: number;
     monthInterval: number;
@@ -23,6 +24,7 @@ export class CreateBike {
     const bike = new Bike(
       uuidv4(),
       request.name,
+      request.registrationNumber,
       maintenanceInterval
     );
 

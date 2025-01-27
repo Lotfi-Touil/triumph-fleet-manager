@@ -45,16 +45,19 @@ export class BikeController {
     @Body()
     request: {
       name: string;
+      registrationNumber: string;
       maintenanceKilometers: number;
       maintenanceMonths: number;
     },
   ): Promise<void> {
-    const bike = new Bike(
-      randomUUID(),
-      request.name,
-      new MaintenanceInterval(request.maintenanceKilometers, request.maintenanceMonths)
-    );
-    return this.bikeRepository.save(bike);
+    return this.createBikeUseCase.execute({
+      name: request.name,
+      registrationNumber: request.registrationNumber,
+      maintenanceInterval: {
+        kilometers: request.maintenanceKilometers,
+        monthInterval: request.maintenanceMonths,
+      },
+    });
   }
 
   @Put('update/:id')
@@ -63,21 +66,20 @@ export class BikeController {
     @Body()
     request: {
       name: string;
+      registrationNumber: string;
       maintenanceKilometers: number;
       maintenanceMonths: number;
     },
   ): Promise<void> {
-    const existingBike = await this.bikeRepository.findById(id);
-    if (!existingBike) {
-      throw new Error('Bike not found');
-    }
-
-    const bike = new Bike(
+    return this.updateBikeUseCase.execute({
       id,
-      request.name,
-      new MaintenanceInterval(request.maintenanceKilometers, request.maintenanceMonths)
-    );
-    return this.bikeRepository.save(bike);
+      name: request.name,
+      registrationNumber: request.registrationNumber,
+      maintenanceInterval: {
+        kilometers: request.maintenanceKilometers,
+        monthInterval: request.maintenanceMonths
+      }
+    });
   }
 
   @Delete('delete/:id')

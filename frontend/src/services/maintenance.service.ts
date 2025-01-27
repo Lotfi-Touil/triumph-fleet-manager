@@ -74,6 +74,11 @@ class MaintenanceService {
     return response.data
   }
 
+  async getAllMaintenances(): Promise<Maintenance[]> {
+    const response = await axios.get<Maintenance[]>(`${this.baseUrl}/all-maintenances`)
+    return response.data
+  }
+
   async getNotifications(): Promise<MaintenanceNotification[]> {
     const response = await mainAxios.get<MaintenanceNotification[]>(`${this.baseUrl}/notifications`)
     return response.data

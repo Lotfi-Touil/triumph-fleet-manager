@@ -97,7 +97,12 @@ export class PostgresBreakdownRepository implements BreakdownRepository {
       entity.bike.maintenanceKilometers,
       entity.bike.maintenanceMonths
     );
-    const bike = new Bike(entity.bike.id, entity.bike.name, maintenanceInterval);
+    const bike = new Bike(
+      entity.bike.id,
+      entity.bike.name,
+      entity.bike.registrationNumber,
+      maintenanceInterval
+    );
 
     return new Breakdown(
       entity.id,

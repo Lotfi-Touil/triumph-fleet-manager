@@ -30,8 +30,8 @@ export class UpdateMaintenance {
       request.id,
       bike,
       request.maintenanceDate,
-      0, // On met 0 par défaut car ce n'est pas utilisé
       request.currentKilometers,
+      request.currentKilometers
     )
 
     await this.maintenanceRepository.save(updatedMaintenance)
