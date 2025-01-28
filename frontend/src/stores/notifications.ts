@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { maintenanceService, type MaintenanceNotification } from '../services/maintenance.service'
 
 export const useNotificationStore = defineStore('notifications', () => {
@@ -25,7 +25,7 @@ export const useNotificationStore = defineStore('notifications', () => {
       // Parse dates for low stock notifications
       const parsedLowStock = lowStock.map(notif => ({
         ...notif,
-        createdAt: new Date(notif.createdAt)
+        createdAt: notif.createdAt // Keep as string instead of converting to Date
       }))
 
       pendingNotifications.value = [...maintenance, ...parsedLowStock]

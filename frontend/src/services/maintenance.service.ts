@@ -12,6 +12,7 @@ const sparePartsAxios = axios.create({
 export interface Bike {
   id: string
   name: string
+  registrationNumber: string
   maintenanceInterval: {
     kilometerInterval: number
     monthInterval: number
@@ -24,6 +25,13 @@ export interface Maintenance {
   lastMaintenanceDate: string
   lastMaintenanceKilometers: number
   currentKilometers: number
+}
+
+export interface MaintenanceSchedule {
+  id: string
+  bike: Bike
+  scheduledDate: string
+  scheduledKilometers: number
 }
 
 export interface MaintenanceNotification {
@@ -39,6 +47,7 @@ export interface MaintenanceNotification {
   message: string
   type: 'MAINTENANCE' | 'LOW_STOCK'
   status: 'PENDING' | 'ACKNOWLEDGED'
+  createdAt: string
 }
 
 class MaintenanceService {
@@ -75,7 +84,7 @@ class MaintenanceService {
   }
 
   async getAllMaintenances(): Promise<Maintenance[]> {
-    const response = await axios.get<Maintenance[]>(`${this.baseUrl}/all-maintenances`)
+    const response = await mainAxios.get<Maintenance[]>(`${this.baseUrl}/all-maintenances`)
     return response.data
   }
 

@@ -54,7 +54,7 @@
               </p>
               <span class="text-sm text-muted-foreground">•</span>
               <p class="text-sm font-medium text-muted-foreground" :class="notification.type === 'LOW_STOCK' ? 'text-warning' : 'text-primary'">
-                {{ notification.type === 'LOW_STOCK' ? notification.sparePart?.name : notification.maintenanceSchedule?.bikeModel.name }}
+                {{ notification.type === 'LOW_STOCK' ? notification.sparePart?.name : notification.maintenanceSchedule?.bike.name }}
               </p>
             </div>
             <Button

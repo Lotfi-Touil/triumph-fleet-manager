@@ -43,7 +43,7 @@
         <tbody class="bg-card divide-y divide-border">
           <tr v-for="maintenance in maintenances" :key="maintenance.id" class="hover:bg-muted/50">
             <td class="px-6 py-4 whitespace-nowrap text-foreground">
-              {{ maintenance.bike.name }} - {{ maintenance.bike.registrationNumber }}
+              {{ maintenance.bike?.name }} {{ maintenance.bike?.registrationNumber ? `- ${maintenance.bike.registrationNumber}` : '' }}
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-foreground">
               {{ new Date(maintenance.lastMaintenanceDate).toLocaleDateString() }}
