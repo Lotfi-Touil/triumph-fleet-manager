@@ -250,11 +250,18 @@
                       Dernier entretien :
                       {{ new Date(maintenance.lastMaintenanceDate).toLocaleDateString() }}
                     </p>
-                  </div>
-                  <div class="text-right">
-                    <p class="text-sm font-medium text-primary">
-                      {{ maintenance.currentKilometers }} km
+                    <p class="text-sm text-muted-foreground">
+                      Kilométrage actuel : {{ maintenance.currentKilometers }} km
                     </p>
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    <UpdateKilometersDialog
+                      :maintenance="maintenance"
+                      @updated="fetchDueMaintenances"
+                    />
+                    <Button variant="outline" size="sm" asChild>
+                      <router-link :to="{ name: 'maintenance' }"> Voir les détails </router-link>
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -282,7 +289,10 @@
                       <p class="font-medium text-card-foreground">
                         {{ notification.message }}
                       </p>
-                      <p class="text-sm text-muted-foreground">
+                      <p
+                        class="text-sm text-muted-foreground"
+                        v-if="notification.type === 'MAINTENANCE' && notification.maintenance"
+                      >
                         {{
                           new Date(
                             notification.maintenance.lastMaintenanceDate,
@@ -291,13 +301,20 @@
                       </p>
                     </div>
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    @click="notificationStore.acknowledgeNotification(notification.id)"
-                  >
-                    Acquitter
-                  </Button>
+                  <div class="flex items-center space-x-2">
+                    <UpdateKilometersDialog
+                      v-if="notification.type === 'MAINTENANCE' && notification.maintenance"
+                      :maintenance="notification.maintenance"
+                      @updated="notificationStore.fetchAllNotifications"
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      @click="notificationStore.acknowledgeNotification(notification.id)"
+                    >
+                      Acquitter
+                    </Button>
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -310,7 +327,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useMaintenanceStore } from '../stores/maintenance'
@@ -332,6 +349,7 @@ import {
   CalendarClock,
   Wrench,
 } from 'lucide-vue-next'
+import UpdateKilometersDialog from '../components/maintenance/UpdateKilometersDialog.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -341,8 +359,18 @@ const notificationStore = useNotificationStore()
 const isSidebarOpen = ref(false)
 const dueMaintenances = ref<Maintenance[]>([])
 
-onMounted(async () => {
+const fetchDueMaintenances = async () => {
   dueMaintenances.value = await maintenanceStore.getDueMaintenances()
+}
+
+onMounted(async () => {
+  await fetchDueMaintenances()
+  await notificationStore.fetchAllNotifications()
+  notificationStore.startAutoRefresh()
+})
+
+onUnmounted(() => {
+  notificationStore.stopAutoRefresh()
 })
 
 const handleLogout = () => {

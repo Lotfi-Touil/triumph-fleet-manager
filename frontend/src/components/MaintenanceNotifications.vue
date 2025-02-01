@@ -22,7 +22,8 @@
           <div class="space-y-1">
             <h3 class="font-medium text-foreground">{{ notification.maintenance.bike.name }}</h3>
             <p class="text-sm text-muted-foreground">
-              Créée le {{ new Date(notification.maintenance.lastMaintenanceDate).toLocaleDateString() }}
+              Créée le
+              {{ new Date(notification.maintenance.lastMaintenanceDate).toLocaleDateString() }}
             </p>
             <p class="text-sm text-foreground">{{ notification.message }}</p>
           </div>
@@ -58,6 +59,6 @@ async function handleAcknowledge(id: string) {
 }
 
 onMounted(() => {
-  notificationStore.fetchPendingNotifications()
+  notificationStore.fetchAllNotifications()
 })
 </script>

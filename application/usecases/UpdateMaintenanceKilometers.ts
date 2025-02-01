@@ -8,9 +8,7 @@ export interface UpdateMaintenanceKilometersRequest {
 }
 
 export class UpdateMaintenanceKilometers {
-  constructor(
-    private readonly maintenanceRepository: MaintenanceRepository
-  ) {}
+  constructor(private readonly maintenanceRepository: MaintenanceRepository) {}
 
   async execute(request: UpdateMaintenanceKilometersRequest): Promise<void> {
     const maintenance = await this.maintenanceRepository.findById(
@@ -22,10 +20,14 @@ export class UpdateMaintenanceKilometers {
 
     // Valider les nouveaux kilomètres
     const newKilometers = new Kilometers(request.newKilometers);
-    const lastMaintenanceKilometers = new Kilometers(maintenance.getLastMaintenanceKilometers());
-    
+    const lastMaintenanceKilometers = new Kilometers(
+      maintenance.getLastMaintenanceKilometers()
+    );
+
     if (newKilometers.getValue() < lastMaintenanceKilometers.getValue()) {
-      throw new Error("New kilometers cannot be less than last maintenance kilometers");
+      throw new Error(
+        "New kilometers cannot be less than last maintenance kilometers"
+      );
     }
 
     const updatedMaintenance = new Maintenance(
@@ -38,4 +40,4 @@ export class UpdateMaintenanceKilometers {
 
     await this.maintenanceRepository.save(updatedMaintenance);
   }
-} 
+}

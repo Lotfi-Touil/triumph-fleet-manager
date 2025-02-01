@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { BikeEntity } from '../entities/bike.entity';
 import { MaintenanceEntity } from '../entities/maintenance.entity';
 import { MaintenanceNotificationEntity } from '../entities/maintenance-notification.entity';
@@ -33,6 +34,7 @@ import {
       MaintenanceEntity,
       MaintenanceNotificationEntity,
     ]),
+    EventEmitterModule.forRoot(),
   ],
   controllers: [MaintenanceController],
   providers: [
@@ -44,13 +46,21 @@ import {
     },
     {
       provide: MAINTENANCE_REPOSITORY,
-      useFactory: (repository, bikeRepo) => new PostgresMaintenanceRepository(repository, bikeRepo),
+      useFactory: (repository, bikeRepo) =>
+        new PostgresMaintenanceRepository(repository, bikeRepo),
       inject: [getRepositoryToken(MaintenanceEntity), BIKE_REPOSITORY],
     },
     {
       provide: MAINTENANCE_NOTIFICATION_REPOSITORY,
-      useFactory: (repository, maintenanceRepo) => new PostgresMaintenanceNotificationRepository(repository, maintenanceRepo),
-      inject: [getRepositoryToken(MaintenanceNotificationEntity), MAINTENANCE_REPOSITORY],
+      useFactory: (repository, maintenanceRepo) =>
+        new PostgresMaintenanceNotificationRepository(
+          repository,
+          maintenanceRepo,
+        ),
+      inject: [
+        getRepositoryToken(MaintenanceNotificationEntity),
+        MAINTENANCE_REPOSITORY,
+      ],
     },
     {
       provide: CreateBike,
@@ -64,7 +74,8 @@ import {
     },
     {
       provide: DeleteBike,
-      useFactory: (bikeRepo, maintenanceRepo) => new DeleteBike(bikeRepo, maintenanceRepo),
+      useFactory: (bikeRepo, maintenanceRepo) =>
+        new DeleteBike(bikeRepo, maintenanceRepo),
       inject: [BIKE_REPOSITORY, MAINTENANCE_REPOSITORY],
     },
     {
@@ -80,22 +91,26 @@ import {
     },
     {
       provide: GetMaintenanceNotifications,
-      useFactory: (notificationRepo) => new GetMaintenanceNotifications(notificationRepo),
+      useFactory: (notificationRepo) =>
+        new GetMaintenanceNotifications(notificationRepo),
       inject: [MAINTENANCE_NOTIFICATION_REPOSITORY],
     },
     {
       provide: GetPendingMaintenanceNotifications,
-      useFactory: (notificationRepo) => new GetPendingMaintenanceNotifications(notificationRepo),
+      useFactory: (notificationRepo) =>
+        new GetPendingMaintenanceNotifications(notificationRepo),
       inject: [MAINTENANCE_NOTIFICATION_REPOSITORY],
     },
     {
       provide: AcknowledgeMaintenanceNotification,
-      useFactory: (notificationRepo) => new AcknowledgeMaintenanceNotification(notificationRepo),
+      useFactory: (notificationRepo) =>
+        new AcknowledgeMaintenanceNotification(notificationRepo),
       inject: [MAINTENANCE_NOTIFICATION_REPOSITORY],
     },
     {
       provide: UpdateMaintenance,
-      useFactory: (maintenanceRepo, bikeRepo) => new UpdateMaintenance(maintenanceRepo, bikeRepo),
+      useFactory: (maintenanceRepo, bikeRepo) =>
+        new UpdateMaintenance(maintenanceRepo, bikeRepo),
       inject: [MAINTENANCE_REPOSITORY, BIKE_REPOSITORY],
     },
     {
@@ -105,14 +120,23 @@ import {
     },
     {
       provide: CreateMaintenanceNotification,
-      useFactory: (notificationRepo, maintenanceRepo) => new CreateMaintenanceNotification(notificationRepo, maintenanceRepo),
+      useFactory: (notificationRepo, maintenanceRepo) =>
+        new CreateMaintenanceNotification(notificationRepo, maintenanceRepo),
       inject: [MAINTENANCE_NOTIFICATION_REPOSITORY, MAINTENANCE_REPOSITORY],
     },
     {
       provide: CheckAndCreateMaintenanceNotifications,
-      useFactory: (maintenanceRepo, notificationRepo, createNotification) => 
-        new CheckAndCreateMaintenanceNotifications(maintenanceRepo, notificationRepo, createNotification),
-      inject: [MAINTENANCE_REPOSITORY, MAINTENANCE_NOTIFICATION_REPOSITORY, CreateMaintenanceNotification],
+      useFactory: (maintenanceRepo, notificationRepo, createNotification) =>
+        new CheckAndCreateMaintenanceNotifications(
+          maintenanceRepo,
+          notificationRepo,
+          createNotification,
+        ),
+      inject: [
+        MAINTENANCE_REPOSITORY,
+        MAINTENANCE_NOTIFICATION_REPOSITORY,
+        CreateMaintenanceNotification,
+      ],
     },
   ],
   exports: [

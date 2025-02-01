@@ -22,10 +22,7 @@
     </div>
 
     <!-- Empty state -->
-    <div
-      v-else-if="dueMaintenances.length === 0"
-      class="text-center py-8 text-muted-foreground"
-    >
+    <div v-else-if="dueMaintenances.length === 0" class="text-center py-8 text-muted-foreground">
       Aucun entretien à effectuer pour le moment.
     </div>
 
@@ -34,22 +31,34 @@
       <table class="min-w-full divide-y divide-border">
         <thead class="bg-muted">
           <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+            >
               Moto
             </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+            >
               Dernier entretien
             </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+            >
               Prochain entretien
             </th>
-            <th class="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            <th
+              class="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider"
+            >
               Actions
             </th>
           </tr>
         </thead>
         <tbody class="bg-card divide-y divide-border">
-          <tr v-for="maintenance in dueMaintenances" :key="maintenance.id" class="hover:bg-muted/50">
+          <tr
+            v-for="maintenance in dueMaintenances"
+            :key="maintenance.id"
+            class="hover:bg-muted/50"
+          >
             <td class="px-6 py-4 whitespace-nowrap text-foreground">
               {{ maintenance.bike.name }} - {{ maintenance.bike.registrationNumber }}
             </td>
@@ -60,6 +69,7 @@
               {{ calculateNextMaintenanceDate(maintenance).toLocaleDateString() }}
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+              <UpdateKilometersDialog :maintenance="maintenance" @updated="fetchDueMaintenances" />
               <button
                 @click="viewMaintenanceDetails(maintenance)"
                 class="text-primary hover:text-primary/80 transition-colors"
@@ -82,29 +92,43 @@
 
     <!-- Modal de détails -->
     <div v-if="showDetailsModal" class="fixed inset-0 z-50">
-      <div class="fixed inset-0 bg-background/80 backdrop-blur-sm" @click="showDetailsModal = false" />
+      <div
+        class="fixed inset-0 bg-background/80 backdrop-blur-sm"
+        @click="showDetailsModal = false"
+      />
       <div class="fixed inset-0 flex items-center justify-center">
         <div class="bg-card rounded-lg p-6 w-full max-w-md shadow-lg border">
-          <h2 class="text-xl font-bold mb-4 text-foreground">
-            Détails de l'entretien à effectuer
-          </h2>
+          <h2 class="text-xl font-bold mb-4 text-foreground">Détails de l'entretien à effectuer</h2>
           <div class="space-y-4">
             <div>
               <label class="block text-sm font-medium text-muted-foreground">Moto</label>
               <p class="mt-1 text-foreground">
-                {{ selectedMaintenance?.bike.name }} - {{ selectedMaintenance?.bike.registrationNumber }}
+                {{ selectedMaintenance?.bike.name }} -
+                {{ selectedMaintenance?.bike.registrationNumber }}
               </p>
             </div>
             <div>
-              <label class="block text-sm font-medium text-muted-foreground">Dernier entretien</label>
+              <label class="block text-sm font-medium text-muted-foreground"
+                >Dernier entretien</label
+              >
               <p class="mt-1 text-foreground">
-                {{ selectedMaintenance ? new Date(selectedMaintenance.lastMaintenanceDate).toLocaleDateString() : '' }}
+                {{
+                  selectedMaintenance
+                    ? new Date(selectedMaintenance.lastMaintenanceDate).toLocaleDateString()
+                    : ''
+                }}
               </p>
             </div>
             <div>
-              <label class="block text-sm font-medium text-muted-foreground">Prochain entretien prévu</label>
+              <label class="block text-sm font-medium text-muted-foreground"
+                >Prochain entretien prévu</label
+              >
               <p class="mt-1 text-foreground">
-                {{ selectedMaintenance ? calculateNextMaintenanceDate(selectedMaintenance).toLocaleDateString() : '' }}
+                {{
+                  selectedMaintenance
+                    ? calculateNextMaintenanceDate(selectedMaintenance).toLocaleDateString()
+                    : ''
+                }}
               </p>
             </div>
             <div>
@@ -140,6 +164,7 @@ import { useRouter } from 'vue-router'
 import { useMaintenanceStore } from '../stores/maintenance'
 import type { Maintenance } from '../services/maintenance.service'
 import { Settings2, Eye } from 'lucide-vue-next'
+import UpdateKilometersDialog from '@/components/maintenance/UpdateKilometersDialog.vue'
 
 const router = useRouter()
 const maintenanceStore = useMaintenanceStore()
@@ -156,11 +181,11 @@ function calculateNextMaintenanceDate(maintenance: Maintenance): Date {
 function getMaintenanceReason(maintenance: Maintenance): string {
   const nextDate = calculateNextMaintenanceDate(maintenance)
   const today = new Date()
-  
+
   if (nextDate < today) {
     return `L'entretien est en retard de ${Math.floor((today.getTime() - nextDate.getTime()) / (1000 * 60 * 60 * 24))} jours`
   }
-  
+
   return "L'entretien approche de sa date limite"
 }
 
@@ -174,15 +199,19 @@ function goToMaintenance(maintenance: Maintenance | null) {
     showDetailsModal.value = false
     router.push({
       name: 'maintenance',
-      query: { 
+      query: {
         bikeId: maintenance.bike.id,
-        action: 'create'
-      }
+        action: 'create',
+      },
     })
   }
 }
 
-onMounted(async () => {
+const fetchDueMaintenances = async () => {
   dueMaintenances.value = await maintenanceStore.getDueMaintenances()
+}
+
+onMounted(async () => {
+  await fetchDueMaintenances()
 })
-</script> 
+</script>

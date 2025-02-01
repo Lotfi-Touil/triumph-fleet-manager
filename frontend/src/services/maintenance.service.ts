@@ -6,7 +6,7 @@ const sparePartsAxios = axios.create({
   withCredentials: false,
   headers: {
     'Content-Type': 'application/json',
-  }
+  },
 })
 
 export interface Bike {
@@ -102,17 +102,33 @@ class MaintenanceService {
     const response = await sparePartsAxios.get('/spare-parts/notifications/low-stock')
     return response.data.map((notif: any) => ({
       ...notif,
-      createdAt: new Date(notif.createdAt)
+      createdAt: new Date(notif.createdAt),
     }))
   }
 
-  async acknowledgeNotification(id: string, type: 'MAINTENANCE' | 'LOW_STOCK' = 'MAINTENANCE'): Promise<void> {
+  async acknowledgeNotification(
+    id: string,
+    type: 'MAINTENANCE' | 'LOW_STOCK' = 'MAINTENANCE',
+  ): Promise<void> {
     if (type === 'LOW_STOCK') {
       const sparePartId = id.replace('low-stock-', '')
       await sparePartsAxios.put(`/spare-parts/${sparePartId}/acknowledge-low-stock`)
     } else {
       await mainAxios.put(`${this.baseUrl}/notifications/${id}/acknowledge`)
     }
+  }
+
+  async updateMaintenanceKilometers(data: {
+    maintenanceId: string
+    kilometers: number
+    bikeId: string
+    lastMaintenanceDate: string
+  }): Promise<void> {
+    await mainAxios.put(`${this.baseUrl}/update-maintenance/${data.maintenanceId}`, {
+      bikeId: data.bikeId,
+      date: data.lastMaintenanceDate,
+      kilometers: data.kilometers,
+    })
   }
 }
 

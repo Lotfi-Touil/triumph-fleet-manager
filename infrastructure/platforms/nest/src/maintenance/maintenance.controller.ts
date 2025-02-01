@@ -8,6 +8,7 @@ import {
   Put,
   BadRequestException,
   Delete,
+  Sse,
 } from '@nestjs/common';
 import { CreateMaintenance } from '@application/usecases/CreateMaintenance';
 import { GetDueMaintenances } from '@application/usecases/GetDueMaintenances';
@@ -28,6 +29,8 @@ import {
 import { randomUUID } from 'crypto';
 import { MaintenanceRepository } from '@domain/repositories/MaintenanceRepository';
 import { IsString, IsNumber, IsDateString } from 'class-validator';
+import { Observable } from 'rxjs';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 class CreateMaintenanceDto {
   @IsString()
@@ -63,15 +66,18 @@ export class MaintenanceController {
     private readonly bikeRepository: BikeRepository,
     @Inject(MAINTENANCE_REPOSITORY)
     private readonly maintenanceRepository: MaintenanceRepository,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   @Post('create-maintenance')
-  async createMaintenance(@Body() request: CreateMaintenanceDto): Promise<void> {
+  async createMaintenance(
+    @Body() request: CreateMaintenanceDto,
+  ): Promise<void> {
     console.log('Creating maintenance with request:', request);
-    
+
     const bike = await this.bikeRepository.findById(request.bikeId);
     console.log('Found bike:', bike);
-    
+
     if (!bike) {
       throw new BadRequestException('Bike not found');
     }
@@ -80,7 +86,7 @@ export class MaintenanceController {
       request.bikeId,
     );
     console.log('Last maintenances:', lastMaintenances);
-    
+
     const lastMaintenance = lastMaintenances[lastMaintenances.length - 1];
     console.log('Last maintenance:', lastMaintenance);
 
@@ -93,13 +99,16 @@ export class MaintenanceController {
       id: randomUUID(),
       bikeId: request.bikeId,
       lastMaintenanceDate: maintenanceDate,
-      lastMaintenanceKilometers: lastMaintenance ? lastMaintenance.getCurrentKilometers() : 0,
-      currentKilometers: request.kilometers
+      lastMaintenanceKilometers: lastMaintenance
+        ? lastMaintenance.getCurrentKilometers()
+        : 0,
+      currentKilometers: request.kilometers,
     };
     console.log('Creating maintenance with payload:', payload);
 
     try {
       await this.createMaintenanceUseCase.execute(payload);
+      this.eventEmitter.emit('maintenance.notification');
       console.log('Maintenance created successfully');
     } catch (error) {
       console.error('Error creating maintenance:', error);
@@ -112,9 +121,9 @@ export class MaintenanceController {
     @Param('id') id: string,
     @Body()
     request: {
-      bikeId: string
-      date: string
-      kilometers: number
+      bikeId: string;
+      date: string;
+      kilometers: number;
     },
   ): Promise<void> {
     await this.updateMaintenanceUseCase.execute({
@@ -123,6 +132,7 @@ export class MaintenanceController {
       maintenanceDate: new Date(request.date),
       currentKilometers: request.kilometers,
     });
+    this.eventEmitter.emit('maintenance.notification');
   }
 
   @Delete('delete-maintenance/:id')
@@ -150,8 +160,26 @@ export class MaintenanceController {
     return this.getPendingMaintenanceNotificationsUseCase.execute();
   }
 
+  @Sse('notifications/events')
+  notificationEvents(): Observable<MessageEvent> {
+    return new Observable((subscriber) => {
+      const listener = () => {
+        subscriber.next({
+          data: JSON.stringify({ type: 'NOTIFICATION_UPDATE' }),
+        } as MessageEvent);
+      };
+
+      this.eventEmitter.on('maintenance.notification', listener);
+
+      return () => {
+        this.eventEmitter.off('maintenance.notification', listener);
+      };
+    });
+  }
+
   @Post('notifications/:id/acknowledge')
   async acknowledgeNotification(@Param('id') id: string): Promise<void> {
     await this.acknowledgeMaintenanceNotificationUseCase.execute(id);
+    this.eventEmitter.emit('maintenance.notification');
   }
 }
