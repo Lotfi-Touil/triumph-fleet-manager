@@ -17,6 +17,7 @@ export class JwtAuthenticationService implements IAuthenticationService {
     const tokenPayload = {
       sub: payload.id,
       email: payload.email,
+      role: payload.role,
     };
     this.logger.debug("Generating token with payload:", tokenPayload);
     return jwt.sign(tokenPayload, this.secretKey, { expiresIn: "24h" });
@@ -29,6 +30,7 @@ export class JwtAuthenticationService implements IAuthenticationService {
       return {
         id: decoded.sub,
         email: decoded.email,
+        role: decoded.role,
       };
     } catch (error) {
       this.logger.error("Token verification failed:", error);

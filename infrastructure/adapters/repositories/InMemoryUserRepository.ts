@@ -28,4 +28,8 @@ export class InMemoryUserRepository implements IUserRepository {
     const user = this.users.get(id);
     return user || null;
   }
+
+  async findAll(): Promise<User[]> {
+    return Array.from(this.users.values());
+  }
 }

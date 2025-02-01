@@ -99,6 +99,15 @@
           </div>
         </router-link>
         <router-link
+          v-if="authStore.user?.role === UserRole.ADMIN"
+          :to="{ name: 'admin-users' }"
+          active-class="bg-primary text-primary-foreground"
+          class="flex items-center px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+        >
+          <Users class="h-5 w-5 mr-2" />
+          <span>Gestion des utilisateurs</span>
+        </router-link>
+        <router-link
           :to="{ name: 'profile' }"
           active-class="bg-primary text-primary-foreground"
           class="flex items-center px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
@@ -285,11 +294,12 @@ import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useMaintenanceStore } from '../stores/maintenance'
 import { useNotificationStore } from '../stores/notifications'
+import { UserRole } from '../types/auth'
 import type { Maintenance } from '../services/maintenance.service'
 
 import { Button } from '../components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
-import { Bike, LayoutDashboard, Settings2, Bell, User, Menu, CalendarClock, Wrench } from 'lucide-vue-next'
+import { Bike, LayoutDashboard, Settings2, Bell, User, Menu, Users, CalendarClock, Wrench } from 'lucide-vue-next'
 
 const router = useRouter()
 const route = useRoute()

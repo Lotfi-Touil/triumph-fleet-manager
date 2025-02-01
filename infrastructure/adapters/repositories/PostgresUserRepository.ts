@@ -57,4 +57,19 @@ export class PostgresUserRepository implements IUserRepository {
       throw error;
     }
   }
+
+  async findAll(): Promise<User[]> {
+    try {
+      this.logger.debug("Finding all users");
+      const userEntities = await this.userRepository.find();
+      this.logger.debug(`Found ${userEntities.length} users`);
+      return userEntities.map((entity) => entity.toDomain());
+    } catch (error) {
+      this.logger.error(
+        `Error finding all users: ${error.message}`,
+        error.stack
+      );
+      throw error;
+    }
+  }
 }

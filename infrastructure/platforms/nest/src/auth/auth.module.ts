@@ -11,6 +11,7 @@ import { PostgresUserRepository } from '@infrastructure/adapters/repositories/Po
 import { UserEntity } from '@infrastructure/adapters/repositories/typeorm/entities/UserEntity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './jwt.strategy';
+import { RolesGuard } from './roles.guard';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { JwtStrategy } from './jwt.strategy';
   controllers: [AuthController],
   providers: [
     JwtStrategy,
+    RolesGuard,
     {
       provide: 'IUserRepository',
       useClass: PostgresUserRepository,
@@ -58,6 +60,6 @@ import { JwtStrategy } from './jwt.strategy';
       inject: ['IUserRepository', 'IHashService', 'IAuthenticationService'],
     },
   ],
-  exports: ['IAuthenticationService', JwtStrategy, PassportModule],
+  exports: ['IAuthenticationService', JwtStrategy, PassportModule, RolesGuard],
 })
 export class AuthModule {}

@@ -2,6 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import LandingView from '../views/LandingView.vue'
 import DashboardView from '../views/DashboardView.vue'
+import { useAuthStore } from '../stores/auth'
+import { UserRole } from '../types/auth'
 import BikeManagementView from '../views/BikeManagementView.vue'
 import MaintenanceManagementView from '../views/MaintenanceManagementView.vue'
 import DueMaintenancesView from '../views/DueMaintenancesView.vue'
@@ -81,6 +83,12 @@ const router = createRouter({
           name: 'profile',
           component: () => import('../views/ProfileView.vue'),
         },
+        {
+          path: 'admin/users',
+          name: 'admin-users',
+          component: () => import('../views/AdminUsersView.vue'),
+          meta: { requiresAdmin: true },
+        },
       ],
     },
     {
@@ -99,9 +107,12 @@ const router = createRouter({
 // Navigation guard
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
+  const authStore = useAuthStore()
 
   if (to.meta.requiresAuth && !token) {
     next('/login')
+  } else if (to.meta.requiresAdmin && authStore.user?.role !== UserRole.ADMIN) {
+    next('/dashboard')
   } else {
     next()
   }

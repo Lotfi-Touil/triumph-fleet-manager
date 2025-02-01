@@ -24,7 +24,7 @@ export class UserEntity {
   @Column({
     type: "enum",
     enum: UserRole,
-    default: UserRole.CLIENT,
+    default: UserRole.CLIENT_PARTNER,
   })
   role: UserRole;
 
