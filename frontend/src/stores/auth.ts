@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import authService, { type User } from '../services/auth.service'
 import { AxiosError } from 'axios'
+import { profileService } from '../services/profile.service'
 
 interface AuthState {
   user: User | null
@@ -22,15 +23,48 @@ interface ApiError {
 export const useAuthStore = defineStore('auth', () => {
   const state = ref<AuthState>({
     user: null,
-    error: null
+    error: null,
   })
-  const token = ref<string | null>(localStorage.getItem('token'))
+  const token = ref<string | null>(null)
 
-  const isAuthenticated = computed(() => !!token.value)
+  const isAuthenticated = computed(() => !!token.value && !!state.value.user)
 
-  async function login({ email, password }: { email: string; password: string }): Promise<AuthResult> {
+  async function loadUser() {
+    if (token.value) {
+      try {
+        const user = await profileService.getProfile()
+        state.value.user = user
+      } catch (error) {
+        console.error('Error loading user profile:', error)
+        logout()
+        throw error
+      }
+    }
+  }
+
+  async function initializeFromToken(savedToken: string) {
+    token.value = savedToken
+    authService.setToken(savedToken)
+    await loadUser()
+  }
+
+  async function init() {
+    const savedToken = localStorage.getItem('token')
+    if (savedToken) {
+      await initializeFromToken(savedToken)
+    }
+  }
+
+  async function login({
+    email,
+    password,
+  }: {
+    email: string
+    password: string
+  }): Promise<AuthResult> {
     try {
       const response = await authService.login({ email, password })
+      token.value = response.token
       authService.setToken(response.token)
       state.value.user = response.user
       return { success: true }
@@ -44,9 +78,18 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  async function signup({ email, password, name }: { email: string; password: string; name: string }): Promise<AuthResult> {
+  async function signup({
+    email,
+    password,
+    name,
+  }: {
+    email: string
+    password: string
+    name: string
+  }): Promise<AuthResult> {
     try {
       const response = await authService.signup({ email, password, name })
+      token.value = response.token
       authService.setToken(response.token)
       state.value.user = response.user
       return { success: true }
@@ -63,8 +106,8 @@ export const useAuthStore = defineStore('auth', () => {
   function logout() {
     state.value.user = null
     state.value.error = null
-    authService.removeToken()
     token.value = null
+    authService.removeToken()
   }
 
   return {
@@ -74,5 +117,7 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     signup,
     logout,
+    init,
+    initializeFromToken,
   }
 })

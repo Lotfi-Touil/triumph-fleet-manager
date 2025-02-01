@@ -17,6 +17,7 @@
       </div>
       <nav class="p-4 space-y-2">
         <router-link
+          v-if="hasRoutePermission('dashboard' as RouteNames, authStore.user?.role as UserRole)"
           :to="{ name: 'dashboard' }"
           exact-active-class="bg-primary text-primary-foreground"
           class="flex items-center px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
@@ -24,41 +25,56 @@
           <LayoutDashboard class="h-5 w-5 mr-2" />
           <span>Tableau de bord</span>
         </router-link>
-        <router-link
-          :to="{ name: 'spare-parts' }"
-          active-class="bg-primary text-primary-foreground"
-          class="flex items-center justify-between px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+
+        <template
+          v-if="hasRoutePermission('spare-parts' as RouteNames, authStore.user?.role as UserRole)"
         >
-          <div class="flex items-center">
-            <Wrench class="h-5 w-5 mr-2" />
-            <span>Pièces détachées</span>
-          </div>
-        </router-link>
-        <div class="pl-6 space-y-1">
           <router-link
             :to="{ name: 'spare-parts' }"
-            exact-active-class="bg-primary text-primary-foreground"
-            class="flex items-center px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+            active-class="bg-primary text-primary-foreground"
+            class="flex items-center justify-between px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
           >
-            <span>Inventaire</span>
+            <div class="flex items-center">
+              <Wrench class="h-5 w-5 mr-2" />
+              <span>Pièces détachées</span>
+            </div>
           </router-link>
-          <router-link
-            :to="{ name: 'spare-part-orders' }"
-            exact-active-class="bg-primary text-primary-foreground"
-            class="flex items-center px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
-          >
-            <span>Commandes</span>
-          </router-link>
-        </div>
+          <div class="pl-6 space-y-1">
+            <router-link
+              :to="{ name: 'spare-parts' }"
+              exact-active-class="bg-primary text-primary-foreground"
+              class="flex items-center px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+            >
+              <span>Inventaire</span>
+            </router-link>
+            <router-link
+              v-if="
+                hasRoutePermission(
+                  'spare-part-orders' as RouteNames,
+                  authStore.user?.role as UserRole,
+                )
+              "
+              :to="{ name: 'spare-part-orders' }"
+              exact-active-class="bg-primary text-primary-foreground"
+              class="flex items-center px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+            >
+              <span>Commandes</span>
+            </router-link>
+          </div>
+        </template>
+
         <router-link
-        :to="{ name: 'bikes' }"
+          v-if="hasRoutePermission('bikes' as RouteNames, authStore.user?.role as UserRole)"
+          :to="{ name: 'bikes' }"
           active-class="bg-primary text-primary-foreground"
           class="flex items-center px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
         >
           <Bike class="h-5 w-5 mr-2" />
           <span>Gestion du parc moto</span>
         </router-link>
+
         <router-link
+          v-if="hasRoutePermission('maintenance' as RouteNames, authStore.user?.role as UserRole)"
           :to="{ name: 'maintenance' }"
           active-class="bg-primary text-primary-foreground"
           class="flex items-center px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
@@ -66,7 +82,11 @@
           <Settings2 class="h-5 w-5 mr-2" />
           <span>Gestion des entretiens</span>
         </router-link>
+
         <router-link
+          v-if="
+            hasRoutePermission('due-maintenances' as RouteNames, authStore.user?.role as UserRole)
+          "
           :to="{ name: 'due-maintenances' }"
           active-class="bg-primary text-primary-foreground"
           class="flex items-center px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
@@ -74,7 +94,9 @@
           <CalendarClock class="h-5 w-5 mr-2" />
           <span>Entretiens à venir</span>
         </router-link>
+
         <router-link
+          v-if="hasRoutePermission('breakdowns' as RouteNames, authStore.user?.role as UserRole)"
           :to="{ name: 'breakdowns' }"
           active-class="bg-primary text-primary-foreground"
           class="flex items-center px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
@@ -82,7 +104,9 @@
           <Wrench class="h-5 w-5 mr-2" />
           <span>Pannes & Garanties</span>
         </router-link>
+
         <router-link
+          v-if="hasRoutePermission('notifications' as RouteNames, authStore.user?.role as UserRole)"
           :to="{ name: 'notifications' }"
           active-class="bg-primary text-primary-foreground"
           class="flex items-center justify-between px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
@@ -98,22 +122,15 @@
             {{ notificationStore.pendingNotifications.length }}
           </div>
         </router-link>
+
         <router-link
-          v-if="authStore.user?.role === UserRole.ADMIN"
+          v-if="hasRoutePermission('admin-users' as RouteNames, authStore.user?.role as UserRole)"
           :to="{ name: 'admin-users' }"
           active-class="bg-primary text-primary-foreground"
           class="flex items-center px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
         >
           <Users class="h-5 w-5 mr-2" />
           <span>Gestion des utilisateurs</span>
-        </router-link>
-        <router-link
-          :to="{ name: 'profile' }"
-          active-class="bg-primary text-primary-foreground"
-          class="flex items-center px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
-        >
-          <User class="h-5 w-5 mr-2" />
-          <span>Profil</span>
         </router-link>
       </nav>
     </aside>
@@ -159,18 +176,18 @@
                 : route.name === 'maintenance'
                   ? 'Historique des entretiens'
                   : route.name === 'spare-parts'
-                  ? 'Pièces détachées'
-                  : route.name === 'notifications'
-                    ? 'Notifications'
-                    : route.name === 'profile'
-                      ? 'Mon Profil'
-                      : route.name === 'bikes'
-                        ? 'Gestion du parc moto'
-                        : route.name === 'due-maintenances'
-                          ? 'Entretiens à venir'
-                          : route.name === 'breakdowns'
-                            ? 'Pannes & Garanties'
-                            : ''
+                    ? 'Pièces détachées'
+                    : route.name === 'notifications'
+                      ? 'Notifications'
+                      : route.name === 'profile'
+                        ? 'Mon Profil'
+                        : route.name === 'bikes'
+                          ? 'Gestion du parc moto'
+                          : route.name === 'due-maintenances'
+                            ? 'Entretiens à venir'
+                            : route.name === 'breakdowns'
+                              ? 'Pannes & Garanties'
+                              : ''
             }}
           </h1>
           <div class="flex items-center gap-4">
@@ -266,7 +283,11 @@
                         {{ notification.message }}
                       </p>
                       <p class="text-sm text-muted-foreground">
-                        {{ new Date(notification.maintenance.lastMaintenanceDate).toLocaleDateString() }}
+                        {{
+                          new Date(
+                            notification.maintenance.lastMaintenanceDate,
+                          ).toLocaleDateString()
+                        }}
                       </p>
                     </div>
                   </div>
@@ -296,10 +317,21 @@ import { useMaintenanceStore } from '../stores/maintenance'
 import { useNotificationStore } from '../stores/notifications'
 import { UserRole } from '../types/auth'
 import type { Maintenance } from '../services/maintenance.service'
+import { hasRoutePermission } from '../config/routePermissions'
+import type { RouteNames } from '../config/routePermissions'
 
 import { Button } from '../components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
-import { Bike, LayoutDashboard, Settings2, Bell, User, Menu, Users, CalendarClock, Wrench } from 'lucide-vue-next'
+import {
+  Bike,
+  LayoutDashboard,
+  Settings2,
+  Bell,
+  Menu,
+  Users,
+  CalendarClock,
+  Wrench,
+} from 'lucide-vue-next'
 
 const router = useRouter()
 const route = useRoute()

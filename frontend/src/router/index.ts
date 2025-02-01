@@ -4,10 +4,7 @@ import LandingView from '../views/LandingView.vue'
 import DashboardView from '../views/DashboardView.vue'
 import { useAuthStore } from '../stores/auth'
 import { UserRole } from '../types/auth'
-import BikeManagementView from '../views/BikeManagementView.vue'
-import MaintenanceManagementView from '../views/MaintenanceManagementView.vue'
-import DueMaintenancesView from '../views/DueMaintenancesView.vue'
-import BreakdownManagementView from '../views/BreakdownManagementView.vue'
+import { roleGuard } from './guards/roleGuard'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -27,21 +24,25 @@ const router = createRouter({
       name: 'dashboard',
       component: DashboardView,
       meta: { requiresAuth: true },
+      beforeEnter: roleGuard,
       children: [
         {
           path: 'bikes',
           name: 'bikes',
           component: () => import('../views/BikeManagementView.vue'),
+          beforeEnter: roleGuard,
         },
         {
           path: 'maintenance',
           name: 'maintenance',
           component: () => import('../views/MaintenanceManagementView.vue'),
+          beforeEnter: roleGuard,
         },
         {
           path: 'due-maintenances',
           name: 'due-maintenances',
           component: () => import('../views/DueMaintenancesView.vue'),
+          beforeEnter: roleGuard,
         },
         {
           path: 'spare-parts',
@@ -50,21 +51,25 @@ const router = createRouter({
               path: '',
               name: 'spare-parts',
               component: () => import('../views/spare-parts/SparePartsList.vue'),
+              beforeEnter: roleGuard,
             },
             {
               path: 'orders',
               name: 'spare-part-orders',
               component: () => import('../views/spare-parts/SparePartOrders.vue'),
+              beforeEnter: roleGuard,
             },
             {
               path: 'new',
               name: 'new-spare-part',
               component: () => import('../views/spare-parts/SparePartForm.vue'),
+              beforeEnter: roleGuard,
             },
             {
               path: ':id',
               name: 'edit-spare-part',
               component: () => import('../views/spare-parts/SparePartForm.vue'),
+              beforeEnter: roleGuard,
             },
           ],
         },
@@ -72,22 +77,25 @@ const router = createRouter({
           path: 'breakdowns',
           name: 'breakdowns',
           component: () => import('../views/BreakdownManagementView.vue'),
+          beforeEnter: roleGuard,
         },
         {
           path: 'notifications',
           name: 'notifications',
           component: () => import('../views/NotificationsView.vue'),
+          beforeEnter: roleGuard,
         },
         {
           path: 'profile',
           name: 'profile',
           component: () => import('../views/ProfileView.vue'),
+          beforeEnter: roleGuard,
         },
         {
           path: 'admin/users',
           name: 'admin-users',
           component: () => import('../views/AdminUsersView.vue'),
-          meta: { requiresAdmin: true },
+          beforeEnter: roleGuard,
         },
       ],
     },
@@ -105,14 +113,27 @@ const router = createRouter({
 })
 
 // Navigation guard
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const token = localStorage.getItem('token')
   const authStore = useAuthStore()
 
+  // Si on a un token mais que l'utilisateur n'est pas initialisé
+  if (token && !authStore.isAuthenticated) {
+    try {
+      // Initialise l'utilisateur à partir du token
+      await authStore.initializeFromToken(token)
+    } catch (error) {
+      // Si l'initialisation échoue, on supprime le token et on redirige vers login
+      localStorage.removeItem('token')
+      next({ name: 'login', query: { redirect: to.fullPath } })
+      return
+    }
+  }
+
   if (to.meta.requiresAuth && !token) {
-    next('/login')
+    next({ name: 'login', query: { redirect: to.fullPath } })
   } else if (to.meta.requiresAdmin && authStore.user?.role !== UserRole.ADMIN) {
-    next('/dashboard')
+    next({ name: 'dashboard' })
   } else {
     next()
   }

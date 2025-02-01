@@ -21,12 +21,12 @@
           </TableHeader>
           <TableBody>
             <TableRow v-for="user in users" :key="user.id">
-              <TableCell>{{ user.name }}</TableCell>
-              <TableCell>{{ user.email }}</TableCell>
-              <TableCell>
+              <TableCell class="text-foreground">{{ user.name }}</TableCell>
+              <TableCell class="text-foreground">{{ user.email }}</TableCell>
+              <TableCell class="text-foreground">
                 <Select
                   v-model="user.role"
-                  @update:modelValue="(value) => handleRoleChange(user.id, value)"
+                  @update:modelValue="(value) => handleRoleChange(user.id, value as UserRole)"
                 >
                   <SelectTrigger>
                     <SelectValue :placeholder="user.role" />
@@ -39,7 +39,12 @@
                 </Select>
               </TableCell>
               <TableCell>
-                <Button variant="ghost" size="sm" @click="handleRoleChange(user.id, user.role)">
+                <Button
+                  variant="default"
+                  size="sm"
+                  class="text-primary-foreground"
+                  @click="handleRoleChange(user.id, user.role)"
+                >
                   Enregistrer
                 </Button>
               </TableCell>
