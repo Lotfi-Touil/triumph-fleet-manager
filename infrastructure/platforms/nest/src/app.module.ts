@@ -1,27 +1,34 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { MaintenanceModule } from './maintenance/maintenance.module';
 import { BikeModule } from './bike/bike.module';
 import { BreakdownModule } from './breakdown/breakdown.module';
+import { DriverModule } from './driver/driver.module';
+import { TrialModule } from './trial/trial.module';
+import { IncidentModule } from './incident/incident.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT || '5432'),
-      username: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      autoLoadEntities: true,
-      synchronize: true,
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get('DB_HOST'),
+        port: +configService.get('DB_PORT'),
+        username: configService.get('DB_USERNAME'),
+        password: configService.get('DB_PASSWORD'),
+        database: configService.get('DB_NAME'),
+        autoLoadEntities: true,
+        synchronize: true,
+      }),
+      inject: [ConfigService],
     }),
     ScheduleModule.forRoot(),
     AuthModule,
@@ -29,6 +36,9 @@ import { BreakdownModule } from './breakdown/breakdown.module';
     MaintenanceModule,
     BikeModule,
     BreakdownModule,
+    DriverModule,
+    TrialModule,
+    IncidentModule,
   ],
 })
 export class AppModule {}

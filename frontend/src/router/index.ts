@@ -5,6 +5,7 @@ import DashboardView from '../views/DashboardView.vue'
 import { useAuthStore } from '../stores/auth'
 import { UserRole } from '../types/auth'
 import { roleGuard } from './guards/roleGuard'
+import IncidentHistoryView from '../views/IncidentHistoryView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -31,6 +32,29 @@ const router = createRouter({
           name: 'bikes',
           component: () => import('../views/BikeManagementView.vue'),
           beforeEnter: roleGuard,
+        },
+        {
+          path: 'trials',
+          children: [
+            {
+              path: 'history',
+              name: 'trial-history',
+              component: () => import('../views/TrialTrackingView.vue'),
+              beforeEnter: roleGuard,
+            },
+            {
+              path: 'incidents',
+              name: 'trial-incidents',
+              component: IncidentHistoryView,
+              beforeEnter: roleGuard,
+            },
+            {
+              path: 'drivers',
+              name: 'drivers',
+              component: () => import('../views/DriverManagementView.vue'),
+              beforeEnter: roleGuard,
+            },
+          ],
         },
         {
           path: 'maintenance',

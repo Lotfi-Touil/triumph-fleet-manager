@@ -17,6 +17,10 @@ export type RouteNames =
   | 'home'
   | 'login'
   | 'signup'
+  | 'trial-history'
+  | 'trial-incidents'
+  | 'drivers'
+  | 'incidents'
 
 export const routePermissions: Record<RouteNames, UserRole[]> = {
   // Routes publiques
@@ -94,6 +98,16 @@ export const routePermissions: Record<RouteNames, UserRole[]> = {
 
   // Administration
   'admin-users': [UserRole.ADMIN],
+
+  // Suivi des essais
+  'trial-history': [UserRole.ADMIN, UserRole.FLEET_MANAGER],
+  'trial-incidents': [UserRole.ADMIN, UserRole.FLEET_MANAGER],
+
+  // Gestion des conducteurs
+  'drivers': [UserRole.ADMIN, UserRole.FLEET_MANAGER],
+
+  // Incidents
+  'incidents': [UserRole.ADMIN, UserRole.FLEET_MANAGER],
 }
 
 export const hasRoutePermission = (routeName: RouteNames, userRole: UserRole): boolean => {

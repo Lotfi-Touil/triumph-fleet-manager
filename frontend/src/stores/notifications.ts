@@ -11,6 +11,17 @@ export const useNotificationStore = defineStore('notifications', () => {
 
   const totalPendingCount = computed(() => pendingNotifications.value.length)
 
+  function showSuccess(message: string) {
+    // Vous pouvez implémenter ici une logique pour afficher les notifications de succès
+    // Par exemple, en utilisant une bibliothèque de toast ou en ajoutant à une liste de notifications
+    console.log('Success:', message)
+  }
+
+  function showError(message: string) {
+    // Vous pouvez implémenter ici une logique pour afficher les notifications d'erreur
+    console.log('Error:', message)
+  }
+
   async function fetchAllNotifications() {
     try {
       loading.value = true
@@ -84,5 +95,7 @@ export const useNotificationStore = defineStore('notifications', () => {
     acknowledgeNotification,
     startAutoRefresh,
     stopAutoRefresh,
+    showSuccess,
+    showError
   }
 })

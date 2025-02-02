@@ -17,7 +17,7 @@
       </div>
       <nav class="p-4 space-y-2">
         <router-link
-          v-if="hasRoutePermission('dashboard' as RouteNames, authStore.user?.role as UserRole)"
+          v-if="checkRoutePermission('dashboard')"
           :to="{ name: 'dashboard' }"
           exact-active-class="bg-primary text-primary-foreground"
           class="flex items-center px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
@@ -27,7 +27,7 @@
         </router-link>
 
         <template
-          v-if="hasRoutePermission('spare-parts' as RouteNames, authStore.user?.role as UserRole)"
+          v-if="checkRoutePermission('spare-parts')"
         >
           <router-link
             :to="{ name: 'spare-parts' }"
@@ -48,12 +48,7 @@
               <span>Inventaire</span>
             </router-link>
             <router-link
-              v-if="
-                hasRoutePermission(
-                  'spare-part-orders' as RouteNames,
-                  authStore.user?.role as UserRole,
-                )
-              "
+              v-if="checkRoutePermission('spare-part-orders')"
               :to="{ name: 'spare-part-orders' }"
               exact-active-class="bg-primary text-primary-foreground"
               class="flex items-center px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
@@ -64,7 +59,7 @@
         </template>
 
         <router-link
-          v-if="hasRoutePermission('bikes' as RouteNames, authStore.user?.role as UserRole)"
+          v-if="checkRoutePermission('bikes')"
           :to="{ name: 'bikes' }"
           active-class="bg-primary text-primary-foreground"
           class="flex items-center px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
@@ -74,7 +69,7 @@
         </router-link>
 
         <router-link
-          v-if="hasRoutePermission('maintenance' as RouteNames, authStore.user?.role as UserRole)"
+          v-if="checkRoutePermission('maintenance')"
           :to="{ name: 'maintenance' }"
           active-class="bg-primary text-primary-foreground"
           class="flex items-center px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
@@ -84,9 +79,7 @@
         </router-link>
 
         <router-link
-          v-if="
-            hasRoutePermission('due-maintenances' as RouteNames, authStore.user?.role as UserRole)
-          "
+          v-if="checkRoutePermission('due-maintenances')"
           :to="{ name: 'due-maintenances' }"
           active-class="bg-primary text-primary-foreground"
           class="flex items-center px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
@@ -96,7 +89,7 @@
         </router-link>
 
         <router-link
-          v-if="hasRoutePermission('breakdowns' as RouteNames, authStore.user?.role as UserRole)"
+          v-if="checkRoutePermission('breakdowns')"
           :to="{ name: 'breakdowns' }"
           active-class="bg-primary text-primary-foreground"
           class="flex items-center px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
@@ -105,8 +98,46 @@
           <span>Pannes & Garanties</span>
         </router-link>
 
+        <template v-if="checkRoutePermission('trial-history')">
+          <router-link
+            :to="{ name: 'trial-history' }"
+            active-class="bg-primary text-primary-foreground"
+            class="flex items-center justify-between px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+          >
+            <div class="flex items-center">
+              <ClipboardCheck class="h-5 w-5 mr-2" />
+              <span>Suivi des essais</span>
+            </div>
+          </router-link>
+          <div class="pl-6 space-y-1">
+            <router-link
+              :to="{ name: 'trial-history' }"
+              exact-active-class="bg-primary text-primary-foreground"
+              class="flex items-center px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+            >
+              <span>Historique des essais</span>
+            </router-link>
+            <router-link
+              v-if="checkRoutePermission('trial-incidents')"
+              :to="{ name: 'trial-incidents' }"
+              exact-active-class="bg-primary text-primary-foreground"
+              class="flex items-center px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+            >
+              <span>Historique des incidents</span>
+            </router-link>
+            <router-link
+              v-if="checkRoutePermission('drivers')"
+              :to="{ name: 'drivers' }"
+              exact-active-class="bg-primary text-primary-foreground"
+              class="flex items-center px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+            >
+              <span>Gestion des conducteurs</span>
+            </router-link>
+          </div>
+        </template>
+
         <router-link
-          v-if="hasRoutePermission('notifications' as RouteNames, authStore.user?.role as UserRole)"
+          v-if="checkRoutePermission('notifications')"
           :to="{ name: 'notifications' }"
           active-class="bg-primary text-primary-foreground"
           class="flex items-center justify-between px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
@@ -124,7 +155,7 @@
         </router-link>
 
         <router-link
-          v-if="hasRoutePermission('admin-users' as RouteNames, authStore.user?.role as UserRole)"
+          v-if="checkRoutePermission('admin-users')"
           :to="{ name: 'admin-users' }"
           active-class="bg-primary text-primary-foreground"
           class="flex items-center px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
@@ -187,7 +218,13 @@
                             ? 'Entretiens à venir'
                             : route.name === 'breakdowns'
                               ? 'Pannes & Garanties'
-                              : ''
+                              : route.name === 'trial-history'
+                                ? 'Historique des essais'
+                                : route.name === 'trial-incidents'
+                                  ? 'Historique des incidents'
+                                  : route.name === 'drivers'
+                                    ? 'Gestion des conducteurs'
+                                    : ''
             }}
           </h1>
           <div class="flex items-center gap-4">
@@ -327,7 +364,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useMaintenanceStore } from '../stores/maintenance'
@@ -348,6 +385,7 @@ import {
   Users,
   CalendarClock,
   Wrench,
+  ClipboardCheck,
 } from 'lucide-vue-next'
 import UpdateKilometersDialog from '../components/maintenance/UpdateKilometersDialog.vue'
 
@@ -358,6 +396,13 @@ const maintenanceStore = useMaintenanceStore()
 const notificationStore = useNotificationStore()
 const isSidebarOpen = ref(false)
 const dueMaintenances = ref<Maintenance[]>([])
+
+const checkRoutePermission = computed(() => {
+  return (routeName: string) => {
+    const userRole = authStore.user?.role ?? UserRole.DRIVER;
+    return hasRoutePermission(routeName as RouteNames, userRole as UserRole);
+  }
+})
 
 const fetchDueMaintenances = async () => {
   dueMaintenances.value = await maintenanceStore.getDueMaintenances()
