@@ -44,6 +44,7 @@ export const useMaintenanceStore = defineStore('maintenance', () => {
     bikeId: string
     date: string
     kilometers: number
+    technicianId?: string
   }): Promise<void> {
     try {
       loading.value = true
@@ -63,6 +64,7 @@ export const useMaintenanceStore = defineStore('maintenance', () => {
     bikeId: string
     date: string
     kilometers: number
+    technicianId?: string
   }): Promise<void> {
     try {
       loading.value = true

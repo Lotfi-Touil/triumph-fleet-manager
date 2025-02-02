@@ -1,6 +1,9 @@
 import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { MaintenanceEntity } from './maintenance.entity';
-import { NotificationStatus } from '@domain/entities/MaintenanceNotification';
+import {
+  NotificationStatus,
+  NotificationType,
+} from '@domain/entities/MaintenanceNotification';
 
 @Entity('maintenance_notifications')
 export class MaintenanceNotificationEntity {
@@ -20,6 +23,13 @@ export class MaintenanceNotificationEntity {
     default: NotificationStatus.PENDING,
   })
   status: NotificationStatus;
+
+  @Column({
+    type: 'enum',
+    enum: NotificationType,
+    default: NotificationType.MAINTENANCE,
+  })
+  type: NotificationType;
 
   @Column()
   message: string;

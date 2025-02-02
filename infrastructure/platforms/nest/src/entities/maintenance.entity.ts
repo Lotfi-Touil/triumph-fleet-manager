@@ -1,5 +1,6 @@
 import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { BikeEntity } from './bike.entity';
+import { UserEntity } from './user.entity';
 
 @Entity('maintenances')
 export class MaintenanceEntity {
@@ -12,6 +13,13 @@ export class MaintenanceEntity {
   @ManyToOne(() => BikeEntity)
   @JoinColumn({ name: 'bike_id' })
   bike: BikeEntity;
+
+  @Column({ name: 'technician_id', nullable: true })
+  technicianId: string | null;
+
+  @ManyToOne(() => UserEntity)
+  @JoinColumn({ name: 'technician_id' })
+  technician: UserEntity | null;
 
   @Column({ name: 'last_maintenance_date' })
   lastMaintenanceDate: Date;

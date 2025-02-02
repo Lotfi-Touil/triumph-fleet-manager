@@ -68,15 +68,17 @@
 
     <!-- Main Content -->
     <Card>
-      <CardHeader className="space-y-1">
-        <div class="flex items-center justify-between space-x-2">
-          <CardTitle>Inventaire des pièces</CardTitle>
+      <CardHeader>
+        <div class="flex items-center justify-between mb-2">
+          <CardTitle class="text-xl">Inventaire des pièces</CardTitle>
           <Button @click="router.push('/dashboard/spare-parts/new')">
             <Plus class="mr-2 h-4 w-4" />
             Nouvelle pièce
           </Button>
         </div>
-        <CardDescription>Gérez votre inventaire de pièces détachées</CardDescription>
+        <CardDescription class="text-sm text-muted-foreground">
+          Gérez votre inventaire de pièces détachées
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <div class="space-y-4">

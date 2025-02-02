@@ -1,7 +1,7 @@
 export class Kilometers {
   constructor(private readonly value: number) {
     if (value < 0) {
-      throw new Error('Kilometers cannot be negative');
+      throw new Error("Kilometers cannot be negative");
     }
   }
 
@@ -21,4 +21,8 @@ export class Kilometers {
   public isGreaterThanOrEqual(other: Kilometers): boolean {
     return this.value >= other.getValue();
   }
-} 
+
+  public isLessThanOrEqual(other: Kilometers): boolean {
+    return this.value <= other.getValue();
+  }
+}

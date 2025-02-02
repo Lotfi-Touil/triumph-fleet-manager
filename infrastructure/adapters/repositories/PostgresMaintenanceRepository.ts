@@ -5,28 +5,37 @@ import { Maintenance } from "../../../domain/entities/Maintenance";
 import { MaintenanceRepository } from "../../../domain/repositories/MaintenanceRepository";
 import { MaintenanceEntity } from "../../platforms/nest/src/entities/maintenance.entity";
 import { BikeRepository } from "../../../domain/repositories/BikeRepository";
+import { UserEntity } from "../../platforms/nest/src/entities/user.entity";
+import { User } from "../../../domain/entities/User";
 
 @Injectable()
 export class PostgresMaintenanceRepository implements MaintenanceRepository {
   constructor(
     @InjectRepository(MaintenanceEntity)
     private readonly repository: Repository<MaintenanceEntity>,
-    private readonly bikeRepository: BikeRepository
+    private readonly bikeRepository: BikeRepository,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>
   ) {}
 
   async save(maintenance: Maintenance): Promise<void> {
     const entity = new MaintenanceEntity();
     entity.id = maintenance.getId();
     entity.bikeId = maintenance.getBike().getId();
+    entity.technicianId = maintenance.getTechnician()?.id || null;
     entity.lastMaintenanceDate = maintenance.getLastMaintenanceDate();
-    entity.lastMaintenanceKilometers = maintenance.getLastMaintenanceKilometers();
+    entity.lastMaintenanceKilometers =
+      maintenance.getLastMaintenanceKilometers();
     entity.currentKilometers = maintenance.getCurrentKilometers();
 
     await this.repository.save(entity);
   }
 
   async findById(id: string): Promise<Maintenance | null> {
-    const entity = await this.repository.findOne({ where: { id } });
+    const entity = await this.repository.findOne({
+      where: { id },
+      relations: ["technician"],
+    });
     if (!entity) {
       return null;
     }
@@ -35,12 +44,17 @@ export class PostgresMaintenanceRepository implements MaintenanceRepository {
   }
 
   async findByBikeId(bikeId: string): Promise<Maintenance[]> {
-    const entities = await this.repository.find({ where: { bikeId } });
+    const entities = await this.repository.find({
+      where: { bikeId },
+      relations: ["technician"],
+    });
     return Promise.all(entities.map((entity) => this.toDomain(entity)));
   }
 
   async findAll(): Promise<Maintenance[]> {
-    const entities = await this.repository.find();
+    const entities = await this.repository.find({
+      relations: ["technician"],
+    });
     return Promise.all(entities.map((entity) => this.toDomain(entity)));
   }
 
@@ -50,7 +64,9 @@ export class PostgresMaintenanceRepository implements MaintenanceRepository {
 
   async findDueMaintenances(): Promise<Maintenance[]> {
     const allMaintenances = await this.findAll();
-    return allMaintenances.filter((maintenance) => maintenance.isMaintenanceNeeded());
+    return allMaintenances.filter((maintenance) =>
+      maintenance.isMaintenanceUpcoming()
+    );
   }
 
   private async toDomain(entity: MaintenanceEntity): Promise<Maintenance> {
@@ -59,12 +75,26 @@ export class PostgresMaintenanceRepository implements MaintenanceRepository {
       throw new Error("Bike not found");
     }
 
+    let technician = null;
+    if (entity.technician) {
+      technician = new User({
+        id: entity.technician.id,
+        email: entity.technician.email,
+        password: entity.technician.password,
+        name: entity.technician.name,
+        role: entity.technician.role,
+        createdAt: entity.technician.createdAt,
+        updatedAt: entity.technician.updatedAt,
+      });
+    }
+
     return new Maintenance(
       entity.id,
       bike,
       entity.lastMaintenanceDate,
       entity.lastMaintenanceKilometers,
-      entity.currentKilometers
+      entity.currentKilometers,
+      technician
     );
   }
-} 
+}

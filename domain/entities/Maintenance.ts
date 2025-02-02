@@ -1,5 +1,6 @@
 import { Bike } from "./Bike";
 import { MaintenanceCalculator } from "../services/MaintenanceCalculator";
+import { User } from "./User";
 
 export class Maintenance {
   constructor(
@@ -7,7 +8,8 @@ export class Maintenance {
     private readonly bike: Bike,
     private readonly lastMaintenanceDate: Date,
     private readonly lastMaintenanceKilometers: number,
-    private readonly currentKilometers: number
+    private readonly currentKilometers: number,
+    private readonly technician: User | null
   ) {}
 
   public getId(): string {
@@ -30,8 +32,16 @@ export class Maintenance {
     return this.currentKilometers;
   }
 
+  public getTechnician(): User | null {
+    return this.technician;
+  }
+
   public isMaintenanceNeeded(): boolean {
     return MaintenanceCalculator.isMaintenanceNeeded(this);
+  }
+
+  public isMaintenanceUpcoming(): boolean {
+    return MaintenanceCalculator.isMaintenanceUpcoming(this);
   }
 
   public getNextMaintenanceKilometers(): number {
@@ -41,4 +51,4 @@ export class Maintenance {
   public getNextMaintenanceDate(): Date {
     return MaintenanceCalculator.getNextMaintenanceDate(this);
   }
-} 
+}

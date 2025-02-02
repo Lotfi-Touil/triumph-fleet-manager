@@ -26,16 +26,24 @@
       <table class="min-w-full divide-y divide-border">
         <thead class="bg-muted">
           <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+            >
               Moto
             </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+            >
               Date d'entretien
             </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+            >
               Kilométrage
             </th>
-            <th class="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            <th
+              class="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider"
+            >
               Actions
             </th>
           </tr>
@@ -43,7 +51,12 @@
         <tbody class="bg-card divide-y divide-border">
           <tr v-for="maintenance in maintenances" :key="maintenance.id" class="hover:bg-muted/50">
             <td class="px-6 py-4 whitespace-nowrap text-foreground">
-              {{ maintenance.bike?.name }} {{ maintenance.bike?.registrationNumber ? `- ${maintenance.bike.registrationNumber}` : '' }}
+              {{ maintenance.bike?.name }}
+              {{
+                maintenance.bike?.registrationNumber
+                  ? `- ${maintenance.bike.registrationNumber}`
+                  : ''
+              }}
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-foreground">
               {{ new Date(maintenance.lastMaintenanceDate).toLocaleDateString() }}
@@ -85,7 +98,7 @@
       <div class="fixed inset-0 flex items-center justify-center">
         <div class="bg-card rounded-lg p-6 w-full max-w-md shadow-lg border">
           <h2 class="text-xl font-bold mb-4 text-foreground">
-            {{ showEditModal ? 'Modifier l\'entretien' : 'Enregistrer un entretien' }}
+            {{ showEditModal ? "Modifier l'entretien" : 'Enregistrer un entretien' }}
           </h2>
           <form @submit.prevent="handleSubmit" class="space-y-4">
             <div>
@@ -97,7 +110,12 @@
                 <SelectContent>
                   <SelectGroup>
                     <SelectLabel class="text-foreground">Modèles disponibles</SelectLabel>
-                    <SelectItem v-for="bike in bikes" :key="bike.id" :value="bike.id" class="text-foreground">
+                    <SelectItem
+                      v-for="bike in bikes"
+                      :key="bike.id"
+                      :value="bike.id"
+                      class="text-foreground"
+                    >
                       {{ bike.name }} - {{ bike.registrationNumber }}
                     </SelectItem>
                   </SelectGroup>
@@ -125,6 +143,30 @@
                 />
                 <span class="text-muted-foreground">km</span>
               </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-foreground">Technicien</label>
+              <Select v-model="form.technicianId">
+                <SelectTrigger class="w-full">
+                  <SelectValue
+                    placeholder="Sélectionnez un technicien (optionnel)"
+                    class="text-foreground"
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel class="text-foreground">Techniciens disponibles</SelectLabel>
+                    <SelectItem
+                      v-for="technician in technicians"
+                      :key="technician.id"
+                      :value="technician.id"
+                      class="text-foreground"
+                    >
+                      {{ technician.name }}
+                    </SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </div>
             <div class="flex justify-end space-x-2">
               <button
@@ -178,25 +220,36 @@
       <div class="fixed inset-0 bg-background/80 backdrop-blur-sm" />
       <div class="fixed inset-0 flex items-center justify-center">
         <div class="bg-card rounded-lg p-6 w-full max-w-md shadow-lg border">
-          <h2 class="text-xl font-bold mb-4 text-foreground">
-            Détails de l'entretien
-          </h2>
+          <h2 class="text-xl font-bold mb-4 text-foreground">Détails de l'entretien</h2>
           <div class="space-y-4">
             <div>
               <label class="block text-sm font-medium text-muted-foreground">Moto</label>
               <p class="mt-1 text-foreground">
-                {{ selectedMaintenance?.bike.name }} - {{ selectedMaintenance?.bike.registrationNumber }}
+                {{ selectedMaintenance?.bike.name }} -
+                {{ selectedMaintenance?.bike.registrationNumber }}
               </p>
             </div>
             <div>
-              <label class="block text-sm font-medium text-muted-foreground">Date d'entretien</label>
+              <label class="block text-sm font-medium text-muted-foreground"
+                >Date d'entretien</label
+              >
               <p class="mt-1 text-foreground">
-                {{ selectedMaintenance ? new Date(selectedMaintenance.lastMaintenanceDate).toLocaleDateString() : '' }}
+                {{
+                  selectedMaintenance
+                    ? new Date(selectedMaintenance.lastMaintenanceDate).toLocaleDateString()
+                    : ''
+                }}
               </p>
             </div>
             <div>
               <label class="block text-sm font-medium text-muted-foreground">Kilométrage</label>
               <p class="mt-1 text-foreground">{{ selectedMaintenance?.currentKilometers }} km</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-muted-foreground">Technicien</label>
+              <p class="mt-1 text-foreground">
+                {{ selectedMaintenance?.technician?.name || 'Non assigné' }}
+              </p>
             </div>
             <div class="flex justify-end">
               <button
@@ -217,9 +270,10 @@
 import { ref, onMounted } from 'vue'
 import { useMaintenanceStore } from '../stores/maintenance'
 import { useBikeStore } from '../stores/bike'
+import { useUserStore } from '../stores/user'
 import type { Bike } from '../services/bike.service'
 import type { Maintenance } from '../services/maintenance.service'
-import { Button } from '../components/ui/button'
+import type { User } from '../services/user.service'
 import { Input } from '../components/ui/input'
 import {
   Select,
@@ -234,12 +288,13 @@ import { Eye, Pencil, Trash2 } from 'lucide-vue-next'
 
 const maintenanceStore = useMaintenanceStore()
 const bikeStore = useBikeStore()
+const userStore = useUserStore()
 
 const loading = ref(false)
 const error = ref<string | null>(null)
 const bikes = ref<Bike[]>([])
+const technicians = ref<User[]>([])
 const maintenances = ref<Maintenance[]>([])
-
 const showCreateModal = ref(false)
 const showEditModal = ref(false)
 const showDeleteModal = ref(false)
@@ -251,16 +306,22 @@ const form = ref({
   bikeId: '',
   date: '',
   kilometers: 0,
+  technicianId: '',
 })
 
 async function fetchData() {
   try {
     loading.value = true
+    error.value = null
+    const [maintenancesData, techniciansData] = await Promise.all([
+      maintenanceStore.getAllMaintenances(),
+      userStore.getTechnicians(),
+    ])
     await bikeStore.fetchBikes()
+    maintenances.value = maintenancesData
     bikes.value = bikeStore.bikes
-    const allMaintenances = await maintenanceStore.getAllMaintenances()
-    maintenances.value = allMaintenances
-  } catch (err) {
+    technicians.value = techniciansData
+  } catch {
     error.value = 'Erreur lors du chargement des données'
   } finally {
     loading.value = false
@@ -273,6 +334,7 @@ function editMaintenance(maintenance: Maintenance) {
     bikeId: maintenance.bike.id,
     date: new Date(maintenance.lastMaintenanceDate).toISOString().split('T')[0],
     kilometers: maintenance.currentKilometers,
+    technicianId: maintenance.technician?.id || '',
   }
   showEditModal.value = true
 }
@@ -288,10 +350,18 @@ async function handleSubmit() {
     if (showEditModal.value && selectedMaintenanceId.value) {
       await maintenanceStore.updateMaintenance({
         id: selectedMaintenanceId.value,
-        ...form.value
+        bikeId: form.value.bikeId,
+        date: form.value.date,
+        kilometers: form.value.kilometers,
+        technicianId: form.value.technicianId || undefined,
       })
     } else {
-      await maintenanceStore.createMaintenance(form.value)
+      await maintenanceStore.createMaintenance({
+        bikeId: form.value.bikeId,
+        date: form.value.date,
+        kilometers: form.value.kilometers,
+        technicianId: form.value.technicianId || undefined,
+      })
     }
     closeModal()
     await fetchData()
@@ -330,6 +400,7 @@ function closeModal() {
     bikeId: '',
     date: '',
     kilometers: 0,
+    technicianId: '',
   }
 }
 
@@ -341,4 +412,4 @@ function viewMaintenance(maintenance: Maintenance) {
 onMounted(async () => {
   await fetchData()
 })
-</script> 
+</script>

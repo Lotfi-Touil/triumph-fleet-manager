@@ -34,6 +34,12 @@ export class UserEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
+  constructor(partial?: Partial<UserEntity>) {
+    if (partial) {
+      Object.assign(this, partial);
+    }
+  }
+
   toDomain(): User {
     return new User({
       id: this.id,

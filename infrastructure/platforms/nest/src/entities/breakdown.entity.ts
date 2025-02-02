@@ -17,18 +17,21 @@ export class BreakdownEntity {
   @Column({
     type: 'enum',
     enum: BreakdownType,
-    default: BreakdownType.MECHANICAL
+    default: BreakdownType.MECHANICAL,
   })
   type: BreakdownType;
 
   @Column({
     type: 'enum',
     enum: BreakdownStatus,
-    default: BreakdownStatus.REPORTED
+    default: BreakdownStatus.REPORTED,
   })
   status: BreakdownStatus;
 
-  @Column({ type: 'timestamp' })
+  @Column({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   reportDate: Date;
 
   @Column({ type: 'timestamp', nullable: true })
@@ -48,4 +51,4 @@ export class BreakdownEntity {
 
   @Column('simple-array', { default: '' })
   replacedParts: string[];
-} 
+}

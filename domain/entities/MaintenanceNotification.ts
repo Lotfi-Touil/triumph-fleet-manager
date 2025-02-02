@@ -6,13 +6,19 @@ export enum NotificationStatus {
   ACKNOWLEDGED = "ACKNOWLEDGED",
 }
 
+export enum NotificationType {
+  MAINTENANCE = "MAINTENANCE",
+  LOW_STOCK = "LOW_STOCK",
+}
+
 export class MaintenanceNotification {
   constructor(
     private readonly id: string,
     private readonly maintenance: Maintenance,
     private readonly createdAt: Date,
     private status: NotificationStatus,
-    private readonly message: string
+    private readonly message: string,
+    private readonly type: NotificationType = NotificationType.MAINTENANCE
   ) {}
 
   public getId(): string {
@@ -33,6 +39,10 @@ export class MaintenanceNotification {
 
   public getMessage(): string {
     return this.message;
+  }
+
+  public getType(): NotificationType {
+    return this.type;
   }
 
   public acknowledge(): void {

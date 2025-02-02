@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { breakdownService } from '../services/breakdown.service'
-import type { Breakdown } from '../services/breakdown.service'
+import type { Breakdown, SparePartRequest } from '../services/breakdown.service'
 import { BreakdownType, BreakdownStatus } from '../services/breakdown.service'
 
 export const useBreakdownStore = defineStore('breakdown', () => {
@@ -16,9 +16,9 @@ export const useBreakdownStore = defineStore('breakdown', () => {
       const result = await breakdownService.getBreakdowns()
       breakdowns.value = result
       return result
-    } catch (err) {
+    } catch {
       error.value = 'Erreur lors de la récupération des pannes'
-      throw err
+      throw error
     } finally {
       loading.value = false
     }
@@ -31,9 +31,9 @@ export const useBreakdownStore = defineStore('breakdown', () => {
       const result = await breakdownService.getBreakdownsByBike(bikeId)
       breakdowns.value = result
       return result
-    } catch (err) {
+    } catch {
       error.value = 'Erreur lors de la récupération des pannes pour cette moto'
-      throw err
+      throw error
     } finally {
       loading.value = false
     }
@@ -46,9 +46,9 @@ export const useBreakdownStore = defineStore('breakdown', () => {
       const result = await breakdownService.getUnresolvedBreakdowns()
       breakdowns.value = result
       return result
-    } catch (err) {
+    } catch {
       error.value = 'Erreur lors de la récupération des pannes non résolues'
-      throw err
+      throw error
     } finally {
       loading.value = false
     }
@@ -59,36 +59,39 @@ export const useBreakdownStore = defineStore('breakdown', () => {
     description: string
     type: BreakdownType
     warrantyApplied: boolean
+    spareParts?: SparePartRequest[]
   }): Promise<void> {
     try {
       loading.value = true
       error.value = null
       await breakdownService.createBreakdown(data)
       await fetchBreakdowns()
-    } catch (err) {
+    } catch {
       error.value = 'Erreur lors de la création de la panne'
-      throw err
+      throw error
     } finally {
       loading.value = false
     }
   }
 
-  async function updateBreakdown(id: string, data: {
+  async function updateBreakdown(
+    id: string,
+    data: {
     status?: BreakdownStatus
     repairActions?: string
     technicalRecommendations?: string
-    replacedParts?: string[]
-    cost?: number
+      spareParts?: SparePartRequest[]
     warrantyApplied?: boolean
-  }): Promise<void> {
+    },
+  ): Promise<void> {
     try {
       loading.value = true
       error.value = null
       await breakdownService.updateBreakdown(id, data)
       await fetchBreakdowns()
-    } catch (err) {
+    } catch {
       error.value = 'Erreur lors de la mise à jour de la panne'
-      throw err
+      throw error
     } finally {
       loading.value = false
     }
@@ -100,9 +103,9 @@ export const useBreakdownStore = defineStore('breakdown', () => {
       error.value = null
       await breakdownService.deleteBreakdown(id)
       await fetchBreakdowns()
-    } catch (err) {
+    } catch {
       error.value = 'Erreur lors de la suppression de la panne'
-      throw err
+      throw error
     } finally {
       loading.value = false
     }
@@ -117,6 +120,6 @@ export const useBreakdownStore = defineStore('breakdown', () => {
     fetchUnresolvedBreakdowns,
     createBreakdown,
     updateBreakdown,
-    deleteBreakdown
+    deleteBreakdown,
   }
-}) 
+})

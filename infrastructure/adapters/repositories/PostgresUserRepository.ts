@@ -33,7 +33,10 @@ export class PostgresUserRepository implements IUserRepository {
         where: { email },
       });
       this.logger.debug("Found user entity:", userEntity);
-      return userEntity ? userEntity.toDomain() : null;
+      if (!userEntity) return null;
+
+      const entity = new UserEntity(userEntity);
+      return entity.toDomain();
     } catch (error) {
       this.logger.error(
         `Error finding user by email: ${error.message}`,
@@ -48,7 +51,10 @@ export class PostgresUserRepository implements IUserRepository {
       this.logger.debug(`Finding user by ID: ${id}`);
       const userEntity = await this.userRepository.findOne({ where: { id } });
       this.logger.debug("Found user entity:", userEntity);
-      return userEntity ? userEntity.toDomain() : null;
+      if (!userEntity) return null;
+
+      const entity = new UserEntity(userEntity);
+      return entity.toDomain();
     } catch (error) {
       this.logger.error(
         `Error finding user by ID: ${error.message}`,
@@ -63,7 +69,7 @@ export class PostgresUserRepository implements IUserRepository {
       this.logger.debug("Finding all users");
       const userEntities = await this.userRepository.find();
       this.logger.debug(`Found ${userEntities.length} users`);
-      return userEntities.map((entity) => entity.toDomain());
+      return userEntities.map((entity) => new UserEntity(entity).toDomain());
     } catch (error) {
       this.logger.error(
         `Error finding all users: ${error.message}`,

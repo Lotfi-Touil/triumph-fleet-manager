@@ -39,15 +39,17 @@
 
     <!-- Main Content -->
     <Card>
-      <CardHeader className="space-y-1">
-        <div class="flex items-center justify-between space-x-2">
-          <CardTitle>Historique des commandes</CardTitle>
+      <CardHeader>
+        <div class="flex items-center justify-between mb-2">
+          <CardTitle class="text-xl">Historique des commandes</CardTitle>
           <Button @click="openNewOrderDialog">
             <Plus class="mr-2 h-4 w-4" />
             Nouvelle commande
           </Button>
         </div>
-        <CardDescription>Gérez vos commandes de pièces détachées</CardDescription>
+        <CardDescription class="text-sm text-muted-foreground">
+          Gérez vos commandes de pièces détachées
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <div class="space-y-4">
@@ -74,7 +76,9 @@
             <div class="relative w-full overflow-auto">
               <table class="w-full caption-bottom text-sm">
                 <thead class="[&_tr]:border-b">
-                  <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                  <tr
+                    class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
+                  >
                     <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
                       Pièce
                     </th>
@@ -111,7 +115,9 @@
                     <td class="p-4 align-middle">{{ order.sparePart.name }}</td>
                     <td class="p-4 align-middle">{{ order.quantity }}</td>
                     <td class="p-4 align-middle">{{ order.unitPrice }}€</td>
-                    <td class="p-4 align-middle">{{ (order.quantity * order.unitPrice).toFixed(2) }}€</td>
+                    <td class="p-4 align-middle">
+                      {{ (order.quantity * order.unitPrice).toFixed(2) }}€
+                    </td>
                     <td class="p-4 align-middle">
                       <span
                         class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
@@ -119,7 +125,7 @@
                           'bg-warning/10 text-warning': order.status === 'PENDING',
                           'bg-info/10 text-info': order.status === 'ORDERED',
                           'bg-success/10 text-success': order.status === 'DELIVERED',
-                          'bg-destructive/10 text-destructive': order.status === 'CANCELLED'
+                          'bg-destructive/10 text-destructive': order.status === 'CANCELLED',
                         }"
                       >
                         {{ order.status }}
@@ -127,7 +133,9 @@
                     </td>
                     <td class="p-4 align-middle">{{ formatDate(order.orderDate) }}</td>
                     <td class="p-4 align-middle">
-                      {{ order.expectedDeliveryDate ? formatDate(order.expectedDeliveryDate) : '-' }}
+                      {{
+                        order.expectedDeliveryDate ? formatDate(order.expectedDeliveryDate) : '-'
+                      }}
                     </td>
                     <td class="p-4 align-middle text-right">
                       <Button variant="ghost" size="icon" @click="editOrder(order)">
@@ -150,11 +158,15 @@
     <Dialog v-model:open="showNewOrderDialog">
       <DialogContent class="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle
-          class="text-2xl font-bold text-primary"
-          >{{ editingOrder ? 'Modifier la commande' : 'Nouvelle commande' }}</DialogTitle>
+          <DialogTitle class="text-2xl font-bold text-primary">{{
+            editingOrder ? 'Modifier la commande' : 'Nouvelle commande'
+          }}</DialogTitle>
           <DialogDescription>
-            {{ editingOrder ? 'Modifiez les détails de la commande' : 'Créez une nouvelle commande de pièces' }}
+            {{
+              editingOrder
+                ? 'Modifiez les détails de la commande'
+                : 'Créez une nouvelle commande de pièces'
+            }}
           </DialogDescription>
         </DialogHeader>
         <form @submit.prevent="handleSubmit" class="space-y-4">
@@ -166,7 +178,9 @@
                 v-model="useExistingPart"
                 class="h-4 w-4 rounded border-input"
               />
-              <Label for="useExistingPart" class="text-muted-foreground">Sélectionner une pièce existante</Label>
+              <Label for="useExistingPart" class="text-muted-foreground"
+                >Sélectionner une pièce existante</Label
+              >
             </div>
 
             <div v-if="useExistingPart" class="grid gap-2">
@@ -242,13 +256,20 @@
                 </div>
                 <div class="flex justify-between">
                   <span class="text-muted-foreground">Stock actuel:</span>
-                  <span class="font-medium text-muted-foreground" :class="{ 'text-destructive': selectedPart.quantity < selectedPart.minQuantity }">
+                  <span
+                    class="font-medium text-muted-foreground"
+                    :class="{
+                      'text-destructive': selectedPart.quantity < selectedPart.minQuantity,
+                    }"
+                  >
                     {{ selectedPart.quantity }}
                   </span>
                 </div>
                 <div class="flex justify-between">
                   <span class="text-muted-foreground">Stock minimum:</span>
-                  <span class="font-medium text-muted-foreground">{{ selectedPart.minQuantity }}</span>
+                  <span class="font-medium text-muted-foreground">{{
+                    selectedPart.minQuantity
+                  }}</span>
                 </div>
                 <div class="flex justify-between">
                   <span class="text-muted-foreground">Emplacement:</span>
@@ -292,7 +313,12 @@
 
             <div class="grid gap-2">
               <Label for="supplier" class="text-muted-foreground">Fournisseur</Label>
-              <Input id="supplier" v-model="orderForm.supplier" required class="text-muted-foreground" />
+              <Input
+                id="supplier"
+                v-model="orderForm.supplier"
+                required
+                class="text-muted-foreground"
+              />
             </div>
 
             <div v-if="editingOrder" class="grid gap-2">
@@ -310,7 +336,9 @@
             </div>
 
             <div class="grid gap-2">
-              <Label for="expectedDeliveryDate" class="text-muted-foreground">Date de livraison prévue</Label>
+              <Label for="expectedDeliveryDate" class="text-muted-foreground"
+                >Date de livraison prévue</Label
+              >
               <Input
                 id="expectedDeliveryDate"
                 type="date"
@@ -321,7 +349,11 @@
 
             <div class="grid gap-2">
               <Label for="orderReference" class="text-muted-foreground">Référence commande</Label>
-              <Input id="orderReference" v-model="orderForm.orderReference" class="text-muted-foreground" />
+              <Input
+                id="orderReference"
+                v-model="orderForm.orderReference"
+                class="text-muted-foreground"
+              />
             </div>
 
             <div class="grid gap-2">
@@ -384,31 +416,32 @@ const orderForm = ref({
   orderReference: '',
   notes: '',
   status: OrderStatus.PENDING,
-  orderDate: new Date().toISOString().split('T')[0]
+  orderDate: new Date().toISOString().split('T')[0],
 })
 
 const orderStatuses = Object.values(OrderStatus)
 
 const pendingOrders = computed(() =>
-  orders.value.filter(order =>
-    order.status === OrderStatus.PENDING || order.status === OrderStatus.ORDERED
-  )
+  orders.value.filter(
+    (order) => order.status === OrderStatus.PENDING || order.status === OrderStatus.ORDERED,
+  ),
 )
 
 const lateOrders = computed(() =>
-  orders.value.filter(order =>
-    order.status === OrderStatus.ORDERED &&
-    order.expectedDeliveryDate &&
-    new Date() > new Date(order.expectedDeliveryDate)
-  )
+  orders.value.filter(
+    (order) =>
+      order.status === OrderStatus.ORDERED &&
+      order.expectedDeliveryDate &&
+      new Date() > new Date(order.expectedDeliveryDate),
+  ),
 )
 
 const totalOrderValue = computed(() =>
-  pendingOrders.value.reduce((sum, order) => sum + (order.quantity * order.unitPrice), 0)
+  pendingOrders.value.reduce((sum, order) => sum + order.quantity * order.unitPrice, 0),
 )
 
 const filteredOrders = computed(() => {
-  return orders.value.filter(order => {
+  return orders.value.filter((order) => {
     const matchesSearch =
       order.sparePart.name.toLowerCase().includes(search.value.toLowerCase()) ||
       order.supplier.toLowerCase().includes(search.value.toLowerCase()) ||
@@ -451,11 +484,13 @@ const editOrder = (order: SparePartOrder) => {
     quantity: order.quantity,
     unitPrice: order.unitPrice,
     supplier: order.supplier,
-    expectedDeliveryDate: order.expectedDeliveryDate ? new Date(order.expectedDeliveryDate).toISOString().split('T')[0] : '',
+    expectedDeliveryDate: order.expectedDeliveryDate
+      ? new Date(order.expectedDeliveryDate).toISOString().split('T')[0]
+      : '',
     orderReference: order.orderReference || '',
     notes: order.notes || '',
     status: order.status,
-    orderDate: new Date(order.orderDate).toISOString().split('T')[0]
+    orderDate: new Date(order.orderDate).toISOString().split('T')[0],
   }
   showNewOrderDialog.value = true
 }
@@ -483,7 +518,7 @@ const handleSubmit = async () => {
         location: orderForm.value.location,
         quantity: 0,
         minQuantity: orderForm.value.minQuantity,
-        price: orderForm.value.unitPrice
+        price: orderForm.value.unitPrice,
       })
       sparePartId = newPart.data.id
     }
@@ -492,34 +527,42 @@ const handleSubmit = async () => {
       ...orderForm.value,
       sparePartId: sparePartId,
       status: editingOrder.value ? orderForm.value.status : OrderStatus.PENDING,
-      orderDate: editingOrder.value ? new Date(editingOrder.value.orderDate) : new Date()
+      orderDate: editingOrder.value ? new Date(editingOrder.value.orderDate) : new Date(),
     }
 
     if (editingOrder.value) {
       const previousStatus = editingOrder.value.status
       await axios.put(`http://localhost:3001/api/spare-part-orders/${editingOrder.value.id}`, {
         ...orderData,
-        orderDate: editingOrder.value.orderDate // Garder la date originale
+        orderDate: editingOrder.value.orderDate, // Garder la date originale
       })
 
-      if (orderData.status === OrderStatus.ORDERED && previousStatus !== OrderStatus.ORDERED && !editingOrder.value.sparePart.id) {
+      if (
+        orderData.status === OrderStatus.ORDERED &&
+        previousStatus !== OrderStatus.ORDERED &&
+        !editingOrder.value.sparePart.id
+      ) {
         await axios.post('http://localhost:3001/api/spare-parts', {
           name: orderForm.value.partName,
           category: orderForm.value.category,
           location: orderForm.value.location,
           quantity: 0,
           minQuantity: orderForm.value.minQuantity,
-          price: orderForm.value.unitPrice
+          price: orderForm.value.unitPrice,
         })
       }
 
       if (orderData.status === OrderStatus.DELIVERED && previousStatus !== OrderStatus.DELIVERED) {
-        const sparePartId = editingOrder.value.sparePart.id || (await getSparePartByName(orderForm.value.partName))?.id
+        const sparePartId =
+          editingOrder.value.sparePart.id ||
+          (await getSparePartByName(orderForm.value.partName))?.id
         if (sparePartId) {
-          const currentPart = await axios.get(`http://localhost:3001/api/spare-parts/${sparePartId}`)
+          const currentPart = await axios.get(
+            `http://localhost:3001/api/spare-parts/${sparePartId}`,
+          )
           await axios.put(`http://localhost:3001/api/spare-parts/${sparePartId}`, {
             ...currentPart.data,
-            quantity: currentPart.data.quantity + orderForm.value.quantity
+            quantity: currentPart.data.quantity + orderForm.value.quantity,
           })
         }
       }
@@ -544,7 +587,7 @@ const handleSubmit = async () => {
       orderReference: '',
       notes: '',
       status: OrderStatus.PENDING,
-      orderDate: new Date().toISOString().split('T')[0]
+      orderDate: new Date().toISOString().split('T')[0],
     }
   } catch (error) {
     console.error('Error saving order:', error)
@@ -554,7 +597,7 @@ const handleSubmit = async () => {
 const selectedPart = ref<SparePart | null>(null)
 
 const updateSparePartInfo = () => {
-  const part = spareParts.value.find(p => p.id === orderForm.value.sparePartId)
+  const part = spareParts.value.find((p) => p.id === orderForm.value.sparePartId)
   if (part) {
     selectedPart.value = part
     orderForm.value.unitPrice = part.price
@@ -589,7 +632,7 @@ const openNewOrderDialog = () => {
     orderReference: '',
     notes: '',
     status: OrderStatus.PENDING,
-    orderDate: new Date().toISOString().split('T')[0]
+    orderDate: new Date().toISOString().split('T')[0],
   }
   useExistingPart.value = true
   selectedPart.value = null

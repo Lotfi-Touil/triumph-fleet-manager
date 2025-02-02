@@ -1,9 +1,9 @@
 <template>
   <div>
     <Card>
-      <CardHeader className="space-y-1">
-        <div class="flex items-center justify-between">
-          <div>
+      <CardHeader>
+        <div class="flex items-center justify-between space-x-4">
+          <div class="space-y-1">
             <CardTitle>{{ isEditing ? 'Modifier' : 'Ajouter' }} une pièce</CardTitle>
             <CardDescription>
               {{
@@ -19,7 +19,7 @@
           </Button>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent class="pt-6">
         <form @submit.prevent="handleSubmit" class="space-y-6">
           <div class="grid gap-6">
             <div class="grid gap-2">
@@ -132,7 +132,7 @@
             </div>
           </div>
 
-          <div class="flex gap-4">
+          <div class="flex gap-4 pt-4">
             <Button type="submit" class="flex-1">
               <Save class="mr-2 h-4 w-4" />
               {{ isEditing ? 'Mettre à jour' : 'Créer' }}

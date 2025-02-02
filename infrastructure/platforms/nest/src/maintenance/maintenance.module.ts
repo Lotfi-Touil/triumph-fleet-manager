@@ -4,11 +4,12 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { BikeEntity } from '../entities/bike.entity';
 import { MaintenanceEntity } from '../entities/maintenance.entity';
 import { MaintenanceNotificationEntity } from '../entities/maintenance-notification.entity';
+import { UserEntity } from '../entities/user.entity';
 import { MaintenanceController } from './maintenance.controller';
-import { MaintenanceCheckService } from './maintenance-check.service';
 import { PostgresBikeRepository } from '@infrastructure/adapters/repositories/PostgresBikeRepository';
 import { PostgresMaintenanceRepository } from '@infrastructure/adapters/repositories/PostgresMaintenanceRepository';
 import { PostgresMaintenanceNotificationRepository } from '@infrastructure/adapters/repositories/PostgresMaintenanceNotificationRepository';
+import { PostgresUserRepository } from '@infrastructure/adapters/repositories/PostgresUserRepository';
 import { CreateBike } from '@application/usecases/CreateBike';
 import { UpdateBike } from '@application/usecases/UpdateBike';
 import { DeleteBike } from '@application/usecases/DeleteBike';
@@ -25,6 +26,7 @@ import {
   BIKE_REPOSITORY,
   MAINTENANCE_REPOSITORY,
   MAINTENANCE_NOTIFICATION_REPOSITORY,
+  USER_REPOSITORY,
 } from './maintenance.constants';
 
 @Module({
@@ -33,12 +35,12 @@ import {
       BikeEntity,
       MaintenanceEntity,
       MaintenanceNotificationEntity,
+      UserEntity,
     ]),
     EventEmitterModule.forRoot(),
   ],
   controllers: [MaintenanceController],
   providers: [
-    MaintenanceCheckService,
     {
       provide: BIKE_REPOSITORY,
       useFactory: (repository) => new PostgresBikeRepository(repository),
@@ -46,9 +48,18 @@ import {
     },
     {
       provide: MAINTENANCE_REPOSITORY,
-      useFactory: (repository, bikeRepo) =>
-        new PostgresMaintenanceRepository(repository, bikeRepo),
-      inject: [getRepositoryToken(MaintenanceEntity), BIKE_REPOSITORY],
+      useFactory: (repository, bikeRepo, userRepo) =>
+        new PostgresMaintenanceRepository(repository, bikeRepo, userRepo),
+      inject: [
+        getRepositoryToken(MaintenanceEntity),
+        BIKE_REPOSITORY,
+        getRepositoryToken(UserEntity),
+      ],
+    },
+    {
+      provide: USER_REPOSITORY,
+      useFactory: (repository) => new PostgresUserRepository(repository),
+      inject: [getRepositoryToken(UserEntity)],
     },
     {
       provide: MAINTENANCE_NOTIFICATION_REPOSITORY,
@@ -80,9 +91,9 @@ import {
     },
     {
       provide: CreateMaintenance,
-      useFactory: (maintenanceRepo, bikeRepo) =>
-        new CreateMaintenance(maintenanceRepo, bikeRepo),
-      inject: [MAINTENANCE_REPOSITORY, BIKE_REPOSITORY],
+      useFactory: (maintenanceRepo, bikeRepo, userRepo) =>
+        new CreateMaintenance(maintenanceRepo, bikeRepo, userRepo),
+      inject: [MAINTENANCE_REPOSITORY, BIKE_REPOSITORY, USER_REPOSITORY],
     },
     {
       provide: GetDueMaintenances,
@@ -109,9 +120,9 @@ import {
     },
     {
       provide: UpdateMaintenance,
-      useFactory: (maintenanceRepo, bikeRepo) =>
-        new UpdateMaintenance(maintenanceRepo, bikeRepo),
-      inject: [MAINTENANCE_REPOSITORY, BIKE_REPOSITORY],
+      useFactory: (maintenanceRepo, bikeRepo, userRepo) =>
+        new UpdateMaintenance(maintenanceRepo, bikeRepo, userRepo),
+      inject: [MAINTENANCE_REPOSITORY, BIKE_REPOSITORY, USER_REPOSITORY],
     },
     {
       provide: DeleteMaintenance,
@@ -143,6 +154,7 @@ import {
     BIKE_REPOSITORY,
     MAINTENANCE_REPOSITORY,
     MAINTENANCE_NOTIFICATION_REPOSITORY,
+    USER_REPOSITORY,
   ],
 })
 export class MaintenanceModule {}

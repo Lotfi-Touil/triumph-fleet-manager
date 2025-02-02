@@ -35,7 +35,8 @@ export class UpdateMaintenanceKilometers {
       maintenance.getBike(),
       maintenance.getLastMaintenanceDate(),
       maintenance.getLastMaintenanceKilometers(),
-      newKilometers.getValue()
+      newKilometers.getValue(),
+      maintenance.getTechnician()
     );
 
     await this.maintenanceRepository.save(updatedMaintenance);

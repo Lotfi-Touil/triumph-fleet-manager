@@ -1,5 +1,6 @@
 import mainAxios from './axios'
 import axios from 'axios'
+import type { User } from './user.service'
 
 const sparePartsAxios = axios.create({
   baseURL: 'http://localhost:3001/api',
@@ -22,6 +23,7 @@ export interface Bike {
 export interface Maintenance {
   id: string
   bike: Bike
+  technician: User | null
   lastMaintenanceDate: string
   lastMaintenanceKilometers: number
   currentKilometers: number
@@ -57,6 +59,7 @@ class MaintenanceService {
     bikeId: string
     date: string
     kilometers: number
+    technicianId?: string
   }): Promise<void> {
     await mainAxios.post(`${this.baseUrl}/create-maintenance`, data)
   }
@@ -66,11 +69,13 @@ class MaintenanceService {
     bikeId: string
     date: string
     kilometers: number
+    technicianId?: string
   }): Promise<void> {
     await mainAxios.put(`${this.baseUrl}/update-maintenance/${data.id}`, {
       bikeId: data.bikeId,
       date: data.date,
       kilometers: data.kilometers,
+      technicianId: data.technicianId,
     })
   }
 

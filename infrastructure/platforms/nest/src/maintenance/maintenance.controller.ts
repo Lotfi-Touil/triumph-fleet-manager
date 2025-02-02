@@ -28,9 +28,10 @@ import {
 } from './maintenance.constants';
 import { randomUUID } from 'crypto';
 import { MaintenanceRepository } from '@domain/repositories/MaintenanceRepository';
-import { IsString, IsNumber, IsDateString } from 'class-validator';
+import { IsString, IsNumber, IsDateString, IsOptional } from 'class-validator';
 import { Observable } from 'rxjs';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { CheckAndCreateMaintenanceNotifications } from '@application/usecases/CheckAndCreateMaintenanceNotifications';
 
 class CreateMaintenanceDto {
   @IsString()
@@ -41,6 +42,10 @@ class CreateMaintenanceDto {
 
   @IsDateString()
   date: string;
+
+  @IsString()
+  @IsOptional()
+  technicianId?: string;
 }
 
 @Controller('maintenance')
@@ -66,8 +71,15 @@ export class MaintenanceController {
     private readonly bikeRepository: BikeRepository,
     @Inject(MAINTENANCE_REPOSITORY)
     private readonly maintenanceRepository: MaintenanceRepository,
+    @Inject(CheckAndCreateMaintenanceNotifications)
+    private readonly checkAndCreateNotifications: CheckAndCreateMaintenanceNotifications,
     private eventEmitter: EventEmitter2,
   ) {}
+
+  private async checkAndEmitNotifications(): Promise<void> {
+    await this.checkAndCreateNotifications.execute();
+    this.eventEmitter.emit('maintenance.notification');
+  }
 
   @Post('create-maintenance')
   async createMaintenance(
@@ -98,6 +110,7 @@ export class MaintenanceController {
     const payload = {
       id: randomUUID(),
       bikeId: request.bikeId,
+      technicianId: request.technicianId || null,
       lastMaintenanceDate: maintenanceDate,
       lastMaintenanceKilometers: lastMaintenance
         ? lastMaintenance.getCurrentKilometers()
@@ -108,7 +121,7 @@ export class MaintenanceController {
 
     try {
       await this.createMaintenanceUseCase.execute(payload);
-      this.eventEmitter.emit('maintenance.notification');
+      await this.checkAndEmitNotifications();
       console.log('Maintenance created successfully');
     } catch (error) {
       console.error('Error creating maintenance:', error);
@@ -124,20 +137,23 @@ export class MaintenanceController {
       bikeId: string;
       date: string;
       kilometers: number;
+      technicianId?: string;
     },
   ): Promise<void> {
     await this.updateMaintenanceUseCase.execute({
       id,
       bikeId: request.bikeId,
+      technicianId: request.technicianId || null,
       maintenanceDate: new Date(request.date),
       currentKilometers: request.kilometers,
     });
-    this.eventEmitter.emit('maintenance.notification');
+    await this.checkAndEmitNotifications();
   }
 
   @Delete('delete-maintenance/:id')
   async deleteMaintenance(@Param('id') id: string): Promise<void> {
     await this.deleteMaintenanceUseCase.execute(id);
+    await this.checkAndEmitNotifications();
   }
 
   @Get('due-maintenances')
@@ -177,7 +193,7 @@ export class MaintenanceController {
     });
   }
 
-  @Post('notifications/:id/acknowledge')
+  @Put('notifications/:id/acknowledge')
   async acknowledgeNotification(@Param('id') id: string): Promise<void> {
     await this.acknowledgeMaintenanceNotificationUseCase.execute(id);
     this.eventEmitter.emit('maintenance.notification');

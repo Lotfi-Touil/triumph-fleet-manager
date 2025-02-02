@@ -1,0 +1,20 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.createSparePartOrderRouter = void 0;
+const express_1 = require("express");
+const sparePartOrder_controller_1 = require("../controllers/sparePartOrder.controller");
+const createSparePartOrderRouter = (sparePartOrderRepository, sparePartRepository) => {
+    const router = (0, express_1.Router)();
+    const controller = new sparePartOrder_controller_1.SparePartOrderController(sparePartOrderRepository, sparePartRepository);
+    router.post("/", controller.create);
+    router.get("/", controller.getAll);
+    router.get("/pending", controller.getPendingOrders);
+    router.get("/late", controller.getLateOrders);
+    router.get("/status/:status", controller.getByStatus);
+    router.get("/spare-part/:sparePartId", controller.getBySparePartId);
+    router.get("/:id", controller.getById);
+    router.put("/:id", controller.update);
+    router.delete("/:id", controller.delete);
+    return router;
+};
+exports.createSparePartOrderRouter = createSparePartOrderRouter;

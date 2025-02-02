@@ -2,21 +2,25 @@
   <div class="space-y-6">
     <div class="flex items-center justify-between">
       <div>
-        <h2 class="text-2xl font-bold tracking-tight">Notifications</h2>
-        <p class="text-muted-foreground">Gérez vos notifications d'entretien et de stock</p>
+        <p class="text-foreground">Gérez vos notifications d'entretien et de stock</p>
       </div>
-      <Button variant="outline" @click="fetchNotifications" :disabled="isLoading">
-        <RefreshCw v-if="isLoading" class="mr-2 h-4 w-4 animate-spin" />
-        <RefreshCw v-else class="mr-2 h-4 w-4" />
+      <Button
+        variant="outline"
+        @click="fetchNotifications"
+        :disabled="isLoading"
+        class="text-gray-600 hover:text-gray-800 hover:bg-gray-100 border-gray-300"
+      >
+        <RefreshCw v-if="isLoading" class="mr-2 h-4 w-4 animate-spin text-blue-500" />
+        <RefreshCw v-else class="mr-2 h-4 w-4 text-gray-500" />
         Actualiser
       </Button>
     </div>
 
     <Tabs defaultValue="all" class="w-full">
       <TabsList>
-        <TabsTrigger value="all">Toutes</TabsTrigger>
-        <TabsTrigger value="maintenance">Entretiens</TabsTrigger>
-        <TabsTrigger value="stock">Stock</TabsTrigger>
+        <TabsTrigger value="all" class="text-foreground">Toutes</TabsTrigger>
+        <TabsTrigger value="maintenance" class="text-foreground">Entretiens</TabsTrigger>
+        <TabsTrigger value="stock" class="text-foreground">Stock</TabsTrigger>
       </TabsList>
       <TabsContent value="all">
         <NotificationsList :notifications="notifications" @updated="fetchNotifications" />

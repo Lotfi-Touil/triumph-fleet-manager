@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from '../../../../../infrastructure/adapters/repositories/typeorm/entities/UserEntity';
 import { ProfileController } from './profile.controller';
 import { AdminController } from './admin.controller';
+import { UserController } from './user.controller';
 import { PostgresUserRepository } from '../../../../../infrastructure/adapters/repositories/PostgresUserRepository';
 import { UpdateUserProfile } from '../../../../../application/usecases/UpdateUserProfile';
 import { JwtModule } from '@nestjs/jwt';
@@ -25,7 +26,7 @@ import { AuthModule } from '../auth/auth.module';
     }),
     AuthModule,
   ],
-  controllers: [ProfileController, AdminController],
+  controllers: [ProfileController, AdminController, UserController],
   providers: [
     {
       provide: 'IUserRepository',

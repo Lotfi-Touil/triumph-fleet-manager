@@ -7,9 +7,13 @@
     >
       <div class="space-y-1">
         <div class="flex items-center space-x-2">
-          <Bell v-if="notification.type === 'MAINTENANCE'" class="h-4 w-4 text-warning" />
-          <Package v-else class="h-4 w-4 text-warning" />
-          <h4 class="font-medium">{{ notification.message }}</h4>
+          <Bell
+            v-if="notification.type === 'MAINTENANCE'"
+            class="h-4 w-4 text-yellow-500"
+            color="currentColor"
+          />
+          <Package v-else class="h-4 w-4 text-yellow-500" color="currentColor" />
+          <h4 class="font-medium text-foreground">{{ notification.message }}</h4>
         </div>
         <p class="text-sm text-muted-foreground">
           {{ new Date(notification.createdAt).toLocaleDateString() }}

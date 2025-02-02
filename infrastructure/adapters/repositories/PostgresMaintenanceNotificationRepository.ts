@@ -24,6 +24,7 @@ export class PostgresMaintenanceNotificationRepository
     entity.id = notification.getId();
     entity.maintenanceId = notification.getMaintenance().getId();
     entity.status = notification.getStatus();
+    entity.type = notification.getType();
     entity.message = notification.getMessage();
     entity.createdAt = notification.getCreatedAt();
 
@@ -79,7 +80,8 @@ export class PostgresMaintenanceNotificationRepository
       maintenance,
       entity.createdAt,
       entity.status,
-      entity.message
+      entity.message,
+      entity.type
     );
   }
 }
