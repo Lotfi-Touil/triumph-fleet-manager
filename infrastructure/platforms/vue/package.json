@@ -1,5 +1,5 @@
 {
-  "name": "package.json",
+  "name": "@triumph-fleet-manager/vue-platform",
   "version": "0.0.0",
   "private": true,
   "type": "module",

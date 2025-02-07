@@ -30,7 +30,7 @@ services:
 
   frontend:
     build:
-      context: ./frontend
+      context: ./infrastructure/platforms/vue
       dockerfile: Dockerfile
     ports:
       - "8080:80"
