@@ -23,7 +23,7 @@
             <h3 class="font-medium text-foreground">{{ notification.maintenance.bike.name }}</h3>
             <p class="text-sm text-muted-foreground">
               Créée le
-              {{ new Date(notification.maintenance.lastMaintenanceDate).toLocaleDateString() }}
+              {{ new Date(notification.createdAt).toLocaleDateString() }}
             </p>
             <p class="text-sm text-foreground">{{ notification.message }}</p>
           </div>

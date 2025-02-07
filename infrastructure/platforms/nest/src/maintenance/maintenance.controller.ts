@@ -25,6 +25,7 @@ import {
   MAINTENANCE_NOTIFICATION_REPOSITORY,
   BIKE_REPOSITORY,
   MAINTENANCE_REPOSITORY,
+  USER_REPOSITORY,
 } from './maintenance.constants';
 import { randomUUID } from 'crypto';
 import { MaintenanceRepository } from '@domain/repositories/MaintenanceRepository';
@@ -32,6 +33,9 @@ import { IsString, IsNumber, IsDateString, IsOptional } from 'class-validator';
 import { Observable } from 'rxjs';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { CheckAndCreateMaintenanceNotifications } from '@application/usecases/CheckAndCreateMaintenanceNotifications';
+import { GetMaintenances } from '@application/usecases/GetMaintenances';
+import { MaintenanceType, MaintenanceStatus } from '@domain/entities/Maintenance';
+import { UserRepository } from '@domain/repositories/UserRepository';
 
 class CreateMaintenanceDto {
   @IsString()
@@ -48,7 +52,32 @@ class CreateMaintenanceDto {
   technicianId?: string;
 }
 
-@Controller('maintenance')
+interface MaintenanceResponse {
+  id: string;
+  bike: {
+    id: string;
+    name: string;
+    registrationNumber: string;
+  };
+  maintenanceDate: string;
+  lastMaintenanceKilometers: number;
+  currentKilometers: number;
+  technician: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  } | null;
+  status: MaintenanceStatus;
+  type: MaintenanceType;
+  replacedParts: string[];
+  cost: number;
+  technicalRecommendations: string;
+  workDescription: string;
+  nextRecommendedMaintenanceDate: string | null;
+}
+
+@Controller('maintenances')
 export class MaintenanceController {
   constructor(
     @Inject(CreateMaintenance)
@@ -74,6 +103,10 @@ export class MaintenanceController {
     @Inject(CheckAndCreateMaintenanceNotifications)
     private readonly checkAndCreateNotifications: CheckAndCreateMaintenanceNotifications,
     private eventEmitter: EventEmitter2,
+    @Inject(GetMaintenances)
+    private readonly getMaintenances: GetMaintenances,
+    @Inject(USER_REPOSITORY)
+    private readonly userRepository: UserRepository
   ) {}
 
   private async checkAndEmitNotifications(): Promise<void> {
@@ -81,79 +114,109 @@ export class MaintenanceController {
     this.eventEmitter.emit('maintenance.notification');
   }
 
-  @Post('create-maintenance')
-  async createMaintenance(
-    @Body() request: CreateMaintenanceDto,
-  ): Promise<void> {
-    console.log('Creating maintenance with request:', request);
-
-    const bike = await this.bikeRepository.findById(request.bikeId);
-    console.log('Found bike:', bike);
-
+  @Post('create')
+  async create(
+    @Body()
+    data: {
+      bikeId: string;
+      maintenanceDate: string;
+      lastMaintenanceKilometers: number;
+      currentKilometers: number;
+      technicianId?: string;
+      type: MaintenanceType;
+      replacedParts?: string[];
+      cost?: number;
+      technicalRecommendations?: string;
+      workDescription?: string;
+      nextRecommendedMaintenanceDate?: string;
+    },
+  ) {
+    const bike = await this.bikeRepository.findById(data.bikeId);
     if (!bike) {
       throw new BadRequestException('Bike not found');
     }
 
-    const lastMaintenances = await this.maintenanceRepository.findByBikeId(
-      request.bikeId,
-    );
-    console.log('Last maintenances:', lastMaintenances);
+    const maintenanceId = randomUUID();
 
-    const lastMaintenance = lastMaintenances[lastMaintenances.length - 1];
-    console.log('Last maintenance:', lastMaintenance);
+    await this.createMaintenanceUseCase.execute({
+      id: maintenanceId,
+      bikeId: data.bikeId,
+      maintenanceDate: new Date(data.maintenanceDate),
+      lastMaintenanceKilometers: data.lastMaintenanceKilometers,
+      currentKilometers: data.currentKilometers,
+      technicianId: data.technicianId,
+      type: data.type,
+      replacedParts: data.replacedParts,
+      cost: data.cost,
+      technicalRecommendations: data.technicalRecommendations,
+      workDescription: data.workDescription,
+      nextRecommendedMaintenanceDate: data.nextRecommendedMaintenanceDate ? new Date(data.nextRecommendedMaintenanceDate) : undefined
+    });
 
-    const maintenanceDate = new Date(request.date);
-    if (isNaN(maintenanceDate.getTime())) {
-      throw new BadRequestException('Invalid date format');
-    }
-
-    const payload = {
-      id: randomUUID(),
-      bikeId: request.bikeId,
-      technicianId: request.technicianId || null,
-      lastMaintenanceDate: maintenanceDate,
-      lastMaintenanceKilometers: lastMaintenance
-        ? lastMaintenance.getCurrentKilometers()
-        : 0,
-      currentKilometers: request.kilometers,
-    };
-    console.log('Creating maintenance with payload:', payload);
-
-    try {
-      await this.createMaintenanceUseCase.execute(payload);
-      await this.checkAndEmitNotifications();
-      console.log('Maintenance created successfully');
-    } catch (error) {
-      console.error('Error creating maintenance:', error);
-      throw error;
-    }
+    return { id: maintenanceId };
   }
 
-  @Put('update-maintenance/:id')
-  async updateMaintenance(
+  @Put('update/:id')
+  async update(
     @Param('id') id: string,
     @Body()
-    request: {
-      bikeId: string;
-      date: string;
-      kilometers: number;
+    data: {
+      status?: MaintenanceStatus;
       technicianId?: string;
+      type?: MaintenanceType;
+      replacedParts?: string[];
+      cost?: number;
+      technicalRecommendations?: string;
+      workDescription?: string;
+      nextRecommendedMaintenanceDate?: string;
     },
-  ): Promise<void> {
-    await this.updateMaintenanceUseCase.execute({
+  ) {
+    return this.updateMaintenanceUseCase.execute({
       id,
-      bikeId: request.bikeId,
-      technicianId: request.technicianId || null,
-      maintenanceDate: new Date(request.date),
-      currentKilometers: request.kilometers,
+      status: data.status,
+      technicianId: data.technicianId,
+      type: data.type,
+      replacedParts: data.replacedParts,
+      cost: data.cost,
+      technicalRecommendations: data.technicalRecommendations,
+      workDescription: data.workDescription,
+      nextRecommendedMaintenanceDate: data.nextRecommendedMaintenanceDate ? new Date(data.nextRecommendedMaintenanceDate) : undefined
     });
-    await this.checkAndEmitNotifications();
   }
 
-  @Delete('delete-maintenance/:id')
-  async deleteMaintenance(@Param('id') id: string): Promise<void> {
-    await this.deleteMaintenanceUseCase.execute(id);
-    await this.checkAndEmitNotifications();
+  @Delete('delete/:id')
+  async delete(@Param('id') id: string) {
+    return this.deleteMaintenanceUseCase.execute(id);
+  }
+
+  @Get()
+  async getAll(): Promise<MaintenanceResponse[]> {
+    const maintenances = await this.getMaintenances.execute();
+    return maintenances.map(maintenance => this.toResponse(maintenance));
+  }
+
+  @Get('bike/:bikeId')
+  async getByBikeId(@Param('bikeId') bikeId: string): Promise<MaintenanceResponse[]> {
+    const maintenances = await this.getMaintenances.executeByBikeId(bikeId);
+    return maintenances.map(maintenance => this.toResponse(maintenance));
+  }
+
+  @Get('status/:status')
+  async getByStatus(@Param('status') status: MaintenanceStatus): Promise<MaintenanceResponse[]> {
+    const maintenances = await this.getMaintenances.executeByStatus(status);
+    return maintenances.map(maintenance => this.toResponse(maintenance));
+  }
+
+  @Get('scheduled')
+  async getScheduled(): Promise<MaintenanceResponse[]> {
+    const maintenances = await this.getMaintenances.executeScheduled();
+    return maintenances.map(maintenance => this.toResponse(maintenance));
+  }
+
+  @Get('completed')
+  async getCompleted(): Promise<MaintenanceResponse[]> {
+    const maintenances = await this.getMaintenances.executeCompleted();
+    return maintenances.map(maintenance => this.toResponse(maintenance));
   }
 
   @Get('due-maintenances')
@@ -197,5 +260,35 @@ export class MaintenanceController {
   async acknowledgeNotification(@Param('id') id: string): Promise<void> {
     await this.acknowledgeMaintenanceNotificationUseCase.execute(id);
     this.eventEmitter.emit('maintenance.notification');
+  }
+
+  private toResponse(maintenance: any): MaintenanceResponse {
+    const bike = maintenance.getBike();
+    const technician = maintenance.getTechnician();
+
+    return {
+      id: maintenance.getId(),
+      bike: {
+        id: bike.getId(),
+        name: bike.getName(),
+        registrationNumber: bike.getRegistrationNumber(),
+      },
+      maintenanceDate: maintenance.getMaintenanceDate().toISOString(),
+      lastMaintenanceKilometers: maintenance.getLastMaintenanceKilometers(),
+      currentKilometers: maintenance.getCurrentKilometers(),
+      technician: technician ? {
+        id: technician.getId(),
+        firstName: technician.getFirstName(),
+        lastName: technician.getLastName(),
+        email: technician.getEmail(),
+      } : null,
+      status: maintenance.getStatus(),
+      type: maintenance.getType(),
+      replacedParts: maintenance.getReplacedParts(),
+      cost: maintenance.getCost(),
+      technicalRecommendations: maintenance.getTechnicalRecommendations(),
+      workDescription: maintenance.getWorkDescription(),
+      nextRecommendedMaintenanceDate: maintenance.getNextRecommendedMaintenanceDate()?.toISOString() || null
+    };
   }
 }

@@ -75,9 +75,7 @@ const handleSubmit = async () => {
     isLoading.value = true
     await maintenanceService.updateMaintenanceKilometers({
       maintenanceId: props.maintenance.id,
-      kilometers: kilometers.value,
-      bikeId: props.maintenance.bike.id,
-      lastMaintenanceDate: props.maintenance.lastMaintenanceDate,
+      newKilometers: kilometers.value
     })
     toast({
       title: 'Kilométrage mis à jour',

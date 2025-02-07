@@ -1,40 +1,80 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import { maintenanceService } from '../services/maintenance.service'
-import type { Maintenance, MaintenanceNotification } from '../services/maintenance.service'
+import { maintenanceService, type Maintenance, MaintenanceStatus, MaintenanceType } from '../services/maintenance.service'
 
 export const useMaintenanceStore = defineStore('maintenance', () => {
+  const maintenances = ref<Maintenance[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
-  const dueMaintenances = ref<Maintenance[]>([])
-  const notifications = ref<MaintenanceNotification[]>([])
-  const allMaintenances = ref<Maintenance[]>([])
 
-  async function getDueMaintenances(): Promise<Maintenance[]> {
+  async function fetchMaintenances() {
     try {
       loading.value = true
       error.value = null
-      const maintenances = await maintenanceService.getDueMaintenances()
-      dueMaintenances.value = maintenances
-      return maintenances
-    } catch (err) {
-      error.value = 'Erreur lors de la récupération des entretiens'
-      throw err
+      maintenances.value = await maintenanceService.getMaintenances()
+    } catch (e) {
+      error.value = e instanceof Error ? e.message : 'An error occurred while fetching maintenances'
     } finally {
       loading.value = false
     }
   }
 
-  async function getAllMaintenances(): Promise<Maintenance[]> {
+  async function fetchMaintenancesByBike(bikeId: string) {
     try {
       loading.value = true
       error.value = null
-      const maintenances = await maintenanceService.getAllMaintenances()
-      allMaintenances.value = maintenances
-      return maintenances
-    } catch (err) {
-      error.value = 'Erreur lors de la récupération des entretiens'
-      throw err
+      maintenances.value = await maintenanceService.getMaintenancesByBike(bikeId)
+    } catch (e) {
+      error.value = e instanceof Error ? e.message : 'An error occurred while fetching maintenances'
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function fetchMaintenancesByStatus(status: MaintenanceStatus) {
+    try {
+      loading.value = true
+      error.value = null
+      maintenances.value = await maintenanceService.getMaintenancesByStatus(status)
+    } catch (e) {
+      error.value = e instanceof Error ? e.message : 'An error occurred while fetching maintenances'
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function fetchScheduledMaintenances() {
+    try {
+      loading.value = true
+      error.value = null
+      maintenances.value = await maintenanceService.getScheduledMaintenances()
+    } catch (e) {
+      error.value = e instanceof Error ? e.message : 'An error occurred while fetching scheduled maintenances'
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function fetchCompletedMaintenances() {
+    try {
+      loading.value = true
+      error.value = null
+      maintenances.value = await maintenanceService.getCompletedMaintenances()
+    } catch (e) {
+      error.value = e instanceof Error ? e.message : 'An error occurred while fetching completed maintenances'
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function getDueMaintenances(): Promise<Maintenance[]> {
+    try {
+      loading.value = true
+      error.value = null
+      return await maintenanceService.getDueMaintenances()
+    } catch (e) {
+      error.value = e instanceof Error ? e.message : 'An error occurred while fetching due maintenances'
+      throw e
     } finally {
       loading.value = false
     }
@@ -42,114 +82,100 @@ export const useMaintenanceStore = defineStore('maintenance', () => {
 
   async function createMaintenance(data: {
     bikeId: string
-    date: string
-    kilometers: number
+    maintenanceDate: string
+    lastMaintenanceKilometers: number
+    currentKilometers: number
     technicianId?: string
-  }): Promise<void> {
+    type: MaintenanceType
+    replacedParts?: string[]
+    cost?: number
+    technicalRecommendations?: string
+    workDescription?: string
+    nextRecommendedMaintenanceDate?: string
+  }) {
     try {
       loading.value = true
       error.value = null
       await maintenanceService.createMaintenance(data)
-      await getDueMaintenances()
-    } catch (err) {
-      error.value = "Erreur lors de la création de l'entretien"
-      throw err
+      await fetchMaintenances()
+    } catch (e) {
+      error.value = e instanceof Error ? e.message : 'An error occurred while creating maintenance'
+      throw e
     } finally {
       loading.value = false
     }
   }
 
-  async function updateMaintenance(data: {
-    id: string
-    bikeId: string
-    date: string
-    kilometers: number
-    technicianId?: string
-  }): Promise<void> {
+  async function updateMaintenance(
+    id: string,
+    data: {
+      status?: MaintenanceStatus
+      technicianId?: string
+      type?: MaintenanceType
+      replacedParts?: string[]
+      cost?: number
+      technicalRecommendations?: string
+      workDescription?: string
+      nextRecommendedMaintenanceDate?: string
+    }
+  ) {
     try {
       loading.value = true
       error.value = null
-      await maintenanceService.updateMaintenance(data)
-      await getDueMaintenances()
-    } catch (err) {
-      error.value = "Erreur lors de la modification de l'entretien"
-      throw err
+      await maintenanceService.updateMaintenance(id, data)
+      await fetchMaintenances()
+    } catch (e) {
+      error.value = e instanceof Error ? e.message : 'An error occurred while updating maintenance'
+      throw e
     } finally {
       loading.value = false
     }
   }
 
-  async function deleteMaintenance(id: string): Promise<void> {
+  async function updateMaintenanceKilometers(data: {
+    maintenanceId: string
+    newKilometers: number
+  }) {
+    try {
+      loading.value = true
+      error.value = null
+      await maintenanceService.updateMaintenanceKilometers(data)
+      await fetchMaintenances()
+    } catch (e) {
+      error.value = e instanceof Error ? e.message : 'An error occurred while updating maintenance kilometers'
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function deleteMaintenance(id: string) {
     try {
       loading.value = true
       error.value = null
       await maintenanceService.deleteMaintenance(id)
-      await getDueMaintenances()
-    } catch (err) {
-      error.value = "Erreur lors de la suppression de l'entretien"
-      throw err
-    } finally {
-      loading.value = false
-    }
-  }
-
-  async function getNotifications(): Promise<MaintenanceNotification[]> {
-    try {
-      loading.value = true
-      error.value = null
-      const result = await maintenanceService.getNotifications()
-      notifications.value = result
-      return result
-    } catch (err) {
-      error.value = 'Erreur lors de la récupération des notifications'
-      throw err
-    } finally {
-      loading.value = false
-    }
-  }
-
-  async function getPendingNotifications(): Promise<MaintenanceNotification[]> {
-    try {
-      loading.value = true
-      error.value = null
-      const result = await maintenanceService.getPendingNotifications()
-      notifications.value = result
-      return result
-    } catch (err) {
-      error.value = 'Erreur lors de la récupération des notifications en attente'
-      throw err
-    } finally {
-      loading.value = false
-    }
-  }
-
-  async function acknowledgeNotification(id: string): Promise<void> {
-    try {
-      loading.value = true
-      error.value = null
-      await maintenanceService.acknowledgeNotification(id)
-      await getNotifications()
-    } catch (err) {
-      error.value = 'Erreur lors de la confirmation de la notification'
-      throw err
+      maintenances.value = maintenances.value.filter(m => m.id !== id)
+    } catch (e) {
+      error.value = e instanceof Error ? e.message : 'An error occurred while deleting maintenance'
+      throw e
     } finally {
       loading.value = false
     }
   }
 
   return {
+    maintenances,
     loading,
     error,
-    dueMaintenances,
-    notifications,
-    allMaintenances,
+    fetchMaintenances,
+    fetchMaintenancesByBike,
+    fetchMaintenancesByStatus,
+    fetchScheduledMaintenances,
+    fetchCompletedMaintenances,
     getDueMaintenances,
-    getAllMaintenances,
     createMaintenance,
     updateMaintenance,
-    deleteMaintenance,
-    getNotifications,
-    getPendingNotifications,
-    acknowledgeNotification,
+    updateMaintenanceKilometers,
+    deleteMaintenance
   }
 })

@@ -6,84 +6,87 @@ export class MaintenanceCalculator {
   private static readonly UPCOMING_KILOMETERS_THRESHOLD = 500;
 
   public static isMaintenanceNeeded(maintenance: Maintenance): boolean {
-    const maintenanceInterval = maintenance.getBike().getMaintenanceInterval();
-    const currentKilometers = new Kilometers(
-      maintenance.getCurrentKilometers()
+    return (
+      this.isMaintenanceNeededByKilometers(maintenance) ||
+      this.isMaintenanceNeededByDate(maintenance)
     );
-    const lastMaintenanceKilometers = new Kilometers(
-      maintenance.getLastMaintenanceKilometers()
-    );
-    const kilometersDifference = currentKilometers.subtract(
-      lastMaintenanceKilometers
-    );
-
-    // Vérifier si l'intervalle kilométrique est dépassé
-    if (
-      kilometersDifference.isGreaterThanOrEqual(
-        new Kilometers(maintenanceInterval.getKilometers())
-      )
-    ) {
-      return true;
-    }
-
-    // Vérifier si l'intervalle temporel est dépassé
-    const monthsSinceLastMaintenance =
-      MaintenanceCalculator.getMonthsDifference(
-        maintenance.getLastMaintenanceDate(),
-        new Date()
-      );
-    return monthsSinceLastMaintenance >= maintenanceInterval.getMonthInterval();
   }
 
   public static isMaintenanceUpcoming(maintenance: Maintenance): boolean {
-    if (this.isMaintenanceNeeded(maintenance)) {
-      return true;
-    }
+    return (
+      this.isMaintenanceUpcomingByKilometers(maintenance) ||
+      this.isMaintenanceUpcomingByDate(maintenance)
+    );
+  }
 
-    const maintenanceInterval = maintenance.getBike().getMaintenanceInterval();
-    const currentKilometers = new Kilometers(
-      maintenance.getCurrentKilometers()
-    );
-    const lastMaintenanceKilometers = new Kilometers(
-      maintenance.getLastMaintenanceKilometers()
-    );
-    const kilometersDifference = currentKilometers.subtract(
-      lastMaintenanceKilometers
-    );
-    const remainingKilometers = new Kilometers(
-      maintenanceInterval.getKilometers()
-    ).subtract(kilometersDifference);
+  private static isMaintenanceNeededByKilometers(
+    maintenance: Maintenance
+  ): boolean {
+    const currentKilometers = maintenance.getCurrentKilometers();
+    const lastMaintenanceKilometers = maintenance.getLastMaintenanceKilometers();
+    const maintenanceInterval = maintenance
+      .getBike()
+      .getMaintenanceInterval()
+      .getKilometers();
 
-    // Vérifier si on approche de l'intervalle kilométrique
-    if (
-      remainingKilometers.isLessThanOrEqual(
-        new Kilometers(this.UPCOMING_KILOMETERS_THRESHOLD)
-      )
-    ) {
-      return true;
-    }
-
-    // Vérifier si on approche de l'intervalle temporel
-    const nextMaintenanceDate = this.getNextMaintenanceDate(maintenance);
-    const daysUntilMaintenance = Math.floor(
-      (nextMaintenanceDate.getTime() - new Date().getTime()) /
-        (1000 * 60 * 60 * 24)
+    return (
+      currentKilometers - lastMaintenanceKilometers >= maintenanceInterval
     );
-    return daysUntilMaintenance <= this.UPCOMING_DAYS_THRESHOLD;
+  }
+
+  private static isMaintenanceNeededByDate(maintenance: Maintenance): boolean {
+    const monthsSinceLastMaintenance =
+      MaintenanceCalculator.getMonthsDifference(
+        maintenance.getMaintenanceDate(),
+        new Date()
+      );
+    return monthsSinceLastMaintenance >= maintenance.getBike().getMaintenanceInterval().getMonthInterval();
+  }
+
+  private static isMaintenanceUpcomingByKilometers(
+    maintenance: Maintenance
+  ): boolean {
+    const currentKilometers = maintenance.getCurrentKilometers();
+    const lastMaintenanceKilometers = maintenance.getLastMaintenanceKilometers();
+    const maintenanceInterval = maintenance
+      .getBike()
+      .getMaintenanceInterval()
+      .getKilometers();
+    const upcomingThreshold = maintenanceInterval * 0.9; // 90% of the interval
+
+    return (
+      currentKilometers - lastMaintenanceKilometers >= upcomingThreshold &&
+      currentKilometers - lastMaintenanceKilometers < maintenanceInterval
+    );
+  }
+
+  private static isMaintenanceUpcomingByDate(maintenance: Maintenance): boolean {
+    const monthsSinceLastMaintenance =
+      MaintenanceCalculator.getMonthsDifference(
+        maintenance.getMaintenanceDate(),
+        new Date()
+      );
+    const maintenanceInterval = maintenance
+      .getBike()
+      .getMaintenanceInterval()
+      .getMonthInterval();
+    const upcomingThreshold = maintenanceInterval * 0.9; // 90% of the interval
+
+    return (
+      monthsSinceLastMaintenance >= upcomingThreshold &&
+      monthsSinceLastMaintenance < maintenanceInterval
+    );
   }
 
   public static getNextMaintenanceKilometers(maintenance: Maintenance): number {
-    const lastMaintenanceKilometers = new Kilometers(
-      maintenance.getLastMaintenanceKilometers()
-    );
-    const intervalKilometers = new Kilometers(
+    return (
+      maintenance.getLastMaintenanceKilometers() +
       maintenance.getBike().getMaintenanceInterval().getKilometers()
     );
-    return lastMaintenanceKilometers.add(intervalKilometers).getValue();
   }
 
   public static getNextMaintenanceDate(maintenance: Maintenance): Date {
-    const nextDate = new Date(maintenance.getLastMaintenanceDate());
+    const nextDate = new Date(maintenance.getMaintenanceDate());
     nextDate.setMonth(
       nextDate.getMonth() +
         maintenance.getBike().getMaintenanceInterval().getMonthInterval()
@@ -92,8 +95,8 @@ export class MaintenanceCalculator {
   }
 
   private static getMonthsDifference(date1: Date, date2: Date): number {
-    const yearDifference = date2.getFullYear() - date1.getFullYear();
-    const monthDifference = date2.getMonth() - date1.getMonth();
-    return yearDifference * 12 + monthDifference;
+    const yearDiff = date2.getFullYear() - date1.getFullYear();
+    const monthDiff = date2.getMonth() - date1.getMonth();
+    return yearDiff * 12 + monthDiff;
   }
 }

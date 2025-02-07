@@ -285,7 +285,7 @@
                     </h4>
                     <p class="text-sm text-muted-foreground">
                       Dernier entretien :
-                      {{ new Date(maintenance.lastMaintenanceDate).toLocaleDateString() }}
+                      {{ new Date(maintenance.maintenanceDate).toLocaleDateString() }}
                     </p>
                     <p class="text-sm text-muted-foreground">
                       Kilométrage actuel : {{ maintenance.currentKilometers }} km
@@ -332,7 +332,7 @@
                       >
                         {{
                           new Date(
-                            notification.maintenance.lastMaintenanceDate,
+                            notification.maintenance.maintenanceDate,
                           ).toLocaleDateString()
                         }}
                       </p>

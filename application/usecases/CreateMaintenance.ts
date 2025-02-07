@@ -1,15 +1,21 @@
-import { Maintenance } from "../../domain/entities/Maintenance";
-import { BikeRepository } from "../../domain/repositories/BikeRepository";
+import { Maintenance, MaintenanceStatus, MaintenanceType } from "../../domain/entities/Maintenance";
 import { MaintenanceRepository } from "../../domain/repositories/MaintenanceRepository";
+import { BikeRepository } from "../../domain/repositories/BikeRepository";
 import { UserRepository } from "../../domain/repositories/UserRepository";
-import { UserRole } from "../../domain/entities/User";
 
 export interface CreateMaintenanceRequest {
   id: string;
   bikeId: string;
-  technicianId: string | null;
-  lastMaintenanceDate: Date;
+  maintenanceDate: Date;
+  lastMaintenanceKilometers: number;
   currentKilometers: number;
+  technicianId?: string;
+  type: MaintenanceType;
+  replacedParts?: string[];
+  cost?: number;
+  technicalRecommendations?: string;
+  workDescription?: string;
+  nextRecommendedMaintenanceDate?: Date;
 }
 
 export class CreateMaintenance {
@@ -31,18 +37,22 @@ export class CreateMaintenance {
       if (!technician) {
         throw new Error("Technician not found");
       }
-      if (technician.role !== UserRole.TECHNICIAN) {
-        throw new Error("User is not a technician");
-      }
     }
 
     const maintenance = new Maintenance(
       request.id,
       bike,
-      request.lastMaintenanceDate,
+      request.maintenanceDate,
+      request.lastMaintenanceKilometers,
       request.currentKilometers,
-      request.currentKilometers,
-      technician
+      technician,
+      MaintenanceStatus.SCHEDULED,
+      request.type,
+      request.replacedParts || [],
+      request.cost || 0,
+      request.technicalRecommendations || '',
+      request.workDescription || '',
+      request.nextRecommendedMaintenanceDate || null
     );
 
     await this.maintenanceRepository.save(maintenance);

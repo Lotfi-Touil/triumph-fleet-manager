@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { maintenanceService, type MaintenanceNotification } from '../services/maintenance.service'
+import { maintenanceService, type MaintenanceNotification, NotificationType } from '../services/maintenance.service'
 import { notificationEventService } from '../services/events.service'
 
 export const useNotificationStore = defineStore('notifications', () => {
@@ -34,14 +34,14 @@ export const useNotificationStore = defineStore('notifications', () => {
       // Fusionner les notifications en conservant les existantes si pas de changement
       const currentNotifications = pendingNotifications.value
       const newMaintenanceNotifs = maintenance.filter(
-        (m) => !currentNotifications.some((c) => c.id === m.id && c.type === 'MAINTENANCE'),
+        (m: MaintenanceNotification) => !currentNotifications.some((c) => c.id === m.id && c.type === NotificationType.MAINTENANCE),
       )
       const newLowStockNotifs = lowStock.filter(
-        (l) => !currentNotifications.some((c) => c.id === l.id && c.type === 'LOW_STOCK'),
+        (l: MaintenanceNotification) => !currentNotifications.some((c) => c.id === l.id && c.type === NotificationType.LOW_STOCK),
       )
 
       // Garder les notifications existantes qui n'ont pas été acquittées
-      const existingNotifs = currentNotifications.filter((n) =>
+      const existingNotifs = currentNotifications.filter((n: MaintenanceNotification) =>
         [...maintenance, ...lowStock].some((m) => m.id === n.id),
       )
 
@@ -69,14 +69,14 @@ export const useNotificationStore = defineStore('notifications', () => {
 
   async function acknowledgeNotification(
     id: string,
-    type: 'MAINTENANCE' | 'LOW_STOCK' = 'MAINTENANCE',
+    type: NotificationType = NotificationType.MAINTENANCE,
   ) {
     try {
       loading.value = true
       error.value = null
       await maintenanceService.acknowledgeNotification(id, type)
       // Mettre à jour la liste des notifications immédiatement
-      pendingNotifications.value = pendingNotifications.value.filter((notif) => notif.id !== id)
+      pendingNotifications.value = pendingNotifications.value.filter((notif: MaintenanceNotification) => notif.id !== id)
     } catch (err) {
       error.value = 'Erreur lors de la confirmation de la notification'
       console.error('Error acknowledging notification:', err)

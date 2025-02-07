@@ -3,13 +3,18 @@ import { MaintenanceRepository } from "../../domain/repositories/MaintenanceRepo
 import { BikeRepository } from "../../domain/repositories/BikeRepository";
 import { UserRepository } from "../../domain/repositories/UserRepository";
 import { UserRole } from "../../domain/entities/User";
+import { MaintenanceStatus, MaintenanceType } from "../../domain/entities/Maintenance";
 
 export interface UpdateMaintenanceRequest {
   id: string;
-  bikeId: string;
-  technicianId: string | null;
-  maintenanceDate: Date;
-  currentKilometers: number;
+  status?: MaintenanceStatus;
+  technicianId?: string;
+  type?: MaintenanceType;
+  replacedParts?: string[];
+  cost?: number;
+  technicalRecommendations?: string;
+  workDescription?: string;
+  nextRecommendedMaintenanceDate?: Date | null;
 }
 
 export class UpdateMaintenance {
@@ -20,36 +25,42 @@ export class UpdateMaintenance {
   ) {}
 
   async execute(request: UpdateMaintenanceRequest): Promise<void> {
-    const bike = await this.bikeRepository.findById(request.bikeId);
-    if (!bike) {
-      throw new Error("Bike not found");
-    }
-
     const maintenance = await this.maintenanceRepository.findById(request.id);
     if (!maintenance) {
       throw new Error("Maintenance not found");
     }
 
-    let technician = null;
     if (request.technicianId) {
-      technician = await this.userRepository.findById(request.technicianId);
+      const technician = await this.userRepository.findById(request.technicianId);
       if (!technician) {
         throw new Error("Technician not found");
       }
       if (technician.role !== UserRole.TECHNICIAN) {
         throw new Error("User is not a technician");
       }
+      maintenance.assignTechnician(technician);
     }
 
-    const updatedMaintenance = new Maintenance(
-      request.id,
-      bike,
-      request.maintenanceDate,
-      request.currentKilometers,
-      request.currentKilometers,
-      technician
+    if (request.status) {
+      maintenance.updateStatus(request.status);
+    }
+
+    const details = {
+      replacedParts: request.replacedParts ?? maintenance.getReplacedParts(),
+      cost: request.cost ?? maintenance.getCost(),
+      technicalRecommendations: request.technicalRecommendations ?? maintenance.getTechnicalRecommendations(),
+      workDescription: request.workDescription ?? maintenance.getWorkDescription(),
+      nextRecommendedMaintenanceDate: request.nextRecommendedMaintenanceDate ?? maintenance.getNextRecommendedMaintenanceDate()
+    };
+
+    maintenance.updateMaintenanceDetails(
+      details.replacedParts,
+      details.cost,
+      details.technicalRecommendations,
+      details.workDescription,
+      details.nextRecommendedMaintenanceDate
     );
 
-    await this.maintenanceRepository.save(updatedMaintenance);
+    await this.maintenanceRepository.save(maintenance);
   }
 }

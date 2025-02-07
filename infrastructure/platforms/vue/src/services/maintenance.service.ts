@@ -1,139 +1,209 @@
-import mainAxios from './axios'
-import axios from 'axios'
-import type { User } from './user.service'
+import axios from './axios'
+import type { Bike } from './bike.service'
 
-const sparePartsAxios = axios.create({
-  baseURL: 'http://localhost:3001/api',
-  withCredentials: false,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-})
+export enum MaintenanceStatus {
+  SCHEDULED = 'SCHEDULED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
+}
 
-export interface Bike {
+export enum MaintenanceType {
+  PREVENTIVE = 'PREVENTIVE',
+  REGULAR = 'REGULAR',
+  INSPECTION = 'INSPECTION',
+}
+
+export enum NotificationType {
+  MAINTENANCE = 'MAINTENANCE',
+  LOW_STOCK = 'LOW_STOCK',
+}
+
+export interface MaintenanceNotification {
   id: string
-  name: string
-  registrationNumber: string
-  maintenanceInterval: {
-    kilometerInterval: number
-    monthInterval: number
+  type: NotificationType
+  message: string
+  createdAt: string
+  status: 'PENDING' | 'SENT' | 'ACKNOWLEDGED'
+  maintenance: {
+    id: string
+    bike: {
+      id: string
+      name: string
+      registrationNumber: string
+      maintenanceInterval: {
+        kilometers: number
+        monthInterval: number
+      }
+    }
+    maintenanceDate: string
+    lastMaintenanceKilometers: number
+    currentKilometers: number
+    technician: {
+      id: string
+      firstName: string
+      lastName: string
+      email: string
+      name: string
+    } | null
+    status: MaintenanceStatus
+    type: MaintenanceType
+    replacedParts: string[]
+    cost: number
+    technicalRecommendations: string
+    workDescription: string
+    nextRecommendedMaintenanceDate: string | null
   }
 }
 
 export interface Maintenance {
   id: string
   bike: Bike
-  technician: User | null
-  lastMaintenanceDate: string
+  maintenanceDate: string
   lastMaintenanceKilometers: number
   currentKilometers: number
+  technician: {
+    id: string
+    firstName: string
+    lastName: string
+    email: string
+    name: string
+  } | null
+  status: MaintenanceStatus
+  type: MaintenanceType
+  replacedParts: string[]
+  cost: number
+  technicalRecommendations: string
+  workDescription: string
+  nextRecommendedMaintenanceDate: string | null
 }
 
-export interface MaintenanceSchedule {
+interface RawMaintenance {
   id: string
   bike: Bike
-  scheduledDate: string
-  scheduledKilometers: number
-}
-
-export interface MaintenanceNotification {
-  id: string
-  maintenanceSchedule?: MaintenanceSchedule
-  sparePart?: {
+  maintenanceDate: string
+  lastMaintenanceKilometers: string | number
+  currentKilometers: string | number
+  technician: {
     id: string
+    firstName: string
+    lastName: string
+    email: string
     name: string
-    quantity: number
-    minQuantity: number
-  }
-  maintenance: Maintenance
-  message: string
-  type: 'MAINTENANCE' | 'LOW_STOCK'
-  status: 'PENDING' | 'ACKNOWLEDGED'
-  createdAt: string
+  } | null
+  status: MaintenanceStatus
+  type: MaintenanceType
+  replacedParts: string[]
+  cost: string | number
+  technicalRecommendations: string
+  workDescription: string
+  nextRecommendedMaintenanceDate: string | null
 }
 
 class MaintenanceService {
-  private readonly baseUrl = '/maintenance'
+  private readonly baseUrl = '/maintenances'
+
+  private transformMaintenance(data: RawMaintenance): Maintenance {
+    return {
+      ...data,
+      lastMaintenanceKilometers: Number(data.lastMaintenanceKilometers),
+      currentKilometers: Number(data.currentKilometers),
+      cost: Number(data.cost),
+    }
+  }
 
   async createMaintenance(data: {
     bikeId: string
-    date: string
-    kilometers: number
+    maintenanceDate: string
+    lastMaintenanceKilometers: number
+    currentKilometers: number
     technicianId?: string
-  }): Promise<void> {
-    await mainAxios.post(`${this.baseUrl}/create-maintenance`, data)
+    type: MaintenanceType
+    replacedParts?: string[]
+    cost?: number
+    technicalRecommendations?: string
+    workDescription?: string
+    nextRecommendedMaintenanceDate?: string
+  }): Promise<string> {
+    const response = await axios.post<{ id: string }>(`${this.baseUrl}/create`, data)
+    return response.data.id
   }
 
-  async updateMaintenance(data: {
-    id: string
-    bikeId: string
-    date: string
-    kilometers: number
-    technicianId?: string
-  }): Promise<void> {
-    await mainAxios.put(`${this.baseUrl}/update-maintenance/${data.id}`, {
-      bikeId: data.bikeId,
-      date: data.date,
-      kilometers: data.kilometers,
-      technicianId: data.technicianId,
-    })
-  }
-
-  async deleteMaintenance(id: string): Promise<void> {
-    await mainAxios.delete(`${this.baseUrl}/delete-maintenance/${id}`)
-  }
-
-  async getDueMaintenances(): Promise<Maintenance[]> {
-    const response = await mainAxios.get<Maintenance[]>(`${this.baseUrl}/due-maintenances`)
-    return response.data
-  }
-
-  async getAllMaintenances(): Promise<Maintenance[]> {
-    const response = await mainAxios.get<Maintenance[]>(`${this.baseUrl}/all-maintenances`)
-    return response.data
-  }
-
-  async getNotifications(): Promise<MaintenanceNotification[]> {
-    const response = await mainAxios.get<MaintenanceNotification[]>(`${this.baseUrl}/notifications`)
-    return response.data
-  }
-
-  async getPendingNotifications(): Promise<MaintenanceNotification[]> {
-    const response = await mainAxios.get(`${this.baseUrl}/notifications/pending`)
-    return response.data
-  }
-
-  async getLowStockNotifications(): Promise<MaintenanceNotification[]> {
-    const response = await sparePartsAxios.get('/spare-parts/notifications/low-stock')
-    return response.data.map((notif: any) => ({
-      ...notif,
-      createdAt: new Date(notif.createdAt),
-    }))
-  }
-
-  async acknowledgeNotification(
+  async updateMaintenance(
     id: string,
-    type: 'MAINTENANCE' | 'LOW_STOCK' = 'MAINTENANCE',
+    data: {
+      status?: MaintenanceStatus
+      technicianId?: string
+      type?: MaintenanceType
+      replacedParts?: string[]
+      cost?: number
+      technicalRecommendations?: string
+      workDescription?: string
+      nextRecommendedMaintenanceDate?: string
+    },
   ): Promise<void> {
-    if (type === 'LOW_STOCK') {
-      const sparePartId = id.replace('low-stock-', '')
-      await sparePartsAxios.put(`/spare-parts/${sparePartId}/acknowledge-low-stock`)
-    } else {
-      await mainAxios.put(`${this.baseUrl}/notifications/${id}/acknowledge`)
-    }
+    await axios.put(`${this.baseUrl}/update/${id}`, data)
   }
 
   async updateMaintenanceKilometers(data: {
     maintenanceId: string
-    kilometers: number
-    bikeId: string
-    lastMaintenanceDate: string
+    newKilometers: number
   }): Promise<void> {
-    await mainAxios.put(`${this.baseUrl}/update-maintenance/${data.maintenanceId}`, {
-      bikeId: data.bikeId,
-      date: data.lastMaintenanceDate,
-      kilometers: data.kilometers,
+    await axios.put(`${this.baseUrl}/update-kilometers/${data.maintenanceId}`, {
+      newKilometers: data.newKilometers
     })
+  }
+
+  async deleteMaintenance(id: string): Promise<void> {
+    await axios.delete(`${this.baseUrl}/delete/${id}`)
+  }
+
+  async getMaintenances(): Promise<Maintenance[]> {
+    const response = await axios.get<RawMaintenance[]>(`${this.baseUrl}`)
+    return response.data.map(this.transformMaintenance)
+  }
+
+  async getMaintenancesByBike(bikeId: string): Promise<Maintenance[]> {
+    const response = await axios.get<RawMaintenance[]>(`${this.baseUrl}/bike/${bikeId}`)
+    return response.data.map(this.transformMaintenance)
+  }
+
+  async getMaintenancesByStatus(status: MaintenanceStatus): Promise<Maintenance[]> {
+    const response = await axios.get<RawMaintenance[]>(`${this.baseUrl}/status/${status}`)
+    return response.data.map(this.transformMaintenance)
+  }
+
+  async getScheduledMaintenances(): Promise<Maintenance[]> {
+    const response = await axios.get<RawMaintenance[]>(`${this.baseUrl}/scheduled`)
+    return response.data.map(this.transformMaintenance)
+  }
+
+  async getCompletedMaintenances(): Promise<Maintenance[]> {
+    const response = await axios.get<RawMaintenance[]>(`${this.baseUrl}/completed`)
+    return response.data.map(this.transformMaintenance)
+  }
+
+  async getDueMaintenances(): Promise<Maintenance[]> {
+    const response = await axios.get<RawMaintenance[]>(`${this.baseUrl}/due-maintenances`)
+    return response.data.map(this.transformMaintenance)
+  }
+
+  async getPendingNotifications(): Promise<MaintenanceNotification[]> {
+    const response = await axios.get<MaintenanceNotification[]>(`${this.baseUrl}/notifications/pending`)
+    return response.data
+  }
+
+  async getLowStockNotifications(): Promise<MaintenanceNotification[]> {
+    const response = await axios.get<MaintenanceNotification[]>(`/spare-parts/notifications/low-stock`)
+    return response.data
+  }
+
+  async acknowledgeNotification(id: string, type: NotificationType): Promise<void> {
+    if (type === NotificationType.MAINTENANCE) {
+      await axios.put(`${this.baseUrl}/notifications/${id}/acknowledge`)
+    } else {
+      await axios.put(`/spare-parts/notifications/${id}/acknowledge`)
+    }
   }
 }
 

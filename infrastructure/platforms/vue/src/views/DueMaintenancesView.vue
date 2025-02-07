@@ -63,7 +63,7 @@
               {{ maintenance.bike.name }} - {{ maintenance.bike.registrationNumber }}
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-foreground">
-              {{ new Date(maintenance.lastMaintenanceDate).toLocaleDateString() }}
+              {{ new Date(maintenance.maintenanceDate).toLocaleDateString() }}
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-foreground">
               {{ calculateNextMaintenanceDate(maintenance).toLocaleDateString() }}
@@ -114,7 +114,7 @@
               <p class="mt-1 text-foreground">
                 {{
                   selectedMaintenance
-                    ? new Date(selectedMaintenance.lastMaintenanceDate).toLocaleDateString()
+                    ? new Date(selectedMaintenance.maintenanceDate).toLocaleDateString()
                     : ''
                 }}
               </p>
@@ -173,7 +173,7 @@ const showDetailsModal = ref(false)
 const selectedMaintenance = ref<Maintenance | null>(null)
 
 function calculateNextMaintenanceDate(maintenance: Maintenance): Date {
-  const lastDate = new Date(maintenance.lastMaintenanceDate)
+  const lastDate = new Date(maintenance.maintenanceDate)
   const monthsToAdd = maintenance.bike.maintenanceInterval.monthInterval
   return new Date(lastDate.setMonth(lastDate.getMonth() + monthsToAdd))
 }

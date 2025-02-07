@@ -76,4 +76,8 @@ export class User {
       ...this.props,
     };
   }
+
+  getId(): string | undefined {
+    return this.id;
+  }
 }
