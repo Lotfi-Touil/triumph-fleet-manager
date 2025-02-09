@@ -32,7 +32,7 @@
                     <SelectValue :placeholder="user.role" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem v-for="role in roles" :key="role" :value="role">
+                    <SelectItem v-for="role in availableRoles" :key="role" :value="role">
                       {{ formatRole(role) }}
                     </SelectItem>
                   </SelectContent>
@@ -57,7 +57,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { Loader2 } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import {
@@ -78,6 +78,7 @@ import {
 import { showSuccess, showError } from '@/components/ui/toast'
 import { UserRole } from '@/types/auth'
 import axios from '@/services/axios'
+import { useAuthStore } from '@/stores/auth'
 
 interface User {
   id: string
@@ -88,16 +89,33 @@ interface User {
 
 const users = ref<User[]>([])
 const loading = ref(true)
+const authStore = useAuthStore()
 
-const roles = Object.values(UserRole)
+const availableRoles = computed(() => {
+  if (authStore.user?.role === UserRole.ADMIN) {
+    return Object.values(UserRole)
+  }
+  return Object.values(UserRole).filter(role => role !== UserRole.ADMIN)
+})
+
+const translateRole = (role: string): string => {
+  const translations: Record<string, string> = {
+    'admin': 'Administrateur',
+    'fleet_manager': 'Gestionnaire de flotte',
+    'client_partner': 'Partenaire client',
+    'technician': 'Technicien',
+    'driver': 'Conducteur'
+  }
+  return translations[role] || role
+}
 
 const formatRole = (role: string) => {
-  const formattedRole = role.toLowerCase().replace(/_/g, ' ')
-  return formattedRole.charAt(0).toUpperCase() + formattedRole.slice(1)
+  return translateRole(role)
 }
 
 const loadUsers = async () => {
   try {
+    loading.value = true
     const { data } = await axios.get<User[]>('/admin/users')
     users.value = data
   } catch (error) {
@@ -111,6 +129,7 @@ const handleRoleChange = async (userId: string, newRole: UserRole) => {
   try {
     await axios.post(`/admin/users/${userId}/role`, { role: newRole })
     showSuccess('Rôle mis à jour avec succès')
+    await loadUsers()
   } catch (error) {
     showError('Erreur lors de la mise à jour du rôle')
   }

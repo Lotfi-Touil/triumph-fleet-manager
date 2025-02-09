@@ -228,8 +228,35 @@
             }}
           </h1>
           <div class="flex items-center gap-4">
-            <span class="text-muted-foreground">{{ authStore.user?.name }}</span>
-            <Button variant="destructive" @click="handleLogout"> Déconnexion </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button class="relative h-8 w-8 text-black rounded-full bg-gray-200 hover:bg-gray-300">
+                    <User class="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent class="w-56" align="end">
+                <DropdownMenuLabel class="font-normal">
+                  <div class="flex flex-col space-y-1">
+                    <p class="text-sm font-medium leading-none">{{ authStore.user?.name }}</p>
+                    <p class="text-xs leading-none text-muted-foreground">
+                      {{ authStore.user?.email }}
+                    </p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <router-link to="/dashboard/profile">
+                    <User class="mr-2 h-4 w-4" />
+                    <span>Profil</span>
+                  </router-link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem @click="handleLogout">
+                  <LogOut class="mr-2 h-4 w-4" />
+                  <span>Déconnexion</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </header>
@@ -386,7 +413,18 @@ import {
   CalendarClock,
   Wrench,
   ClipboardCheck,
+  User,
+  LogOut,
 } from 'lucide-vue-next'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../components/ui/dropdown-menu'
+import { Avatar, AvatarImage, AvatarFallback } from '../components/ui/avatar'
 import UpdateKilometersDialog from '../components/maintenance/UpdateKilometersDialog.vue'
 
 const router = useRouter()

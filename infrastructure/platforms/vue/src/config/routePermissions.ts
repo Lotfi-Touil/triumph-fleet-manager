@@ -88,7 +88,7 @@ export const routePermissions: Record<RouteNames, UserRole[]> = {
     UserRole.DRIVER,
   ],
 
-  'admin-users': [UserRole.ADMIN],
+  'admin-users': [UserRole.ADMIN, UserRole.FLEET_MANAGER],
 
   'trial-history': [UserRole.ADMIN, UserRole.FLEET_MANAGER],
   'trial-incidents': [UserRole.ADMIN, UserRole.FLEET_MANAGER],
