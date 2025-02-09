@@ -52,7 +52,7 @@ export class MaintenanceCalculator {
       .getBike()
       .getMaintenanceInterval()
       .getKilometers();
-    const upcomingThreshold = maintenanceInterval * 0.9; // 90% of the interval
+    const upcomingThreshold = maintenanceInterval * 0.9;
 
     return (
       currentKilometers - lastMaintenanceKilometers >= upcomingThreshold &&
@@ -70,7 +70,7 @@ export class MaintenanceCalculator {
       .getBike()
       .getMaintenanceInterval()
       .getMonthInterval();
-    const upcomingThreshold = maintenanceInterval * 0.9; // 90% of the interval
+    const upcomingThreshold = maintenanceInterval * 0.9;
 
     return (
       monthsSinceLastMaintenance >= upcomingThreshold &&

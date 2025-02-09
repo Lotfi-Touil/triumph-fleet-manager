@@ -2,8 +2,8 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindOptionsSelect, FindOptionsOrder } from 'typeorm';
 import { Trial } from './trial.entity';
-import { CreateTrialDto } from './dto/create-trial.dto';
-import { UpdateTrialDto } from './dto/update-trial.dto';
+import { TrialService, CreateTrialDTO, UpdateTrialDTO } from '@application/ports/services/TrialService';
+import { MaintenanceService, CreateMaintenanceDTO, UpdateMaintenanceDTO } from '@application/ports/services/MaintenanceService';
 import { DriverEntity } from '../entities/driver.entity';
 import { BikeEntity } from '../entities/bike.entity';
 
@@ -35,7 +35,7 @@ const DEFAULT_FIND_OPTIONS = {
 };
 
 @Injectable()
-export class TrialService {
+export class NestTrialService implements TrialService {
   constructor(
     @InjectRepository(Trial)
     private trialRepository: Repository<Trial>,
@@ -63,7 +63,7 @@ export class TrialService {
     });
   }
 
-  async create(createTrialDto: CreateTrialDto): Promise<Trial> {
+  async create(createTrialDto: CreateTrialDTO): Promise<Trial> {
     const [driver, bike] = await Promise.all([
       this.driverRepository.findOne({ where: { id: createTrialDto.driverId } }),
       this.bikeRepository.findOne({ where: { id: createTrialDto.bikeId } }),
@@ -82,7 +82,7 @@ export class TrialService {
     return this.trialRepository.save(trial);
   }
 
-  async endTrial(id: string, updateTrialDto: UpdateTrialDto): Promise<Trial> {
+  async endTrial(id: string, updateTrialDto: UpdateTrialDTO): Promise<Trial> {
     const trial = await this.trialRepository.findOne({ where: { id } });
     if (!trial) throw new NotFoundException('Trial not found');
     if (!trial.startDate) throw new BadRequestException('Trial has no start date');

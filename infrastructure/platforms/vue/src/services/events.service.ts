@@ -7,7 +7,6 @@ class NotificationEventService {
     this.stopListening()
     this.callback = callback
 
-    // Connexion au serveur de maintenance (NestJS)
     this.maintenanceSource = new EventSource(
       'http://localhost:3000/api/maintenance/notifications/events',
     )
@@ -19,7 +18,6 @@ class NotificationEventService {
       this.reconnectMaintenanceSSE()
     }
 
-    // Connexion au serveur de stock (Express)
     this.lowStockSource = new EventSource(
       'http://localhost:3001/api/spare-parts/notifications/events',
     )

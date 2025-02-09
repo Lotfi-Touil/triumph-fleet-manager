@@ -4,9 +4,9 @@ export class SparePart {
   constructor(
     public readonly id: string,
     public name: string,
-    public category: string, // e.g., 'filter', 'tire', 'brake'
+    public category: string,
     public quantity: number,
-    public minQuantity: number, // For stock alerts
+    public minQuantity: number,
     public location: string,
     public lastRestockDate: Date,
     public price: number,

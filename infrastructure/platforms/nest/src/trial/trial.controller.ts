@@ -1,18 +1,21 @@
-import { Controller, Get, Post, Body, Param, Delete, Put, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
-import { TrialService } from './trial.service';
-import { CreateTrialDto } from './dto/create-trial.dto';
-import { UpdateTrialDto } from './dto/update-trial.dto';
+import { Controller, Get, Post, Body, Param, Delete, Put, UseGuards, UsePipes, ValidationPipe, Inject } from '@nestjs/common';
+import { TrialService } from '@application/ports/services/TrialService';
+import { CreateTrialDTO, UpdateTrialDTO } from '@application/ports/services/TrialService';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '@domain/entities/User';
+import { NestTrialService } from './trial.service';
 
 @Controller('trials')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.ADMIN, UserRole.FLEET_MANAGER)
 @UsePipes(new ValidationPipe({ transform: true }))
 export class TrialController {
-  constructor(private readonly trialService: TrialService) {}
+  constructor(
+    @Inject('TrialService')
+    private readonly trialService: TrialService
+  ) {}
 
   @Get()
   findAll() {
@@ -30,12 +33,12 @@ export class TrialController {
   }
 
   @Post()
-  create(@Body() createTrialDto: CreateTrialDto) {
+  create(@Body() createTrialDto: CreateTrialDTO) {
     return this.trialService.create(createTrialDto);
   }
 
   @Put(':id/end')
-  endTrial(@Param('id') id: string, @Body() updateTrialDto: UpdateTrialDto) {
+  endTrial(@Param('id') id: string, @Body() updateTrialDto: UpdateTrialDTO) {
     return this.trialService.endTrial(id, updateTrialDto);
   }
 

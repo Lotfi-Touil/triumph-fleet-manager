@@ -23,7 +23,6 @@ export type RouteNames =
   | 'incidents'
 
 export const routePermissions: Record<RouteNames, UserRole[]> = {
-  // Routes publiques
   landing: [
     UserRole.ADMIN,
     UserRole.FLEET_MANAGER,
@@ -53,7 +52,6 @@ export const routePermissions: Record<RouteNames, UserRole[]> = {
     UserRole.DRIVER,
   ],
 
-  // Dashboard accessible à tous les utilisateurs authentifiés
   dashboard: [
     UserRole.ADMIN,
     UserRole.FLEET_MANAGER,
@@ -62,23 +60,18 @@ export const routePermissions: Record<RouteNames, UserRole[]> = {
     UserRole.DRIVER,
   ],
 
-  // Gestion des motos
   bikes: [UserRole.ADMIN, UserRole.FLEET_MANAGER],
 
-  // Maintenance
   maintenance: [UserRole.ADMIN, UserRole.FLEET_MANAGER, UserRole.TECHNICIAN],
   'due-maintenances': [UserRole.ADMIN, UserRole.FLEET_MANAGER, UserRole.TECHNICIAN],
 
-  // Pièces détachées
   'spare-parts': [UserRole.ADMIN, UserRole.FLEET_MANAGER, UserRole.TECHNICIAN],
   'spare-part-orders': [UserRole.ADMIN, UserRole.FLEET_MANAGER, UserRole.TECHNICIAN],
   'new-spare-part': [UserRole.ADMIN, UserRole.FLEET_MANAGER],
   'edit-spare-part': [UserRole.ADMIN, UserRole.FLEET_MANAGER],
 
-  // Pannes
   breakdowns: [UserRole.ADMIN, UserRole.FLEET_MANAGER, UserRole.TECHNICIAN, UserRole.DRIVER],
 
-  // Notifications
   notifications: [
     UserRole.ADMIN,
     UserRole.FLEET_MANAGER,
@@ -87,7 +80,6 @@ export const routePermissions: Record<RouteNames, UserRole[]> = {
     UserRole.DRIVER,
   ],
 
-  // Profil
   profile: [
     UserRole.ADMIN,
     UserRole.FLEET_MANAGER,
@@ -96,17 +88,13 @@ export const routePermissions: Record<RouteNames, UserRole[]> = {
     UserRole.DRIVER,
   ],
 
-  // Administration
   'admin-users': [UserRole.ADMIN],
 
-  // Suivi des essais
   'trial-history': [UserRole.ADMIN, UserRole.FLEET_MANAGER],
   'trial-incidents': [UserRole.ADMIN, UserRole.FLEET_MANAGER],
 
-  // Gestion des conducteurs
   'drivers': [UserRole.ADMIN, UserRole.FLEET_MANAGER],
 
-  // Incidents
   'incidents': [UserRole.ADMIN, UserRole.FLEET_MANAGER],
 }
 

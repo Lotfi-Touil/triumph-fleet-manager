@@ -31,7 +31,6 @@ export class Breakdown {
     private replacedParts: string[]
   ) {}
 
-  // Getters
   getId(): string {
     return this.id;
   }
@@ -80,7 +79,6 @@ export class Breakdown {
     return [...this.replacedParts];
   }
 
-  // Setters and business methods
   updateStatus(status: BreakdownStatus): void {
     this.status = status;
     if (status === BreakdownStatus.RESOLVED && !this.resolutionDate) {

@@ -38,7 +38,6 @@ export class NestBreakdownService implements BreakdownService {
 
     const breakdownId = randomUUID();
 
-    // Create the breakdown
     await this.createBreakdownUseCase.execute({
       id: breakdownId,
       bikeId: dto.bikeId,
@@ -47,7 +46,6 @@ export class NestBreakdownService implements BreakdownService {
       warrantyApplied: dto.warrantyApplied,
     });
 
-    // Handle spare parts if provided
     if (dto.spareParts && dto.spareParts.length > 0) {
       for (const part of dto.spareParts) {
         const sparePart = await this.sparePartsService.getSparePartById(part.sparePartId);
