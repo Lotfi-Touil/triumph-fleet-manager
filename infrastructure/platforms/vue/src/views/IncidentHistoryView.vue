@@ -41,7 +41,7 @@
                   'bg-destructive/20 text-destructive': incident.severity === 'Critique',
                   'bg-warning/20 text-warning': incident.severity === 'Élevé',
                   'bg-yellow-100 text-yellow-800': incident.severity === 'Moyen',
-                  'bg-success/20 text-success': incident.severity === 'Faible'
+                  'bg-muted text-foreground': incident.severity === 'Faible'
                 }"
               >
                 {{ incident.severity }}

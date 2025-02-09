@@ -1,36 +1,45 @@
-import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common';
-import { DriverService } from './driver.service';
-import { DriverEntity } from '../entities/driver.entity';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, Inject } from '@nestjs/common';
+import { CreateDriverDTO, UpdateDriverDTO, DriverService, DRIVER_SERVICE } from '@application/ports/services/DriverService';
+import { Driver } from '@domain/entities/Driver';
 
 @Controller('drivers')
 export class DriverController {
-  constructor(private readonly driverService: DriverService) {}
+  constructor(
+    @Inject(DRIVER_SERVICE)
+    private readonly driverService: DriverService
+  ) {}
 
   @Get()
-  findAll(): Promise<DriverEntity[]> {
-    return this.driverService.findAll();
+  findAll(): Promise<Driver[]> {
+    return this.driverService.getAllDrivers();
+  }
+
+  @Get('expiring')
+  findByLicenseExpiry(@Query('beforeDate') beforeDate: string): Promise<Driver[]> {
+    return this.driverService.getDriversByLicenseExpiry(new Date(beforeDate));
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<DriverEntity> {
-    return this.driverService.findOne(id);
+  findOne(@Param('id') id: string): Promise<Driver | null> {
+    return this.driverService.getDriverById(id);
   }
 
   @Post()
-  create(@Body() driver: Omit<DriverEntity, 'id'>): Promise<DriverEntity> {
-    return this.driverService.create(driver);
+  async create(@Body() driver: CreateDriverDTO): Promise<{ id: string }> {
+    const id = await this.driverService.createDriver(driver);
+    return { id };
   }
 
   @Put(':id')
-  update(
+  async update(
     @Param('id') id: string,
-    @Body() driver: Partial<DriverEntity>,
-  ): Promise<DriverEntity> {
-    return this.driverService.update(id, driver);
+    @Body() driver: Omit<UpdateDriverDTO, 'id'>,
+  ): Promise<void> {
+    await this.driverService.updateDriver({ id, ...driver });
   }
 
   @Delete(':id')
   delete(@Param('id') id: string): Promise<void> {
-    return this.driverService.delete(id);
+    return this.driverService.deleteDriver(id);
   }
 } 

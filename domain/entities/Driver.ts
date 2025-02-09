@@ -3,6 +3,8 @@ export class Driver {
     private readonly id: string,
     private readonly firstName: string,
     private readonly lastName: string,
+    private readonly email: string,
+    private readonly phoneNumber: string,
     private readonly licenseNumber: string,
     private readonly licenseType: string,
     private readonly licenseExpiryDate: Date,
@@ -20,6 +22,14 @@ export class Driver {
 
   public getLastName(): string {
     return this.lastName;
+  }
+
+  public getEmail(): string {
+    return this.email;
+  }
+
+  public getPhoneNumber(): string {
+    return this.phoneNumber;
   }
 
   public getLicenseNumber(): string {

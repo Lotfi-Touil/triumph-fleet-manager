@@ -101,6 +101,24 @@
               />
             </div>
             <div>
+              <label class="block text-sm font-medium text-foreground">Email</label>
+              <input
+                v-model="form.email"
+                type="email"
+                required
+                class="mt-1 block w-full rounded-md border border-black bg-background px-3 py-2 text-foreground focus:border-primary focus:ring-primary"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-foreground">Téléphone</label>
+              <input
+                v-model="form.phoneNumber"
+                type="tel"
+                required
+                class="mt-1 block w-full rounded-md border border-black bg-background px-3 py-2 text-foreground focus:border-primary focus:ring-primary"
+              />
+            </div>
+            <div>
               <label class="block text-sm font-medium text-foreground">Numéro de permis</label>
               <input
                 v-model="form.licenseNumber"
@@ -213,6 +231,14 @@
               <p class="mt-1 text-foreground">{{ selectedDriver?.firstName }}</p>
             </div>
             <div>
+              <label class="block text-sm font-medium text-muted-foreground">Email</label>
+              <p class="mt-1 text-foreground">{{ selectedDriver?.email }}</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-muted-foreground">Téléphone</label>
+              <p class="mt-1 text-foreground">{{ selectedDriver?.phoneNumber }}</p>
+            </div>
+            <div>
               <label class="block text-sm font-medium text-muted-foreground">Numéro de permis</label>
               <p class="mt-1 text-foreground">{{ selectedDriver?.licenseNumber }}</p>
             </div>
@@ -269,6 +295,8 @@ const selectedDriver = ref<Driver | null>(null);
 const form = ref({
   firstName: '',
   lastName: '',
+  email: '',
+  phoneNumber: '',
   licenseNumber: '',
   licenseType: 'A',
   licenseExpiryDate: '',
@@ -296,6 +324,8 @@ function editDriver(driver: Driver) {
   form.value = {
     firstName: driver.firstName,
     lastName: driver.lastName,
+    email: driver.email,
+    phoneNumber: driver.phoneNumber,
     licenseNumber: driver.licenseNumber,
     licenseType: driver.licenseType,
     licenseExpiryDate: new Date(driver.licenseExpiryDate).toISOString().split('T')[0],
@@ -355,6 +385,8 @@ function closeModal() {
   form.value = {
     firstName: '',
     lastName: '',
+    email: '',
+    phoneNumber: '',
     licenseNumber: '',
     licenseType: 'A',
     licenseExpiryDate: '',

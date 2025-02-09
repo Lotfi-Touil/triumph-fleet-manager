@@ -11,6 +11,12 @@ export class DriverEntity {
   @Column()
   lastName: string;
 
+  @Column({ unique: true })
+  email: string;
+
+  @Column()
+  phoneNumber: string;
+
   @Column({ nullable: false })
   licenseNumber: string;
 
