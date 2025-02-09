@@ -23,62 +23,64 @@
 
     <!-- Table -->
     <div v-else class="bg-card rounded-lg shadow overflow-hidden">
-      <table class="min-w-full divide-y divide-border">
-        <thead class="bg-muted">
-          <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              Nom
-            </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              Immatriculation
-            </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              Intervalle kilométrique
-            </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              Intervalle mensuel
-            </th>
-            <th class="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody class="bg-card divide-y divide-border">
-          <tr v-for="bike in bikes" :key="bike.id" class="hover:bg-muted/50">
-            <td class="px-6 py-4 whitespace-nowrap text-foreground">{{ bike.name }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-foreground">{{ bike.registrationNumber }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-foreground">
-              {{ bike.maintenanceInterval.kilometers }} km
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-foreground">
-              {{ bike.maintenanceInterval.monthInterval }} mois
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-              <button
-                @click="viewBike(bike)"
-                class="text-primary hover:text-primary/80 transition-colors"
-                title="Voir les détails"
-              >
-                <Eye class="h-4 w-4" />
-              </button>
-              <button
-                @click="editBike(bike)"
-                class="text-primary hover:text-primary/80 transition-colors"
-                title="Modifier"
-              >
-                <Pencil class="h-4 w-4" />
-              </button>
-              <button
-                @click="confirmDelete(bike)"
-                class="text-destructive hover:text-destructive/80 transition-colors"
-                title="Supprimer"
-              >
-                <Trash2 class="h-4 w-4" />
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-border">
+          <thead class="bg-muted">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Nom
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Immatriculation
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Intervalle kilométrique
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Intervalle mensuel
+              </th>
+              <th class="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-card divide-y divide-border">
+            <tr v-for="bike in bikes" :key="bike.id" class="hover:bg-muted/50">
+              <td class="px-6 py-4 whitespace-nowrap text-foreground">{{ bike.name }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-foreground">{{ bike.registrationNumber }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-foreground">
+                {{ bike.maintenanceInterval.kilometers }} km
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-foreground">
+                {{ bike.maintenanceInterval.monthInterval }} mois
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                <button
+                  @click="viewBike(bike)"
+                  class="text-primary hover:text-primary/80 transition-colors"
+                  title="Voir les détails"
+                >
+                  <Eye class="h-4 w-4" />
+                </button>
+                <button
+                  @click="editBike(bike)"
+                  class="text-primary hover:text-primary/80 transition-colors"
+                  title="Modifier"
+                >
+                  <Pencil class="h-4 w-4" />
+                </button>
+                <button
+                  @click="confirmDelete(bike)"
+                  class="text-destructive hover:text-destructive/80 transition-colors"
+                  title="Supprimer"
+                >
+                  <Trash2 class="h-4 w-4" />
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- Create/Edit Modal -->

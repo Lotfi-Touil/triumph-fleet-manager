@@ -23,105 +23,107 @@
 
     <!-- Table -->
     <div v-else class="bg-card rounded-lg shadow overflow-hidden">
-      <table class="min-w-full divide-y divide-border">
-        <thead class="bg-muted">
-          <tr>
-            <th
-              class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-            >
-              Moto
-            </th>
-            <th
-              class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-            >
-              Date d'entretien
-            </th>
-            <th
-              class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-            >
-              Kilométrage
-            </th>
-            <th
-              class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-            >
-              Type
-            </th>
-            <th
-              class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-            >
-              Statut
-            </th>
-            <th
-              class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-            >
-              Coût
-            </th>
-            <th
-              class="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider"
-            >
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody class="bg-card divide-y divide-border">
-          <tr v-for="maintenance in maintenances" :key="maintenance.id" class="hover:bg-muted/50">
-            <td class="px-6 py-4 whitespace-nowrap text-foreground">
-              {{ maintenance.bike?.name }}
-              {{
-                maintenance.bike?.registrationNumber
-                  ? `- ${maintenance.bike.registrationNumber}`
-                  : ''
-              }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-foreground">
-              {{ new Date(maintenance.maintenanceDate).toLocaleDateString() }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-foreground">
-              {{ maintenance.currentKilometers }} km
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-foreground">
-              {{ getTypeTranslation(maintenance.type) }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-foreground">
-              <span :class="{
-                'px-2 py-1 rounded-full text-xs font-medium': true,
-                'bg-yellow-100 text-yellow-800': maintenance.status === 'SCHEDULED',
-                'bg-blue-100 text-blue-800': maintenance.status === 'IN_PROGRESS',
-                'bg-green-100 text-green-800': maintenance.status === 'COMPLETED',
-                'bg-red-100 text-red-800': maintenance.status === 'CANCELLED'
-              }">
-                {{ getStatusTranslation(maintenance.status) }}
-              </span>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-foreground">
-              {{ maintenance.cost }} €
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-              <button
-                @click="viewMaintenance(maintenance)"
-                class="text-primary hover:text-primary/80 transition-colors"
-                title="Voir les détails"
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-border">
+          <thead class="bg-muted">
+            <tr>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
               >
-                <Eye class="h-4 w-4" />
-              </button>
-              <button
-                @click="editMaintenance(maintenance)"
-                class="text-primary hover:text-primary/80 transition-colors"
-                title="Modifier"
+                Moto
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
               >
-                <Pencil class="h-4 w-4" />
-              </button>
-              <button
-                @click="confirmDelete(maintenance)"
-                class="text-destructive hover:text-destructive/80 transition-colors"
-                title="Supprimer"
+                Date d'entretien
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
               >
-                <Trash2 class="h-4 w-4" />
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+                Kilométrage
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+              >
+                Type
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+              >
+                Statut
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+              >
+                Coût
+              </th>
+              <th
+                class="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider"
+              >
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-card divide-y divide-border">
+            <tr v-for="maintenance in maintenances" :key="maintenance.id" class="hover:bg-muted/50">
+              <td class="px-6 py-4 whitespace-nowrap text-foreground">
+                {{ maintenance.bike?.name }}
+                {{
+                  maintenance.bike?.registrationNumber
+                    ? `- ${maintenance.bike.registrationNumber}`
+                    : ''
+                }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-foreground">
+                {{ new Date(maintenance.maintenanceDate).toLocaleDateString() }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-foreground">
+                {{ maintenance.currentKilometers }} km
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-foreground">
+                {{ getTypeTranslation(maintenance.type) }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-foreground">
+                <span :class="{
+                  'px-2 py-1 rounded-full text-xs font-medium': true,
+                  'bg-yellow-100 text-yellow-800': maintenance.status === 'SCHEDULED',
+                  'bg-blue-100 text-blue-800': maintenance.status === 'IN_PROGRESS',
+                  'bg-green-100 text-green-800': maintenance.status === 'COMPLETED',
+                  'bg-red-100 text-red-800': maintenance.status === 'CANCELLED'
+                }">
+                  {{ getStatusTranslation(maintenance.status) }}
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-foreground">
+                {{ maintenance.cost }} €
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                <button
+                  @click="viewMaintenance(maintenance)"
+                  class="text-primary hover:text-primary/80 transition-colors"
+                  title="Voir les détails"
+                >
+                  <Eye class="h-4 w-4" />
+                </button>
+                <button
+                  @click="editMaintenance(maintenance)"
+                  class="text-primary hover:text-primary/80 transition-colors"
+                  title="Modifier"
+                >
+                  <Pencil class="h-4 w-4" />
+                </button>
+                <button
+                  @click="confirmDelete(maintenance)"
+                  class="text-destructive hover:text-destructive/80 transition-colors"
+                  title="Supprimer"
+                >
+                  <Trash2 class="h-4 w-4" />
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- Create/Edit Modal -->

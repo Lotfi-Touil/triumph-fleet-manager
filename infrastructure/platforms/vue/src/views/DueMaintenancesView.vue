@@ -28,66 +28,68 @@
 
     <!-- Table -->
     <div v-else class="bg-card rounded-lg shadow overflow-hidden">
-      <table class="min-w-full divide-y divide-border">
-        <thead class="bg-muted">
-          <tr>
-            <th
-              class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-            >
-              Moto
-            </th>
-            <th
-              class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-            >
-              Dernier entretien
-            </th>
-            <th
-              class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-            >
-              Prochain entretien
-            </th>
-            <th
-              class="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider"
-            >
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody class="bg-card divide-y divide-border">
-          <tr
-            v-for="maintenance in dueMaintenances"
-            :key="maintenance.id"
-            class="hover:bg-muted/50"
-          >
-            <td class="px-6 py-4 whitespace-nowrap text-foreground">
-              {{ maintenance.bike.name }} - {{ maintenance.bike.registrationNumber }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-foreground">
-              {{ new Date(maintenance.maintenanceDate).toLocaleDateString() }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-foreground">
-              {{ calculateNextMaintenanceDate(maintenance).toLocaleDateString() }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-              <UpdateKilometersDialog :maintenance="maintenance" @updated="fetchDueMaintenances" />
-              <button
-                @click="viewMaintenanceDetails(maintenance)"
-                class="text-primary hover:text-primary/80 transition-colors"
-                title="Voir les détails"
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-border">
+          <thead class="bg-muted">
+            <tr>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
               >
-                <Eye class="h-4 w-4" />
-              </button>
-              <button
-                @click="goToMaintenance(maintenance)"
-                class="text-primary hover:text-primary/80 transition-colors"
-                title="Enregistrer un entretien"
+                Moto
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
               >
-                <Settings2 class="h-4 w-4" />
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+                Dernier entretien
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+              >
+                Prochain entretien
+              </th>
+              <th
+                class="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider"
+              >
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-card divide-y divide-border">
+            <tr
+              v-for="maintenance in dueMaintenances"
+              :key="maintenance.id"
+              class="hover:bg-muted/50"
+            >
+              <td class="px-6 py-4 whitespace-nowrap text-foreground">
+                {{ maintenance.bike.name }} - {{ maintenance.bike.registrationNumber }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-foreground">
+                {{ new Date(maintenance.maintenanceDate).toLocaleDateString() }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-foreground">
+                {{ calculateNextMaintenanceDate(maintenance).toLocaleDateString() }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                <UpdateKilometersDialog :maintenance="maintenance" @updated="fetchDueMaintenances" />
+                <button
+                  @click="viewMaintenanceDetails(maintenance)"
+                  class="text-primary hover:text-primary/80 transition-colors"
+                  title="Voir les détails"
+                >
+                  <Eye class="h-4 w-4" />
+                </button>
+                <button
+                  @click="goToMaintenance(maintenance)"
+                  class="text-primary hover:text-primary/80 transition-colors"
+                  title="Enregistrer un entretien"
+                >
+                  <Settings2 class="h-4 w-4" />
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- Modal de détails -->

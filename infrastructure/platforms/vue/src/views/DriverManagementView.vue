@@ -23,52 +23,54 @@
 
     <!-- Table -->
     <div v-else class="bg-card rounded-lg shadow overflow-hidden">
-      <table class="min-w-full divide-y divide-border">
-        <thead class="bg-muted">
-          <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Nom</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Prénom</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">N° Permis</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Type Permis</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Expiration</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Expérience</th>
-            <th class="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">Actions</th>
-          </tr>
-        </thead>
-        <tbody class="bg-card divide-y divide-border">
-          <tr v-for="driver in drivers" :key="driver.id" class="hover:bg-muted/50">
-            <td class="px-6 py-4 whitespace-nowrap text-foreground">{{ driver.lastName }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-foreground">{{ driver.firstName }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-foreground">{{ driver.licenseNumber }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-foreground">{{ driver.licenseType }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-foreground">{{ formatDate(driver.licenseExpiryDate) }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-foreground">{{ driver.experienceYears }} ans</td>
-            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-              <button
-                @click="viewDriver(driver)"
-                class="text-primary hover:text-primary/80 transition-colors"
-                title="Voir les détails"
-              >
-                <Eye class="h-4 w-4" />
-              </button>
-              <button
-                @click="editDriver(driver)"
-                class="text-primary hover:text-primary/80 transition-colors"
-                title="Modifier"
-              >
-                <Pencil class="h-4 w-4" />
-              </button>
-              <button
-                @click="confirmDelete(driver)"
-                class="text-destructive hover:text-destructive/80 transition-colors"
-                title="Supprimer"
-              >
-                <Trash2 class="h-4 w-4" />
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-border">
+          <thead class="bg-muted">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Nom</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Prénom</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">N° Permis</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Type Permis</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Expiration</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Expérience</th>
+              <th class="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="bg-card divide-y divide-border">
+            <tr v-for="driver in drivers" :key="driver.id" class="hover:bg-muted/50">
+              <td class="px-6 py-4 whitespace-nowrap text-foreground">{{ driver.lastName }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-foreground">{{ driver.firstName }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-foreground">{{ driver.licenseNumber }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-foreground">{{ driver.licenseType }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-foreground">{{ formatDate(driver.licenseExpiryDate) }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-foreground">{{ driver.experienceYears }} ans</td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                <button
+                  @click="viewDriver(driver)"
+                  class="text-primary hover:text-primary/80 transition-colors"
+                  title="Voir les détails"
+                >
+                  <Eye class="h-4 w-4" />
+                </button>
+                <button
+                  @click="editDriver(driver)"
+                  class="text-primary hover:text-primary/80 transition-colors"
+                  title="Modifier"
+                >
+                  <Pencil class="h-4 w-4" />
+                </button>
+                <button
+                  @click="confirmDelete(driver)"
+                  class="text-destructive hover:text-destructive/80 transition-colors"
+                  title="Supprimer"
+                >
+                  <Trash2 class="h-4 w-4" />
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- Create/Edit Modal -->
