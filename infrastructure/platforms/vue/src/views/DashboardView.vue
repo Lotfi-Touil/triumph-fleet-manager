@@ -228,6 +228,10 @@
             }}
           </h1>
           <div class="flex items-center gap-4">
+            <div v-if="authStore.user?.role === 'admin'" class="flex items-center px-2 py-0.5 rounded-full bg-amber-100">
+              <Shield class="h-3 w-3 text-amber-600" />
+              <span class="ml-1 text-xs font-medium text-amber-600">ADMIN</span>
+            </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button class="relative h-8 w-8 text-black rounded-full bg-gray-200 hover:bg-gray-300">
@@ -415,6 +419,7 @@ import {
   ClipboardCheck,
   User,
   LogOut,
+  Shield,
 } from 'lucide-vue-next'
 import {
   DropdownMenu,
@@ -424,7 +429,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../components/ui/dropdown-menu'
-import { Avatar, AvatarImage, AvatarFallback } from '../components/ui/avatar'
 import UpdateKilometersDialog from '../components/maintenance/UpdateKilometersDialog.vue'
 
 const router = useRouter()
