@@ -468,32 +468,46 @@ const getStatusTranslation = (status: MaintenanceStatus | undefined): string => 
   return maintenanceStatusTranslations[status]
 }
 
-const form = ref({
+interface MaintenanceFormData {
+  bikeId: string
+  date: string
+  kilometers: string
+  technicianId: string
+  type: MaintenanceType
+  status: MaintenanceStatus
+  replacedParts: string[]
+  cost: string
+  technicalRecommendations: string
+  workDescription: string
+  nextRecommendedMaintenanceDate: string
+}
+
+const form = ref<MaintenanceFormData>({
   bikeId: '',
   date: '',
-  kilometers: 0,
+  kilometers: '0',
   technicianId: '',
   type: MaintenanceType.REGULAR,
   status: MaintenanceStatus.SCHEDULED,
-  replacedParts: [] as string[],
-  cost: 0,
+  replacedParts: [],
+  cost: '0',
   technicalRecommendations: '',
   workDescription: '',
-  nextRecommendedMaintenanceDate: '',
+  nextRecommendedMaintenanceDate: ''
 })
 
 const fetchData = async () => {
   try {
     loading.value = true
     error.value = null
-    const [maintenanceData, bikeData, technicianData] = await Promise.all([
+    await Promise.all([
       maintenanceStore.fetchMaintenances(),
       bikeStore.fetchBikes(),
       userStore.getTechnicians(),
     ])
     maintenances.value = maintenanceStore.maintenances
     bikes.value = bikeStore.bikes
-    technicians.value = technicianData
+    technicians.value = await userStore.getTechnicians()
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Une erreur est survenue'
   } finally {
@@ -503,6 +517,19 @@ const fetchData = async () => {
 
 function editMaintenance(maintenance: Maintenance) {
   selectedMaintenance.value = maintenance
+  form.value = {
+    bikeId: maintenance.bike.id,
+    date: new Date(maintenance.maintenanceDate).toISOString().split('T')[0],
+    kilometers: String(maintenance.currentKilometers),
+    technicianId: maintenance.technician?.id || '',
+    type: maintenance.type,
+    status: maintenance.status,
+    replacedParts: [...maintenance.replacedParts],
+    cost: String(maintenance.cost),
+    technicalRecommendations: maintenance.technicalRecommendations,
+    workDescription: maintenance.workDescription,
+    nextRecommendedMaintenanceDate: maintenance.nextRecommendedMaintenanceDate ? new Date(maintenance.nextRecommendedMaintenanceDate).toISOString().split('T')[0] : ''
+  }
   showEditModal.value = true
 }
 
@@ -513,20 +540,30 @@ function confirmDelete(maintenance: Maintenance) {
 
 const handleSubmit = async () => {
   try {
-    if (showEditModal && selectedMaintenance.value) {
+    if (showEditModal.value && selectedMaintenance.value) {
       await maintenanceStore.updateMaintenance(selectedMaintenance.value.id, {
         technicianId: form.value.technicianId || undefined,
         status: form.value.status,
         type: form.value.type,
+        replacedParts: form.value.replacedParts,
+        cost: Number(form.value.cost),
+        technicalRecommendations: form.value.technicalRecommendations,
+        workDescription: form.value.workDescription,
+        nextRecommendedMaintenanceDate: form.value.nextRecommendedMaintenanceDate || undefined
       })
     } else {
       await maintenanceStore.createMaintenance({
         bikeId: form.value.bikeId,
         maintenanceDate: form.value.date,
         lastMaintenanceKilometers: 0,
-        currentKilometers: form.value.kilometers,
+        currentKilometers: Number(form.value.kilometers),
         technicianId: form.value.technicianId || undefined,
         type: form.value.type,
+        replacedParts: form.value.replacedParts,
+        cost: Number(form.value.cost),
+        technicalRecommendations: form.value.technicalRecommendations,
+        workDescription: form.value.workDescription,
+        nextRecommendedMaintenanceDate: form.value.nextRecommendedMaintenanceDate || undefined
       })
     }
     closeModal()
@@ -560,15 +597,15 @@ function closeModal() {
   form.value = {
     bikeId: '',
     date: '',
-    kilometers: 0,
+    kilometers: '0',
     technicianId: '',
     type: MaintenanceType.REGULAR,
     status: MaintenanceStatus.SCHEDULED,
     replacedParts: [],
-    cost: 0,
+    cost: '0',
     technicalRecommendations: '',
     workDescription: '',
-    nextRecommendedMaintenanceDate: '',
+    nextRecommendedMaintenanceDate: ''
   }
 }
 

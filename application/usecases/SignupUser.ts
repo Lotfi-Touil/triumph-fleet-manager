@@ -27,7 +27,7 @@ export class SignupUser {
       email: data.email,
       password: hashedPassword,
       name: data.name,
-      role: data.role || UserRole.CLIENT_PARTNER,
+      role: data.role || UserRole.TECHNICIAN,
     };
 
     const user = new User(userProps);
