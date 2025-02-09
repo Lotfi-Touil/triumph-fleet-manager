@@ -59,5 +59,15 @@ export const createSparePartRouter = (
     });
   });
 
+  router.put(
+    "/notifications/low-stock-:id/acknowledge",
+    async (req: Request, res: Response) => {
+      const sparePartId = req.params.id;
+      req.params.id = sparePartId;
+      await controller.acknowledgeNotification(req, res);
+      notificationEmitter.emit("low-stock-notification");
+    }
+  );
+
   return router;
 };
