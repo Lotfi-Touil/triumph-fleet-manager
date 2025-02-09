@@ -21,6 +21,7 @@ import { PostgresMaintenanceNotificationRepository } from '@infrastructure/adapt
 import { MAINTENANCE_REPOSITORY, BIKE_REPOSITORY, USER_REPOSITORY, MAINTENANCE_NOTIFICATION_REPOSITORY } from './maintenance.constants';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { NestMaintenanceService } from './maintenance.service';
 
 @Module({
   imports: [
@@ -29,6 +30,10 @@ import { getRepositoryToken } from '@nestjs/typeorm';
   ],
   controllers: [MaintenanceController],
   providers: [
+    {
+      provide: 'MaintenanceService',
+      useClass: NestMaintenanceService,
+    },
     {
       provide: CreateMaintenance,
       useFactory: (maintenanceRepo, bikeRepo, userRepo) => new CreateMaintenance(maintenanceRepo, bikeRepo, userRepo),
@@ -94,6 +99,10 @@ import { getRepositoryToken } from '@nestjs/typeorm';
       inject: [getRepositoryToken(MaintenanceNotificationEntity), MAINTENANCE_REPOSITORY],
     }
   ],
-  exports: [MAINTENANCE_REPOSITORY],
+  exports: [
+    'MaintenanceService',
+    MAINTENANCE_REPOSITORY,
+    MAINTENANCE_NOTIFICATION_REPOSITORY,
+  ],
 })
 export class MaintenanceModule {}

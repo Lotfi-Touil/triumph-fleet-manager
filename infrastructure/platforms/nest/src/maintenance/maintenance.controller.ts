@@ -10,46 +10,52 @@ import {
   Delete,
   Sse,
 } from '@nestjs/common';
-import { CreateMaintenance } from '@application/usecases/CreateMaintenance';
-import { GetDueMaintenances } from '@application/usecases/GetDueMaintenances';
-import { GetMaintenanceNotifications } from '@application/usecases/GetMaintenanceNotifications';
-import { GetPendingMaintenanceNotifications } from '@application/usecases/GetPendingMaintenanceNotifications';
-import { AcknowledgeMaintenanceNotification } from '@application/usecases/AcknowledgeMaintenanceNotification';
-import { UpdateMaintenance } from '@application/usecases/UpdateMaintenance';
-import { DeleteMaintenance } from '@application/usecases/DeleteMaintenance';
-import { Maintenance } from '@domain/entities/Maintenance';
-import { MaintenanceNotification } from '@domain/entities/MaintenanceNotification';
-import { MaintenanceNotificationRepository } from '@domain/repositories/MaintenanceNotificationRepository';
-import { BikeRepository } from '@domain/repositories/BikeRepository';
-import {
-  MAINTENANCE_NOTIFICATION_REPOSITORY,
-  BIKE_REPOSITORY,
-  MAINTENANCE_REPOSITORY,
-  USER_REPOSITORY,
-} from './maintenance.constants';
-import { randomUUID } from 'crypto';
-import { MaintenanceRepository } from '@domain/repositories/MaintenanceRepository';
-import { IsString, IsNumber, IsDateString, IsOptional } from 'class-validator';
+import { MaintenanceService } from '@application/ports/services/MaintenanceService';
+import { MaintenanceType, MaintenanceStatus } from '@domain/entities/Maintenance';
 import { Observable } from 'rxjs';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { CheckAndCreateMaintenanceNotifications } from '@application/usecases/CheckAndCreateMaintenanceNotifications';
-import { GetMaintenances } from '@application/usecases/GetMaintenances';
-import { MaintenanceType, MaintenanceStatus } from '@domain/entities/Maintenance';
-import { UserRepository } from '@domain/repositories/UserRepository';
+import { IsString, IsNumber, IsDateString, IsOptional } from 'class-validator';
 
 class CreateMaintenanceDto {
   @IsString()
   bikeId: string;
 
   @IsNumber()
-  kilometers: number;
+  lastMaintenanceKilometers: number;
+
+  @IsNumber()
+  currentKilometers: number;
 
   @IsDateString()
-  date: string;
+  maintenanceDate: string;
 
   @IsString()
   @IsOptional()
   technicianId?: string;
+
+  @IsString()
+  type: MaintenanceType;
+
+  @IsString({ each: true })
+  @IsOptional()
+  replacedParts?: string[];
+
+  @IsNumber()
+  @IsOptional()
+  cost?: number;
+
+  @IsString()
+  @IsOptional()
+  technicalRecommendations?: string;
+
+  @IsString()
+  @IsOptional()
+  workDescription?: string;
+
+  @IsDateString()
+  @IsOptional()
+  nextRecommendedMaintenanceDate?: string;
 }
 
 interface MaintenanceResponse {
@@ -79,33 +85,11 @@ interface MaintenanceResponse {
 @Controller('maintenances')
 export class MaintenanceController {
   constructor(
-    @Inject(CreateMaintenance)
-    private readonly createMaintenanceUseCase: CreateMaintenance,
-    @Inject(GetDueMaintenances)
-    private readonly getDueMaintenancesUseCase: GetDueMaintenances,
-    @Inject(GetMaintenanceNotifications)
-    private readonly getMaintenanceNotificationsUseCase: GetMaintenanceNotifications,
-    @Inject(GetPendingMaintenanceNotifications)
-    private readonly getPendingMaintenanceNotificationsUseCase: GetPendingMaintenanceNotifications,
-    @Inject(AcknowledgeMaintenanceNotification)
-    private readonly acknowledgeMaintenanceNotificationUseCase: AcknowledgeMaintenanceNotification,
-    @Inject(UpdateMaintenance)
-    private readonly updateMaintenanceUseCase: UpdateMaintenance,
-    @Inject(DeleteMaintenance)
-    private readonly deleteMaintenanceUseCase: DeleteMaintenance,
-    @Inject(MAINTENANCE_NOTIFICATION_REPOSITORY)
-    private readonly notificationRepository: MaintenanceNotificationRepository,
-    @Inject(BIKE_REPOSITORY)
-    private readonly bikeRepository: BikeRepository,
-    @Inject(MAINTENANCE_REPOSITORY)
-    private readonly maintenanceRepository: MaintenanceRepository,
+    @Inject('MaintenanceService')
+    private readonly maintenanceService: MaintenanceService,
     @Inject(CheckAndCreateMaintenanceNotifications)
     private readonly checkAndCreateNotifications: CheckAndCreateMaintenanceNotifications,
     private eventEmitter: EventEmitter2,
-    @Inject(GetMaintenances)
-    private readonly getMaintenances: GetMaintenances,
-    @Inject(USER_REPOSITORY)
-    private readonly userRepository: UserRepository
   ) {}
 
   private async checkAndEmitNotifications(): Promise<void> {
@@ -114,52 +98,19 @@ export class MaintenanceController {
   }
 
   @Post('create')
-  async create(
-    @Body()
-    data: {
-      bikeId: string;
-      maintenanceDate: string;
-      lastMaintenanceKilometers: number;
-      currentKilometers: number;
-      technicianId?: string;
-      type: MaintenanceType;
-      replacedParts?: string[];
-      cost?: number;
-      technicalRecommendations?: string;
-      workDescription?: string;
-      nextRecommendedMaintenanceDate?: string;
-    },
-  ) {
-    const bike = await this.bikeRepository.findById(data.bikeId);
-    if (!bike) {
-      throw new BadRequestException('Bike not found');
-    }
-
-    const maintenanceId = randomUUID();
-
-    await this.createMaintenanceUseCase.execute({
-      id: maintenanceId,
-      bikeId: data.bikeId,
+  async create(@Body() data: CreateMaintenanceDto) {
+    const maintenanceId = await this.maintenanceService.createMaintenance({
+      ...data,
       maintenanceDate: new Date(data.maintenanceDate),
-      lastMaintenanceKilometers: data.lastMaintenanceKilometers,
-      currentKilometers: data.currentKilometers,
-      technicianId: data.technicianId,
-      type: data.type,
-      replacedParts: data.replacedParts,
-      cost: data.cost,
-      technicalRecommendations: data.technicalRecommendations,
-      workDescription: data.workDescription,
       nextRecommendedMaintenanceDate: data.nextRecommendedMaintenanceDate ? new Date(data.nextRecommendedMaintenanceDate) : undefined
     });
-
     return { id: maintenanceId };
   }
 
   @Put('update/:id')
   async update(
     @Param('id') id: string,
-    @Body()
-    data: {
+    @Body() data: {
       status?: MaintenanceStatus;
       technicianId?: string;
       type?: MaintenanceType;
@@ -170,72 +121,61 @@ export class MaintenanceController {
       nextRecommendedMaintenanceDate?: string;
     },
   ) {
-    return this.updateMaintenanceUseCase.execute({
+    await this.maintenanceService.updateMaintenance({
       id,
-      status: data.status,
-      technicianId: data.technicianId,
-      type: data.type,
-      replacedParts: data.replacedParts,
-      cost: data.cost,
-      technicalRecommendations: data.technicalRecommendations,
-      workDescription: data.workDescription,
+      ...data,
       nextRecommendedMaintenanceDate: data.nextRecommendedMaintenanceDate ? new Date(data.nextRecommendedMaintenanceDate) : undefined
     });
   }
 
   @Delete('delete/:id')
   async delete(@Param('id') id: string) {
-    return this.deleteMaintenanceUseCase.execute(id);
+    await this.maintenanceService.deleteMaintenance(id);
   }
 
   @Get()
   async getAll(): Promise<MaintenanceResponse[]> {
-    const maintenances = await this.getMaintenances.execute();
+    const maintenances = await this.maintenanceService.getAllMaintenances();
     return maintenances.map(maintenance => this.toResponse(maintenance));
   }
 
   @Get('bike/:bikeId')
   async getByBikeId(@Param('bikeId') bikeId: string): Promise<MaintenanceResponse[]> {
-    const maintenances = await this.getMaintenances.executeByBikeId(bikeId);
+    const maintenances = await this.maintenanceService.getMaintenancesByBikeId(bikeId);
     return maintenances.map(maintenance => this.toResponse(maintenance));
   }
 
   @Get('status/:status')
   async getByStatus(@Param('status') status: MaintenanceStatus): Promise<MaintenanceResponse[]> {
-    const maintenances = await this.getMaintenances.executeByStatus(status);
+    const maintenances = await this.maintenanceService.getMaintenancesByStatus(status);
     return maintenances.map(maintenance => this.toResponse(maintenance));
   }
 
   @Get('scheduled')
   async getScheduled(): Promise<MaintenanceResponse[]> {
-    const maintenances = await this.getMaintenances.executeScheduled();
+    const maintenances = await this.maintenanceService.getScheduledMaintenances();
     return maintenances.map(maintenance => this.toResponse(maintenance));
   }
 
   @Get('completed')
   async getCompleted(): Promise<MaintenanceResponse[]> {
-    const maintenances = await this.getMaintenances.executeCompleted();
+    const maintenances = await this.maintenanceService.getCompletedMaintenances();
     return maintenances.map(maintenance => this.toResponse(maintenance));
   }
 
   @Get('due-maintenances')
-  async getDueMaintenances(): Promise<Maintenance[]> {
-    return this.getDueMaintenancesUseCase.execute();
-  }
-
-  @Get('all-maintenances')
-  async getAllMaintenances(): Promise<Maintenance[]> {
-    return this.maintenanceRepository.findAll();
+  async getDueMaintenances() {
+    return this.maintenanceService.getDueMaintenances();
   }
 
   @Get('notifications')
-  async getNotifications(): Promise<MaintenanceNotification[]> {
-    return this.getMaintenanceNotificationsUseCase.execute();
+  async getNotifications() {
+    return this.maintenanceService.getMaintenanceNotifications();
   }
 
   @Get('notifications/pending')
-  async getPendingNotifications(): Promise<MaintenanceNotification[]> {
-    return this.getPendingMaintenanceNotificationsUseCase.execute();
+  async getPendingNotifications() {
+    return this.maintenanceService.getPendingMaintenanceNotifications();
   }
 
   @Sse('notifications/events')
@@ -255,38 +195,26 @@ export class MaintenanceController {
     });
   }
 
-  @Put('notifications/:id/acknowledge')
+  @Post('notifications/:id/acknowledge')
   async acknowledgeNotification(@Param('id') id: string): Promise<void> {
-    await this.acknowledgeMaintenanceNotificationUseCase.execute(id);
-    this.eventEmitter.emit('maintenance.notification');
+    await this.maintenanceService.acknowledgeMaintenanceNotification(id);
   }
 
   private toResponse(maintenance: any): MaintenanceResponse {
-    const bike = maintenance.getBike();
-    const technician = maintenance.getTechnician();
-
     return {
-      id: maintenance.getId(),
-      bike: {
-        id: bike.getId(),
-        name: bike.getName(),
-        registrationNumber: bike.getRegistrationNumber(),
-      },
-      maintenanceDate: maintenance.getMaintenanceDate().toISOString(),
-      lastMaintenanceKilometers: maintenance.getLastMaintenanceKilometers(),
-      currentKilometers: maintenance.getCurrentKilometers(),
-      technician: technician ? {
-        id: technician.id,
-        name: technician.name,
-        email: technician.email,
-      } : null,
-      status: maintenance.getStatus(),
-      type: maintenance.getType(),
-      replacedParts: maintenance.getReplacedParts(),
-      cost: maintenance.getCost(),
-      technicalRecommendations: maintenance.getTechnicalRecommendations(),
-      workDescription: maintenance.getWorkDescription(),
-      nextRecommendedMaintenanceDate: maintenance.getNextRecommendedMaintenanceDate()?.toISOString() || null
+      id: maintenance.id,
+      bike: maintenance.bike,
+      maintenanceDate: maintenance.maintenanceDate.toISOString(),
+      lastMaintenanceKilometers: maintenance.lastMaintenanceKilometers,
+      currentKilometers: maintenance.currentKilometers,
+      technician: maintenance.technician,
+      status: maintenance.status,
+      type: maintenance.type,
+      replacedParts: maintenance.replacedParts || [],
+      cost: maintenance.cost || 0,
+      technicalRecommendations: maintenance.technicalRecommendations || '',
+      workDescription: maintenance.workDescription || '',
+      nextRecommendedMaintenanceDate: maintenance.nextRecommendedMaintenanceDate?.toISOString() || null,
     };
   }
 }
