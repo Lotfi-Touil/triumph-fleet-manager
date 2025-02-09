@@ -17,20 +17,27 @@ class BikeService {
   }
 
   async create(data: Omit<Bike, 'id'>): Promise<void> {
-    await axios.post(`/bikes/create`, {
+    console.log('Creating bike with data:', data);
+    const payload = {
       name: data.name,
       registrationNumber: data.registrationNumber,
-      maintenanceKilometers: data.maintenanceInterval.kilometers,
-      maintenanceMonths: data.maintenanceInterval.monthInterval
-    })
+      maintenanceInterval: {
+        kilometers: data.maintenanceInterval.kilometers,
+        monthInterval: data.maintenanceInterval.monthInterval
+      }
+    };
+    console.log('Sending payload:', payload);
+    await axios.post(`/bikes/create`, payload);
   }
 
   async update(data: Bike): Promise<void> {
     await axios.put(`/bikes/update/${data.id}`, {
       name: data.name,
       registrationNumber: data.registrationNumber,
-      maintenanceKilometers: data.maintenanceInterval.kilometers,
-      maintenanceMonths: data.maintenanceInterval.monthInterval
+      maintenanceInterval: {
+        kilometers: data.maintenanceInterval.kilometers,
+        monthInterval: data.maintenanceInterval.monthInterval
+      }
     })
   }
 
@@ -39,4 +46,4 @@ class BikeService {
   }
 }
 
-export const bikeService = new BikeService() 
+export const bikeService = new BikeService()

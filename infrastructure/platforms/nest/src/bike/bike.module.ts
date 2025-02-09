@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
 import { BikeEntity } from '../entities/bike.entity';
 import { BikeController } from './bike.controller';
+import { NestBikeService } from './bike.service';
 import { PostgresBikeRepository } from '@infrastructure/adapters/repositories/PostgresBikeRepository';
 import { CreateBike } from '@application/usecases/CreateBike';
 import { UpdateBike } from '@application/usecases/UpdateBike';
@@ -16,6 +17,7 @@ import { MaintenanceModule } from '../maintenance/maintenance.module';
   ],
   controllers: [BikeController],
   providers: [
+    NestBikeService,
     {
       provide: BIKE_REPOSITORY,
       useFactory: (repository) => new PostgresBikeRepository(repository),
@@ -37,6 +39,6 @@ import { MaintenanceModule } from '../maintenance/maintenance.module';
       inject: [BIKE_REPOSITORY, MAINTENANCE_REPOSITORY],
     },
   ],
-  exports: [BIKE_REPOSITORY],
+  exports: [BIKE_REPOSITORY, NestBikeService],
 })
 export class BikeModule {} 

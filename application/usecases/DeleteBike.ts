@@ -13,7 +13,6 @@ export class DeleteBike {
       throw new Error("Bike not found");
     }
 
-    // Vérifier s'il y a des maintenances associées
     const maintenances = await this.maintenanceRepository.findByBikeId(id);
     if (maintenances.length > 0) {
       throw new Error("Cannot delete bike with associated maintenances");
