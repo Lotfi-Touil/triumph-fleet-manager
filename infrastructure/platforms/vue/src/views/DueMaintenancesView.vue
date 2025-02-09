@@ -96,8 +96,8 @@
         class="fixed inset-0 bg-background/80 backdrop-blur-sm"
         @click="showDetailsModal = false"
       />
-      <div class="fixed inset-0 flex items-center justify-center">
-        <div class="bg-card rounded-lg p-6 w-full max-w-md shadow-lg border">
+      <div class="fixed inset-0 flex items-center justify-center overflow-y-auto py-8">
+        <div class="bg-card rounded-lg p-6 w-full max-w-md shadow-lg border max-h-[90vh] overflow-y-auto">
           <h2 class="text-xl font-bold mb-4 text-foreground">Détails de l'entretien à effectuer</h2>
           <div class="space-y-4">
             <div>
