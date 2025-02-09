@@ -64,8 +64,7 @@ interface MaintenanceResponse {
   currentKilometers: number;
   technician: {
     id: string;
-    firstName: string;
-    lastName: string;
+    name: string;
     email: string;
   } | null;
   status: MaintenanceStatus;
@@ -277,10 +276,9 @@ export class MaintenanceController {
       lastMaintenanceKilometers: maintenance.getLastMaintenanceKilometers(),
       currentKilometers: maintenance.getCurrentKilometers(),
       technician: technician ? {
-        id: technician.getId(),
-        firstName: technician.getFirstName(),
-        lastName: technician.getLastName(),
-        email: technician.getEmail(),
+        id: technician.id,
+        name: technician.name,
+        email: technician.email,
       } : null,
       status: maintenance.getStatus(),
       type: maintenance.getType(),

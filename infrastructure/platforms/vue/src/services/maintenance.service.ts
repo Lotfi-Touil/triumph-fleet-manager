@@ -41,10 +41,8 @@ export interface MaintenanceNotification {
     currentKilometers: number
     technician: {
       id: string
-      firstName: string
-      lastName: string
-      email: string
       name: string
+      email: string
     } | null
     status: MaintenanceStatus
     type: MaintenanceType
@@ -64,10 +62,8 @@ export interface Maintenance {
   currentKilometers: number
   technician: {
     id: string
-    firstName: string
-    lastName: string
-    email: string
     name: string
+    email: string
   } | null
   status: MaintenanceStatus
   type: MaintenanceType
@@ -86,10 +82,8 @@ interface RawMaintenance {
   currentKilometers: string | number
   technician: {
     id: string
-    firstName: string
-    lastName: string
-    email: string
     name: string
+    email: string
   } | null
   status: MaintenanceStatus
   type: MaintenanceType
