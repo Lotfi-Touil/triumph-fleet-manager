@@ -1,4 +1,4 @@
-import { Bike } from "../../../domain/entities/Bike";
+import { Bike } from "@domain/entities/Bike";
 
 export interface BikeRepository {
   findById(id: string): Promise<Bike | null>;

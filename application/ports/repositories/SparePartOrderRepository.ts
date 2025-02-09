@@ -1,7 +1,7 @@
 import {
   SparePartOrder,
   OrderStatus,
-} from "../../../domain/entities/SparePartOrder";
+} from "@domain/entities/SparePartOrder";
 
 export interface SparePartOrderRepository {
   findById(id: string): Promise<SparePartOrder | null>;

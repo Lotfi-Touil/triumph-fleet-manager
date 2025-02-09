@@ -1,5 +1,5 @@
-import { Bike } from "../../../domain/entities/Bike";
-import { MaintenanceInterval } from "../../../domain/value-objects/MaintenanceInterval";
+import { Bike } from "@domain/entities/Bike";
+import { MaintenanceInterval } from "@domain/value-objects/MaintenanceInterval";
 
 export interface CreateBikeDTO {
   name: string;

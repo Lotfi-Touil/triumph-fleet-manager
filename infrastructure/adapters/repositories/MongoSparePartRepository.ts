@@ -1,6 +1,6 @@
 import { Collection, MongoClient } from "mongodb";
-import { SparePart } from "../../../domain/entities/SparePart";
-import { SparePartRepository } from "../../../application/ports/repositories/SparePartRepository";
+import { SparePart } from "@domain/entities/SparePart";
+import { SparePartRepository } from "@application/ports/repositories/SparePartRepository";
 
 export class MongoSparePartRepository implements SparePartRepository {
   private collection: Collection;

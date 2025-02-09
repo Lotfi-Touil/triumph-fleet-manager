@@ -2,9 +2,9 @@ import { Collection, MongoClient } from "mongodb";
 import {
   SparePartOrder,
   OrderStatus,
-} from "../../../domain/entities/SparePartOrder";
-import { SparePartOrderRepository } from "../../../application/ports/repositories/SparePartOrderRepository";
-import { SparePart } from "../../../domain/entities/SparePart";
+} from "@domain/entities/SparePartOrder";
+import { SparePartOrderRepository } from "@application/ports/repositories/SparePartOrderRepository";
+import { SparePart } from "@domain/entities/SparePart";
 
 export class MongoSparePartOrderRepository implements SparePartOrderRepository {
   private collection: Collection;

@@ -1,13 +1,13 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { Maintenance, MaintenanceStatus, MaintenanceType } from "../../../domain/entities/Maintenance";
-import { MaintenanceRepository } from "../../../application/ports/repositories/MaintenanceRepository";
+import { Maintenance, MaintenanceStatus, MaintenanceType } from "@domain/entities/Maintenance";
+import { MaintenanceRepository } from "@application/ports/repositories/MaintenanceRepository";
 import { MaintenanceEntity } from "../../platforms/nest/src/entities/maintenance.entity";
 import { BikeEntity } from "../../platforms/nest/src/entities/bike.entity";
-import { Bike } from "../../../domain/entities/Bike";
-import { MaintenanceInterval } from "../../../domain/value-objects/MaintenanceInterval";
-import { User } from "../../../domain/entities/User";
+import { Bike } from "@domain/entities/Bike";
+import { MaintenanceInterval } from "@domain/value-objects/MaintenanceInterval";
+import { User } from "@domain/entities/User";
 import { UserEntity } from "../../platforms/nest/src/entities/user.entity";
 
 @Injectable()

@@ -1,5 +1,5 @@
-import { BookRepository } from "../../../application/ports/repositories/BookRepository";
-import { Book } from "../../../domain/entities/Book";
+import { BookRepository } from "@application/ports/repositories/BookRepository";
+import { Book } from "@domain/entities/Book";
 
 export class InMemoryBookRepository implements BookRepository {
   public constructor(private readonly books: Array<Book>) {}

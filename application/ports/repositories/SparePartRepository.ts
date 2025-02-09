@@ -1,4 +1,4 @@
-import { SparePart } from "../../../domain/entities/SparePart";
+import { SparePart } from "@domain/entities/SparePart";
 
 export interface SparePartRepository {
   findById(id: string): Promise<SparePart | null>;

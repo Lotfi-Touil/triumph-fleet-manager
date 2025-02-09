@@ -1,4 +1,4 @@
-import { MaintenanceNotification } from "../../../domain/entities/MaintenanceNotification";
+import { MaintenanceNotification } from "@domain/entities/MaintenanceNotification";
 
 export interface MaintenanceNotificationRepository {
   save(notification: MaintenanceNotification): Promise<void>;

@@ -4,10 +4,10 @@ import { Repository } from "typeorm";
 import {
   MaintenanceNotification,
   NotificationStatus,
-} from "../../../domain/entities/MaintenanceNotification";
-import { MaintenanceNotificationRepository } from "../../../application/ports/repositories/MaintenanceNotificationRepository";
+} from "@domain/entities/MaintenanceNotification";
+import { MaintenanceNotificationRepository } from "@application/ports/repositories/MaintenanceNotificationRepository";
 import { MaintenanceNotificationEntity } from "../../platforms/nest/src/entities/maintenance-notification.entity";
-import { MaintenanceRepository } from "../../../application/ports/repositories/MaintenanceRepository";
+import { MaintenanceRepository } from "@application/ports/repositories/MaintenanceRepository";
 
 @Injectable()
 export class PostgresMaintenanceNotificationRepository implements MaintenanceNotificationRepository

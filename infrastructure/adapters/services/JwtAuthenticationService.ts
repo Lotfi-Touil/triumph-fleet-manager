@@ -1,4 +1,4 @@
-import { IAuthenticationService } from "../../../application/ports/services/IAuthenticationService";
+import { IAuthenticationService } from "@application/ports/services/IAuthenticationService";
 import * as jwt from "jsonwebtoken";
 import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";

@@ -1,4 +1,4 @@
-import { Breakdown } from "../../../domain/entities/Breakdown";
+import { Breakdown } from "@domain/entities/Breakdown";
 
 export interface BreakdownRepository {
   save(breakdown: Breakdown): Promise<void>;

@@ -1,5 +1,5 @@
-import { IUserRepository } from "../../../application/ports/repositories/IUserRepository";
-import { User } from "../../../domain/entities/User";
+import { IUserRepository } from "@application/ports/repositories/IUserRepository";
+import { User } from "@domain/entities/User";
 import { v4 as uuidv4 } from "uuid";
 
 export class InMemoryUserRepository implements IUserRepository {

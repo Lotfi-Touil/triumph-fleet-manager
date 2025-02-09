@@ -1,12 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { Breakdown, BreakdownStatus, BreakdownType } from "../../../domain/entities/Breakdown";
-import { BreakdownRepository } from "../../../application/ports/repositories/BreakdownRepository";
+import { Breakdown, BreakdownStatus, BreakdownType } from "@domain/entities/Breakdown";
+import { BreakdownRepository } from "@application/ports/repositories/BreakdownRepository";
 import { BreakdownEntity } from "../../platforms/nest/src/entities/breakdown.entity";
 import { BikeEntity } from "../../platforms/nest/src/entities/bike.entity";
-import { Bike } from "../../../domain/entities/Bike";
-import { MaintenanceInterval } from "../../../domain/value-objects/MaintenanceInterval";
+import { Bike } from "@domain/entities/Bike";
+import { MaintenanceInterval } from "@domain/value-objects/MaintenanceInterval";
 
 @Injectable()
 export class PostgresBreakdownRepository implements BreakdownRepository {
