@@ -1,5 +1,5 @@
 import { Bike } from "@domain/entities/Bike";
-import { BikeRepository } from "@domain/repositories/BikeRepository";
+import { BikeRepository } from "../ports/repositories/BikeRepository";
 
 export class GetBikeById {
   constructor(private readonly bikeRepository: BikeRepository) {}

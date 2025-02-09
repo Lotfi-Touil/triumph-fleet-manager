@@ -1,5 +1,5 @@
-import { BikeRepository } from "@domain/repositories/BikeRepository";
-import { MaintenanceRepository } from "@domain/repositories/MaintenanceRepository";
+import { BikeRepository } from "../ports/repositories/BikeRepository";
+import { MaintenanceRepository } from "../ports/repositories/MaintenanceRepository";
 
 export class DeleteBike {
   constructor(

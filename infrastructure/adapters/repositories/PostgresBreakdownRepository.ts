@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Breakdown, BreakdownStatus, BreakdownType } from "../../../domain/entities/Breakdown";
-import { BreakdownRepository } from "../../../domain/repositories/BreakdownRepository";
+import { BreakdownRepository } from "../../../application/ports/repositories/BreakdownRepository";
 import { BreakdownEntity } from "../../platforms/nest/src/entities/breakdown.entity";
 import { BikeEntity } from "../../platforms/nest/src/entities/bike.entity";
 import { Bike } from "../../../domain/entities/Bike";
@@ -18,7 +18,9 @@ export class PostgresBreakdownRepository implements BreakdownRepository {
   ) {}
 
   async save(breakdown: Breakdown): Promise<void> {
-    const bikeEntity = await this.bikeRepository.findOne({ where: { id: breakdown.getBike().getId() } });
+    const bikeEntity = await this.bikeRepository.findOne({ 
+      where: { id: breakdown.getBike().getId() },
+    });
     if (!bikeEntity) {
       throw new Error('Bike not found');
     }
@@ -40,10 +42,14 @@ export class PostgresBreakdownRepository implements BreakdownRepository {
     await this.repository.save(entity);
   }
 
+  async update(breakdown: Breakdown): Promise<void> {
+    await this.save(breakdown);
+  }
+
   async findById(id: string): Promise<Breakdown | null> {
-    const entity = await this.repository.findOne({ 
+    const entity = await this.repository.findOne({
       where: { id },
-      relations: ['bike']
+      relations: ['bike'],
     });
     if (!entity) {
       return null;
@@ -54,28 +60,28 @@ export class PostgresBreakdownRepository implements BreakdownRepository {
   async findByBikeId(bikeId: string): Promise<Breakdown[]> {
     const entities = await this.repository.find({
       where: { bike: { id: bikeId } },
-      relations: ['bike']
+      relations: ['bike'],
     });
-    return entities.map(entity => this.toDomain(entity));
+    return entities.map((entity) => this.toDomain(entity));
   }
 
   async findAll(): Promise<Breakdown[]> {
     const entities = await this.repository.find({ relations: ['bike'] });
-    return entities.map(entity => this.toDomain(entity));
+    return entities.map((entity) => this.toDomain(entity));
   }
 
   async findByStatus(status: BreakdownStatus): Promise<Breakdown[]> {
     const entities = await this.repository.find({
       where: { status },
-      relations: ['bike']
+      relations: ['bike'],
     });
-    return entities.map(entity => this.toDomain(entity));
+    return entities.map((entity) => this.toDomain(entity));
   }
 
   async findUnresolved(): Promise<Breakdown[]> {
     const entities = await this.repository.find({
       where: { status: BreakdownStatus.REPORTED },
-      relations: ['bike']
+      relations: ['bike'],
     });
     return entities.map(entity => this.toDomain(entity));
   }
@@ -83,7 +89,7 @@ export class PostgresBreakdownRepository implements BreakdownRepository {
   async findWarrantyCovered(): Promise<Breakdown[]> {
     const entities = await this.repository.find({
       where: { warrantyApplied: true },
-      relations: ['bike']
+      relations: ['bike'],
     });
     return entities.map(entity => this.toDomain(entity));
   }
@@ -95,13 +101,13 @@ export class PostgresBreakdownRepository implements BreakdownRepository {
   private toDomain(entity: BreakdownEntity): Breakdown {
     const maintenanceInterval = new MaintenanceInterval(
       entity.bike.maintenanceKilometers,
-      entity.bike.maintenanceMonths
+      entity.bike.maintenanceMonths,
     );
     const bike = new Bike(
       entity.bike.id,
       entity.bike.name,
       entity.bike.registrationNumber,
-      maintenanceInterval
+      maintenanceInterval,
     );
 
     return new Breakdown(
@@ -116,7 +122,7 @@ export class PostgresBreakdownRepository implements BreakdownRepository {
       entity.repairActions,
       entity.technicalRecommendations,
       entity.cost,
-      entity.replacedParts
+      entity.replacedParts,
     );
   }
 } 

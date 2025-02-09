@@ -1,7 +1,7 @@
 import { Maintenance, MaintenanceStatus, MaintenanceType } from "../../domain/entities/Maintenance";
-import { MaintenanceRepository } from "../../domain/repositories/MaintenanceRepository";
-import { BikeRepository } from "../../domain/repositories/BikeRepository";
-import { UserRepository } from "../../domain/repositories/UserRepository";
+import { MaintenanceRepository } from "../ports/repositories/MaintenanceRepository";
+import { BikeRepository } from "../ports/repositories/BikeRepository";
+import { UserRepository } from "../ports/repositories/UserRepository";
 
 export interface CreateMaintenanceRequest {
   id: string;

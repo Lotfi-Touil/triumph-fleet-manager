@@ -1,5 +1,5 @@
-import { Maintenance } from "../entities/Maintenance";
-import { MaintenanceStatus } from "../entities/Maintenance";
+import { Maintenance } from "../../../domain/entities/Maintenance";
+import { MaintenanceStatus } from "../../../domain/entities/Maintenance";
 
 export interface MaintenanceRepository {
   save(maintenance: Maintenance): Promise<void>;

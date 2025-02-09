@@ -14,12 +14,10 @@ const mongoUrl =
 app.use(cors());
 app.use(express.json());
 
-// Health check endpoint
 app.get("/health", (req: Request, res: Response) => {
   res.json({ status: "ok" });
 });
 
-// Connect to MongoDB and initialize repositories
 let mongoClient: MongoClient;
 
 async function initializeMongo() {
@@ -42,13 +40,11 @@ async function initializeMongo() {
   }
 }
 
-// Error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);
   res.status(500).json({ error: "Something broke!" });
 });
 
-// Initialize MongoDB connection and start server
 initializeMongo().then(() => {
   app
     .listen(port, () => {
@@ -59,7 +55,6 @@ initializeMongo().then(() => {
     });
 });
 
-// Graceful shutdown
 process.on("SIGINT", async () => {
   try {
     if (mongoClient) {

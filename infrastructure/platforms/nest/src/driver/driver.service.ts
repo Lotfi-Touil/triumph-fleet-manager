@@ -36,9 +36,9 @@ export class NestDriverService implements DriverService {
     const newDriver = this.driverRepository.create({
       id: uuidv4(),
       ...dto,
-      licenseType: 'standard', // valeur par défaut
-      experienceYears: 0, // valeur par défaut
-      drivingHistory: '', // valeur par défaut
+      licenseType: 'standard',
+      experienceYears: 0,
+      drivingHistory: '',
     });
     const savedDriver = await this.driverRepository.save(newDriver);
     return savedDriver.id;

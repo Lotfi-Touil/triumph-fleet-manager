@@ -1,5 +1,5 @@
-import { MaintenanceRepository } from "../../domain/repositories/MaintenanceRepository";
-import { MaintenanceNotificationRepository } from "../../domain/repositories/MaintenanceNotificationRepository";
+import { MaintenanceRepository } from "../ports/repositories/MaintenanceRepository";
+import { MaintenanceNotificationRepository } from "../ports/repositories/MaintenanceNotificationRepository";
 import { CreateMaintenanceNotification } from "./CreateMaintenanceNotification";
 import { v4 as uuidv4 } from "uuid";
 

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { BreakdownRepository } from '@domain/repositories/BreakdownRepository';
+import { BreakdownRepository } from '../ports/repositories/BreakdownRepository';
 
 @Injectable()
 export class DeleteBreakdown {

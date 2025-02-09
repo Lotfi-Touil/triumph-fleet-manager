@@ -1,6 +1,6 @@
 import { Breakdown, BreakdownStatus, BreakdownType } from "../../domain/entities/Breakdown";
-import { BreakdownRepository } from "../../domain/repositories/BreakdownRepository";
-import { BikeRepository } from "../../domain/repositories/BikeRepository";
+import { BreakdownRepository } from "../ports/repositories/BreakdownRepository";
+import { BikeRepository } from "../ports/repositories/BikeRepository";
 
 export interface CreateBreakdownRequest {
   id: string;

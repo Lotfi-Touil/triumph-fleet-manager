@@ -136,18 +136,17 @@ const router = createRouter({
   ],
 })
 
-// Navigation guard
 router.beforeEach(async (to, from, next) => {
   const token = localStorage.getItem('token')
   const authStore = useAuthStore()
 
-  // Si on a un token mais que l'utilisateur n'est pas initialisé
+  // si on a un token mais que l'utilisateur n'est pas initialisé
   if (token && !authStore.isAuthenticated) {
     try {
-      // Initialise l'utilisateur à partir du token
+      // initialise l'utilisateur à partir du token
       await authStore.initializeFromToken(token)
     } catch (error) {
-      // Si l'initialisation échoue, on supprime le token et on redirige vers login
+      // si l'initialisation échoue, on supprime le token et on redirige vers login
       localStorage.removeItem('token')
       next({ name: 'login', query: { redirect: to.fullPath } })
       return

@@ -5,7 +5,6 @@ const instance = axios.create({
   withCredentials: true,
 })
 
-// Add a request interceptor
 instance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token')
@@ -19,14 +18,11 @@ instance.interceptors.request.use(
   },
 )
 
-// Add a response interceptor
 instance.interceptors.response.use(
   (response) => response,
   async (error) => {
     if (error.response?.status === 401) {
-      // Handle token expiration
       localStorage.removeItem('token')
-      // Ne pas rediriger si on est déjà sur la page de login
       if (!window.location.pathname.includes('/login')) {
         window.location.href = '/login'
       }

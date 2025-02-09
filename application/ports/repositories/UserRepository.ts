@@ -1,4 +1,4 @@
-import { User } from "../entities/User";
+import { User } from "../../../domain/entities/User";
 
 export interface UserRepository {
   findById(id: string): Promise<User | null>;
@@ -7,4 +7,4 @@ export interface UserRepository {
   save(user: User): Promise<User>;
   update(user: User): Promise<User>;
   delete(id: string): Promise<void>;
-}
+} 

@@ -1,5 +1,5 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { MaintenanceRepository } from '@domain/repositories/MaintenanceRepository'
+import { MaintenanceRepository } from '../ports/repositories/MaintenanceRepository'
 import { MAINTENANCE_REPOSITORY } from '@infrastructure/platforms/nest/src/maintenance/maintenance.constants'
 
 @Injectable()

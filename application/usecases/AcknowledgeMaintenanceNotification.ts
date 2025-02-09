@@ -1,4 +1,4 @@
-import { MaintenanceNotificationRepository } from '@domain/repositories/MaintenanceNotificationRepository'
+import { MaintenanceNotificationRepository } from '../ports/repositories/MaintenanceNotificationRepository'
 
 export class AcknowledgeMaintenanceNotification {
   constructor(private readonly notificationRepository: MaintenanceNotificationRepository) {}

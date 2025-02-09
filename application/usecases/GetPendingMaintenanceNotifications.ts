@@ -1,5 +1,5 @@
 import { MaintenanceNotification } from '@domain/entities/MaintenanceNotification'
-import { MaintenanceNotificationRepository } from '@domain/repositories/MaintenanceNotificationRepository'
+import { MaintenanceNotificationRepository } from '../ports/repositories/MaintenanceNotificationRepository'
 
 export class GetPendingMaintenanceNotifications {
   constructor(private readonly notificationRepository: MaintenanceNotificationRepository) {}

@@ -3,12 +3,21 @@ import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 
-interface SparePart {
+export interface SparePart {
   id: string;
   name: string;
   price: number;
   quantity: number;
   category: string;
+}
+
+export interface SparePartNotification {
+  id: string;
+  type: 'LOW_STOCK';
+  message: string;
+  createdAt: string;
+  status: 'PENDING' | 'SENT' | 'ACKNOWLEDGED';
+  sparePart: SparePart;
 }
 
 @Injectable()
@@ -98,6 +107,33 @@ export class SparePartsService {
     } catch {
       throw new HttpException(
         'Error fetching spare parts',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async getLowStockNotifications(): Promise<SparePartNotification[]> {
+    try {
+      const url = `${this.baseUrl}/notifications/low-stock`;
+      const response = await firstValueFrom(this.httpService.get(url));
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching low stock notifications:', error.response?.data || error.message);
+      throw new HttpException(
+        'Error fetching low stock notifications',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async acknowledgeNotification(id: string): Promise<void> {
+    try {
+      const url = `${this.baseUrl}/notifications/${id}/acknowledge`;
+      await firstValueFrom(this.httpService.put(url));
+    } catch (error) {
+      console.error('Error acknowledging notification:', error.response?.data || error.message);
+      throw new HttpException(
+        'Error acknowledging notification',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

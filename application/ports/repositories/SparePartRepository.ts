@@ -7,5 +7,5 @@ export interface SparePartRepository {
   save(sparePart: SparePart): Promise<void>;
   update(sparePart: SparePart): Promise<void>;
   delete(id: string): Promise<void>;
-  findLowStock(): Promise<SparePart[]>; // Find items that need restocking
+  findLowStock(): Promise<SparePart[]>;
 }

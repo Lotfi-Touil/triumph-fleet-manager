@@ -510,7 +510,6 @@ const handleSubmit = async () => {
   try {
     let sparePartId = orderForm.value.sparePartId
 
-    // Si c'est une nouvelle pièce (pas de sparePartId), on la crée d'abord
     if (!useExistingPart.value && !editingOrder.value) {
       const newPart = await axios.post('http://localhost:3001/api/spare-parts', {
         name: orderForm.value.partName,
@@ -534,7 +533,7 @@ const handleSubmit = async () => {
       const previousStatus = editingOrder.value.status
       await axios.put(`http://localhost:3001/api/spare-part-orders/${editingOrder.value.id}`, {
         ...orderData,
-        orderDate: editingOrder.value.orderDate, // Garder la date originale
+        orderDate: editingOrder.value.orderDate,
       })
 
       if (

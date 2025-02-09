@@ -26,10 +26,11 @@
           @updated="$emit('updated')"
         />
         <Button
-          variant="ghost"
+          variant="secondary"
           size="sm"
           @click="handleAcknowledge(notification)"
           :disabled="isLoading"
+          class="bg-gray-500 hover:bg-gray-600 text-white"
         >
           <Loader2 v-if="isLoading" class="mr-2 h-4 w-4 animate-spin" />
           Marquer comme lu

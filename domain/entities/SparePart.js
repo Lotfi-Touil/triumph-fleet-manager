@@ -3,8 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SparePart = void 0;
 const crypto_1 = require("crypto");
 class SparePart {
-    constructor(id, name, category, // e.g., 'filter', 'tire', 'brake'
-    quantity, minQuantity, // For stock alerts
+    constructor(id, name, category,
+    quantity, minQuantity,
     location, lastRestockDate, price, supplier, notes) {
         this.id = id;
         this.name = name;

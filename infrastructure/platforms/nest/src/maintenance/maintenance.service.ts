@@ -10,7 +10,7 @@ import { GetMaintenanceNotifications } from '@application/usecases/GetMaintenanc
 import { GetPendingMaintenanceNotifications } from '@application/usecases/GetPendingMaintenanceNotifications';
 import { AcknowledgeMaintenanceNotification } from '@application/usecases/AcknowledgeMaintenanceNotification';
 import { GetMaintenances } from '@application/usecases/GetMaintenances';
-import { MaintenanceRepository } from '@domain/repositories/MaintenanceRepository';
+import { MaintenanceRepository } from '../../../../../application/ports/repositories/MaintenanceRepository';
 import { MAINTENANCE_REPOSITORY } from './maintenance.constants';
 import { randomUUID } from 'crypto';
 

@@ -1,5 +1,6 @@
 import axios from './axios'
 import type { Bike } from './bike.service'
+import { sparePartsService } from './spare-parts.service'
 
 export enum MaintenanceStatus {
   SCHEDULED = 'SCHEDULED',
@@ -188,15 +189,14 @@ class MaintenanceService {
   }
 
   async getLowStockNotifications(): Promise<MaintenanceNotification[]> {
-    const response = await axios.get<MaintenanceNotification[]>(`/spare-parts/notifications/low-stock`)
-    return response.data
+    return sparePartsService.getLowStockNotifications()
   }
 
   async acknowledgeNotification(id: string, type: NotificationType): Promise<void> {
     if (type === NotificationType.MAINTENANCE) {
       await axios.put(`${this.baseUrl}/notifications/${id}/acknowledge`)
     } else {
-      await axios.put(`/spare-parts/notifications/${id}/acknowledge`)
+      await sparePartsService.acknowledgeNotification(id)
     }
   }
 }

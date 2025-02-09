@@ -1,5 +1,5 @@
 import { Bike } from "@domain/entities/Bike";
-import { BikeRepository } from "@domain/repositories/BikeRepository";
+import { BikeRepository } from "../ports/repositories/BikeRepository";
 import { MaintenanceInterval } from "@domain/value-objects/MaintenanceInterval";
 import { v4 as uuidv4 } from 'uuid';
 

@@ -4,7 +4,7 @@ import { Bike } from '@domain/entities/Bike';
 import { CreateBike } from '@application/usecases/CreateBike';
 import { UpdateBike } from '@application/usecases/UpdateBike';
 import { DeleteBike } from '@application/usecases/DeleteBike';
-import { BikeRepository } from '@domain/repositories/BikeRepository';
+import { BikeRepository } from '../../../../../application/ports/repositories/BikeRepository';
 import { BIKE_REPOSITORY } from '../maintenance/maintenance.constants';
 
 @Injectable()

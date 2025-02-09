@@ -100,7 +100,6 @@ const loadProfile = async () => {
     form.value.name = profile.name
     form.value.email = profile.email
 
-    // Mettre à jour le store d'authentification avec les données du profil
     if (authStore.user) {
       authStore.user.name = profile.name
       authStore.user.email = profile.email
@@ -124,7 +123,6 @@ const handleSubmit = async () => {
     }
 
     const updatedProfile = await profileService.updateProfile(updateData)
-    // Mettre à jour le store d'authentification avec les nouvelles informations
     if (authStore.user) {
       authStore.user.name = updatedProfile.name
       authStore.user.email = updatedProfile.email

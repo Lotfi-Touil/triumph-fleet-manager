@@ -619,11 +619,9 @@ function editBreakdown(breakdown: Breakdown) {
     warrantyApplied: breakdown.warrantyApplied,
   }
 
-  // Réinitialiser et recalculer les prix
   partPrices.value = {}
   totalPrice.value = 0
 
-  // Initialiser les prix pour chaque pièce
   form.value.spareParts.forEach((part, index) => {
     const sparePart = availableSpareParts.value.find((sp) => sp.id === part.sparePartId)
     if (sparePart && part.quantity) {
@@ -645,7 +643,6 @@ async function handleSubmit() {
   
   try {
     isSubmitting.value = true;
-    // Filtrer les pièces détachées valides (avec un ID et une quantité)
     const validSpareParts = form.value.spareParts.filter(part => part.sparePartId && part.quantity > 0);
     
     if (showCreateModal.value) {

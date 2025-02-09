@@ -5,13 +5,12 @@ import {
   MaintenanceNotification,
   NotificationStatus,
 } from "../../../domain/entities/MaintenanceNotification";
-import { MaintenanceNotificationRepository } from "../../../domain/repositories/MaintenanceNotificationRepository";
+import { MaintenanceNotificationRepository } from "../../../application/ports/repositories/MaintenanceNotificationRepository";
 import { MaintenanceNotificationEntity } from "../../platforms/nest/src/entities/maintenance-notification.entity";
-import { MaintenanceRepository } from "../../../domain/repositories/MaintenanceRepository";
+import { MaintenanceRepository } from "../../../application/ports/repositories/MaintenanceRepository";
 
 @Injectable()
-export class PostgresMaintenanceNotificationRepository
-  implements MaintenanceNotificationRepository
+export class PostgresMaintenanceNotificationRepository implements MaintenanceNotificationRepository
 {
   constructor(
     @InjectRepository(MaintenanceNotificationEntity)
@@ -48,8 +47,18 @@ export class PostgresMaintenanceNotificationRepository
   async findPending(): Promise<MaintenanceNotification[]> {
     const entities = await this.repository.find({
       where: { status: NotificationStatus.PENDING },
+      relations: ['maintenance'],
     });
-    return Promise.all(entities.map((entity) => this.toDomain(entity)));
+
+    return Promise.all(entities.map(entity => this.toDomain(entity)));
+  }
+
+  async findByMaintenanceId(maintenanceId: string): Promise<MaintenanceNotification[]> {
+    const entities = await this.repository.find({
+      where: { maintenanceId },
+    });
+
+    return Promise.all(entities.map(entity => this.toDomain(entity)));
   }
 
   async acknowledge(id: string): Promise<void> {

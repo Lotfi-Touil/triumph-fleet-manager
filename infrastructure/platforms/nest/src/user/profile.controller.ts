@@ -15,7 +15,7 @@ import {
   UpdateUserProfile,
   UpdateUserProfileDTO,
 } from '../../../../../application/usecases/UpdateUserProfile';
-import { UserRepository } from '../../../../../domain/repositories/UserRepository';
+import { UserRepository } from '../../../../../application/ports/repositories/UserRepository';
 
 @Controller('profile')
 @UseGuards(JwtAuthGuard)

@@ -1,5 +1,5 @@
 import { Maintenance } from "../../domain/entities/Maintenance";
-import { MaintenanceRepository } from "../../domain/repositories/MaintenanceRepository";
+import { MaintenanceRepository } from "../ports/repositories/MaintenanceRepository";
 import { Kilometers } from "../../domain/value-objects/Kilometers";
 
 export class UpdateMaintenanceKilometers {

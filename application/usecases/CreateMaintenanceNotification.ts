@@ -2,8 +2,8 @@ import {
   MaintenanceNotification,
   NotificationStatus,
 } from "../../domain/entities/MaintenanceNotification";
-import { MaintenanceNotificationRepository } from "../../domain/repositories/MaintenanceNotificationRepository";
-import { MaintenanceRepository } from "../../domain/repositories/MaintenanceRepository";
+import { MaintenanceNotificationRepository } from "../ports/repositories/MaintenanceNotificationRepository";
+import { MaintenanceRepository } from "../ports/repositories/MaintenanceRepository";
 
 export interface CreateMaintenanceNotificationRequest {
   id: string;

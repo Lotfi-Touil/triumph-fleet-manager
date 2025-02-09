@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { Bike } from "../../../domain/entities/Bike";
-import { BikeRepository } from "../../../domain/repositories/BikeRepository";
+import { Bike } from "@domain/entities/Bike";
+import { BikeRepository } from "../../../application/ports/repositories/BikeRepository";
 import { MaintenanceInterval } from "../../../domain/value-objects/MaintenanceInterval";
 import { BikeEntity } from "../../platforms/nest/src/entities/bike.entity";
 

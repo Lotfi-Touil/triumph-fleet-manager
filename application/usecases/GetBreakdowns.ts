@@ -1,5 +1,5 @@
 import { Breakdown } from "../../domain/entities/Breakdown";
-import { BreakdownRepository } from "../../domain/repositories/BreakdownRepository";
+import { BreakdownRepository } from "../ports/repositories/BreakdownRepository";
 
 export class GetBreakdowns {
   constructor(private readonly breakdownRepository: BreakdownRepository) {}

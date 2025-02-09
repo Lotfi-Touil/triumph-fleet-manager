@@ -1,7 +1,7 @@
 import { Maintenance } from "../../domain/entities/Maintenance";
-import { MaintenanceRepository } from "../../domain/repositories/MaintenanceRepository";
-import { BikeRepository } from "../../domain/repositories/BikeRepository";
-import { UserRepository } from "../../domain/repositories/UserRepository";
+import { MaintenanceRepository } from "../ports/repositories/MaintenanceRepository";
+import { BikeRepository } from "../ports/repositories/BikeRepository";
+import { UserRepository } from "../ports/repositories/UserRepository";
 import { UserRole } from "../../domain/entities/User";
 import { MaintenanceStatus, MaintenanceType } from "../../domain/entities/Maintenance";
 

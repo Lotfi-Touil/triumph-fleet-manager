@@ -1,6 +1,6 @@
 import { Injectable, Inject, NotFoundException, ConflictException } from "@nestjs/common";
 import { User, UserRole } from "../../domain/entities/User";
-import { UserRepository } from "../../domain/repositories/UserRepository";
+import { UserRepository } from "../ports/repositories/UserRepository";
 import * as bcrypt from "bcrypt";
 
 export interface UpdateUserDTO {

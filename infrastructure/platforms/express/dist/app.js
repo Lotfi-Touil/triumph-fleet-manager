@@ -24,11 +24,9 @@ const port = process.env.PORT || 3001;
 const mongoUrl = process.env.MONGODB_URI || "mongodb://mongo:27017/fleet-manager";
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
-// Health check endpoint
 app.get("/health", (req, res) => {
     res.json({ status: "ok" });
 });
-// Connect to MongoDB and initialize repositories
 let mongoClient;
 function initializeMongo() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -46,12 +44,10 @@ function initializeMongo() {
         }
     });
 }
-// Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({ error: "Something broke!" });
 });
-// Initialize MongoDB connection and start server
 initializeMongo().then(() => {
     app
         .listen(port, () => {
@@ -61,7 +57,6 @@ initializeMongo().then(() => {
         console.error("Failed to start server:", err);
     });
 });
-// Graceful shutdown
 process.on("SIGINT", () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (mongoClient) {

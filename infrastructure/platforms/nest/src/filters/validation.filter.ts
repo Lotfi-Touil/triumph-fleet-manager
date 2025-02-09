@@ -14,7 +14,6 @@ export class ValidationFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const status = exception.getStatus();
 
-    // Récupérer les erreurs de validation
     const validationErrors = exception.getResponse() as any;
     let errorMessages: string[] = [];
 

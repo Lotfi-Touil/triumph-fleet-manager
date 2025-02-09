@@ -1,4 +1,4 @@
-import { BreakdownRepository } from "../../domain/repositories/BreakdownRepository";
+import { BreakdownRepository } from "../ports/repositories/BreakdownRepository";
 import { BreakdownStatus } from "../../domain/entities/Breakdown";
 
 export interface UpdateBreakdownRequest {

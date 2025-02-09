@@ -204,7 +204,6 @@ const categoryFilter = ref('')
 const categories = ref<string[]>([])
 const lowStockParts = ref<SparePart[]>([])
 
-// Computed statistics
 const totalStock = computed(() => {
   return parts.value.reduce((sum, part) => sum + part.quantity, 0)
 })
