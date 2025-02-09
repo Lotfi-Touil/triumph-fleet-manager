@@ -372,7 +372,7 @@ async function handleDelete() {
     showDeleteModal.value = false;
     await driverStore.fetchDrivers();
   } catch {
-    error.value = "Erreur lors de la suppression du conducteur";
+    error.value = "Impossible de supprimer le conducteur";
   } finally {
     loading.value = false;
   }

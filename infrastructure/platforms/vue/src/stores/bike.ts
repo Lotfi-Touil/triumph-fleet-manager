@@ -41,7 +41,7 @@ export const useBikeStore = defineStore('bike', () => {
       await bikeService.update(data)
       await fetchBikes()
     } catch (err) {
-      error.value = 'Erreur lors de la mise à jour de la moto'
+      error.value = 'Impossible de mettre à jour la moto'
       throw err
     } finally {
       loading.value = false
@@ -55,7 +55,7 @@ export const useBikeStore = defineStore('bike', () => {
       await bikeService.delete(id)
       await fetchBikes()
     } catch (err) {
-      error.value = 'Erreur lors de la suppression de la moto'
+      error.value = 'Impossible de supprimer la moto'
       throw err
     } finally {
       loading.value = false

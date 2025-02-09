@@ -582,7 +582,7 @@ async function handleDelete() {
     showDeleteModal.value = false
     await fetchData()
   } catch {
-    error.value = "Erreur lors de la suppression de l'entretien"
+    error.value = "Impossible de supprimer l'entretien"
   } finally {
     loading.value = false
   }

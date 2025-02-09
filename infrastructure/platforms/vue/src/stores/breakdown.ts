@@ -90,7 +90,7 @@ export const useBreakdownStore = defineStore('breakdown', () => {
       await breakdownService.updateBreakdown(id, data)
       await fetchBreakdowns()
     } catch {
-      error.value = 'Erreur lors de la mise à jour de la panne'
+      error.value = 'Impossible de mettre à jour la panne'
       throw error
     } finally {
       loading.value = false
@@ -104,7 +104,7 @@ export const useBreakdownStore = defineStore('breakdown', () => {
       await breakdownService.deleteBreakdown(id)
       await fetchBreakdowns()
     } catch {
-      error.value = 'Erreur lors de la suppression de la panne'
+      error.value = 'Impossible de supprimer la panne'
       throw error
     } finally {
       loading.value = false

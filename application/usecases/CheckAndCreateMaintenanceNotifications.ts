@@ -3,6 +3,10 @@ import { MaintenanceNotificationRepository } from "../ports/repositories/Mainten
 import { CreateMaintenanceNotification } from "./CreateMaintenanceNotification";
 import { v4 as uuidv4 } from "uuid";
 
+export interface CheckAndCreateMaintenanceNotificationsRequest {
+  maintenanceId: string;
+}
+
 export class CheckAndCreateMaintenanceNotifications {
   constructor(
     private readonly maintenanceRepository: MaintenanceRepository,
@@ -10,15 +14,16 @@ export class CheckAndCreateMaintenanceNotifications {
     private readonly createNotification: CreateMaintenanceNotification
   ) {}
 
-  async execute(): Promise<void> {
-    const dueMaintenances = await this.maintenanceRepository.findDueMaintenances();
+  async execute(request: CheckAndCreateMaintenanceNotificationsRequest): Promise<void> {
+    const maintenance = await this.maintenanceRepository.findById(request.maintenanceId);
+    if (!maintenance) {
+      throw new Error("Maintenance not found");
+    }
 
-    for (const maintenance of dueMaintenances) {
-      const existingNotifications = await this.notificationRepository.findAll();
+    if (maintenance.isMaintenanceNeeded()) {
+      const existingNotifications = await this.notificationRepository.findByMaintenanceId(maintenance.getId());
       const hasNotification = existingNotifications.some(
-        (notification) =>
-          notification.getMaintenance().getId() === maintenance.getId() &&
-          notification.isPending()
+        (notification) => notification.isPending()
       );
 
       if (!hasNotification) {

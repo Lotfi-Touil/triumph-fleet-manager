@@ -31,7 +31,10 @@ export class PostgresMaintenanceNotificationRepository implements MaintenanceNot
   }
 
   async findById(id: string): Promise<MaintenanceNotification | null> {
-    const entity = await this.repository.findOne({ where: { id } });
+    const entity = await this.repository.findOne({ 
+      where: { id },
+      relations: ['maintenance']
+    });
     if (!entity) {
       return null;
     }

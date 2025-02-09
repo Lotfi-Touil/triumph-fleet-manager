@@ -312,7 +312,7 @@ const handleDelete = async () => {
     showDeleteModal.value = false
     await bikeStore.fetchBikes()
   } catch {
-    error.value = "Erreur lors de la suppression de la moto"
+    error.value = "Impossible de supprimer la moto"
   } finally {
     loading.value = false
   }

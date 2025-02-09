@@ -59,7 +59,7 @@ export const useDriverStore = defineStore('driver', () => {
       drivers.value = drivers.value.filter(d => d.id !== id);
       notificationStore.showSuccess('Conducteur supprimé avec succès');
     } catch (error) {
-      notificationStore.showError('Erreur lors de la suppression du conducteur');
+      notificationStore.showError('Impossible de supprimer le conducteur');
       console.error('Error deleting driver:', error);
     } finally {
       loading.value = false;

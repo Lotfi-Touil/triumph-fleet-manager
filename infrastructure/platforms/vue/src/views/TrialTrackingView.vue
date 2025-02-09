@@ -408,7 +408,7 @@ async function handleDelete() {
     showDeleteModal.value = false
     await trialStore.fetchTrials()
   } catch {
-    error.value = "Erreur lors de la suppression de l'essai"
+    error.value = "Impossible de supprimer l'essai"
   } finally {
     loading.value = false
   }

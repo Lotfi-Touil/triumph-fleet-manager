@@ -22,6 +22,7 @@ import { MAINTENANCE_REPOSITORY, BIKE_REPOSITORY, USER_REPOSITORY, MAINTENANCE_N
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { NestMaintenanceService } from './maintenance.service';
+import { CreateMaintenanceNotification } from '@application/usecases/CreateMaintenanceNotification';
 
 @Module({
   imports: [
@@ -55,10 +56,15 @@ import { NestMaintenanceService } from './maintenance.service';
       inject: [MAINTENANCE_NOTIFICATION_REPOSITORY],
     },
     {
+      provide: CreateMaintenanceNotification,
+      useFactory: (notificationRepo, maintenanceRepo) => new CreateMaintenanceNotification(notificationRepo, maintenanceRepo),
+      inject: [MAINTENANCE_NOTIFICATION_REPOSITORY, MAINTENANCE_REPOSITORY],
+    },
+    {
       provide: CheckAndCreateMaintenanceNotifications,
       useFactory: (maintenanceRepo, notificationRepo, createNotification) => 
         new CheckAndCreateMaintenanceNotifications(maintenanceRepo, notificationRepo, createNotification),
-      inject: [MAINTENANCE_REPOSITORY, MAINTENANCE_NOTIFICATION_REPOSITORY, CreateMaintenance],
+      inject: [MAINTENANCE_REPOSITORY, MAINTENANCE_NOTIFICATION_REPOSITORY, CreateMaintenanceNotification],
     },
     {
       provide: UpdateMaintenance,

@@ -8,7 +8,7 @@ class NotificationEventService {
     this.callback = callback
 
     this.maintenanceSource = new EventSource(
-      'http://localhost:3000/api/maintenance/notifications/events',
+      'http://localhost:3000/api/maintenances/notifications/events',
     )
     this.maintenanceSource.onmessage = () => {
       this.callback?.()
@@ -34,7 +34,7 @@ class NotificationEventService {
     if (this.maintenanceSource) {
       this.maintenanceSource.close()
       this.maintenanceSource = new EventSource(
-        'http://localhost:3000/api/maintenance/notifications/events',
+        'http://localhost:3000/api/maintenances/notifications/events',
       )
       this.maintenanceSource.onmessage = () => {
         this.callback?.()

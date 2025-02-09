@@ -92,8 +92,8 @@ export class MaintenanceController {
     private eventEmitter: EventEmitter2,
   ) {}
 
-  private async checkAndEmitNotifications(): Promise<void> {
-    await this.checkAndCreateNotifications.execute();
+  private async checkAndEmitNotifications(maintenanceId: string): Promise<void> {
+    await this.checkAndCreateNotifications.execute({ maintenanceId });
     this.eventEmitter.emit('maintenance.notification');
   }
 
@@ -104,6 +104,7 @@ export class MaintenanceController {
       maintenanceDate: new Date(data.maintenanceDate),
       nextRecommendedMaintenanceDate: data.nextRecommendedMaintenanceDate ? new Date(data.nextRecommendedMaintenanceDate) : undefined
     });
+    await this.checkAndEmitNotifications(maintenanceId);
     return { id: maintenanceId };
   }
 
@@ -126,6 +127,7 @@ export class MaintenanceController {
       ...data,
       nextRecommendedMaintenanceDate: data.nextRecommendedMaintenanceDate ? new Date(data.nextRecommendedMaintenanceDate) : undefined
     });
+    await this.checkAndEmitNotifications(id);
   }
 
   @Delete('delete/:id')
@@ -195,7 +197,7 @@ export class MaintenanceController {
     });
   }
 
-  @Post('notifications/:id/acknowledge')
+  @Put('notifications/:id/acknowledge')
   async acknowledgeNotification(@Param('id') id: string): Promise<void> {
     await this.maintenanceService.acknowledgeMaintenanceNotification(id);
   }

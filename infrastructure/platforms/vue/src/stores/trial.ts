@@ -83,7 +83,7 @@ export const useTrialStore = defineStore('trial', () => {
       trials.value = trials.value.filter(t => t.id !== id)
       notificationStore.showSuccess('Essai supprimé avec succès')
     } catch (error) {
-      notificationStore.showError('Erreur lors de la suppression de l\'essai')
+      notificationStore.showError('Impossible de supprimer l\'essai')
       console.error('Error deleting trial:', error)
     } finally {
       loading.value = false
