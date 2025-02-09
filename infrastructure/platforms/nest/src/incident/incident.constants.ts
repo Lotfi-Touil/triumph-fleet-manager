@@ -1,0 +1,1 @@
+export const INCIDENT_SERVICE = 'INCIDENT_SERVICE'; 

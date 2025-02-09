@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { DriverEntity } from '../entities/driver.entity';
 import { BikeEntity } from '../entities/bike.entity';
 import { Transform, Type } from 'class-transformer';
@@ -25,4 +25,12 @@ export class Trial {
 
   @Column({ type: 'text', nullable: true })
   notes: string;
+
+  @CreateDateColumn({ type: 'timestamp' })
+  @Type(() => Date)
+  createdAt: Date;
+
+  @UpdateDateColumn({ type: 'timestamp' })
+  @Type(() => Date)
+  updatedAt: Date;
 } 

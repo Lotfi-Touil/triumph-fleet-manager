@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Body, Param, Delete, Put, UseGuards, UsePipes, ValidationPipe, Inject } from '@nestjs/common';
 import { TrialService } from '@application/ports/services/TrialService';
-import { CreateTrialDTO, UpdateTrialDTO } from '@application/ports/services/TrialService';
+import { CreateTrialDTO, UpdateTrialDTO, TrialResponseDTO } from '@application/ports/services/TrialService';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '@domain/entities/User';
-import { NestTrialService } from './trial.service';
+import { TRIAL_SERVICE } from './trial.constants';
 
 @Controller('trials')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -13,37 +13,37 @@ import { NestTrialService } from './trial.service';
 @UsePipes(new ValidationPipe({ transform: true }))
 export class TrialController {
   constructor(
-    @Inject('TrialService')
+    @Inject(TRIAL_SERVICE)
     private readonly trialService: TrialService
   ) {}
 
   @Get()
-  findAll() {
+  async findAll(): Promise<TrialResponseDTO[]> {
     return this.trialService.findAll();
   }
 
   @Get('driver/:id')
-  findByDriver(@Param('id') id: string) {
+  async findByDriver(@Param('id') id: string): Promise<TrialResponseDTO[]> {
     return this.trialService.findByDriver(id);
   }
 
   @Get('bike/:id')
-  findByBike(@Param('id') id: string) {
+  async findByBike(@Param('id') id: string): Promise<TrialResponseDTO[]> {
     return this.trialService.findByBike(id);
   }
 
   @Post()
-  create(@Body() createTrialDto: CreateTrialDTO) {
+  async create(@Body() createTrialDto: CreateTrialDTO): Promise<TrialResponseDTO> {
     return this.trialService.create(createTrialDto);
   }
 
   @Put(':id/end')
-  endTrial(@Param('id') id: string, @Body() updateTrialDto: UpdateTrialDTO) {
+  async endTrial(@Param('id') id: string, @Body() updateTrialDto: UpdateTrialDTO): Promise<TrialResponseDTO> {
     return this.trialService.endTrial(id, updateTrialDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string): Promise<void> {
     return this.trialService.remove(id);
   }
 } 

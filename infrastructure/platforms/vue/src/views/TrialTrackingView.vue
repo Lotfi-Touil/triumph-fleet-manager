@@ -38,15 +38,21 @@
           <tbody class="bg-card divide-y divide-border">
             <tr v-for="trial in trials" :key="trial.id" class="hover:bg-muted/50">
               <td class="px-6 py-4 whitespace-nowrap text-foreground">
-                <span :title="`${trial.driver.firstName} ${trial.driver.lastName}`">
-                  {{ `${trial.driver.firstName} ${trial.driver.lastName}`.length > 20 
-                    ? `${trial.driver.firstName} ${trial.driver.lastName}`.slice(0, 20) + '...' 
-                    : `${trial.driver.firstName} ${trial.driver.lastName}` }}
+                <span :title="trial.driver ? `${trial.driver.firstName} ${trial.driver.lastName}` : 'N/A'">
+                  {{ trial.driver 
+                    ? `${trial.driver.firstName} ${trial.driver.lastName}`.length > 20 
+                      ? `${trial.driver.firstName} ${trial.driver.lastName}`.slice(0, 20) + '...' 
+                      : `${trial.driver.firstName} ${trial.driver.lastName}`
+                    : 'N/A' }}
                 </span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-foreground">
-                <span :title="trial.bike.name">
-                  {{ trial.bike.name.length > 20 ? trial.bike.name.slice(0, 20) + '...' : trial.bike.name }}
+                <span :title="trial.bike ? trial.bike.name : 'N/A'">
+                  {{ trial.bike 
+                    ? trial.bike.name.length > 20 
+                      ? trial.bike.name.slice(0, 20) + '...' 
+                      : trial.bike.name 
+                    : 'N/A' }}
                 </span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-foreground">
@@ -235,12 +241,16 @@
             <div>
               <label class="block text-sm font-medium text-muted-foreground">Conducteur</label>
               <p class="mt-1 text-foreground">
-                {{ selectedTrial?.driver.firstName }} {{ selectedTrial?.driver.lastName }}
+                {{ selectedTrial?.driver 
+                  ? `${selectedTrial.driver.firstName} ${selectedTrial.driver.lastName}` 
+                  : 'N/A' }}
               </p>
             </div>
             <div>
               <label class="block text-sm font-medium text-muted-foreground">Moto</label>
-              <p class="mt-1 text-foreground">{{ selectedTrial?.bike.name }}</p>
+              <p class="mt-1 text-foreground">
+                {{ selectedTrial?.bike ? selectedTrial.bike.name : 'N/A' }}
+              </p>
             </div>
             <div>
               <label class="block text-sm font-medium text-muted-foreground">Début</label>

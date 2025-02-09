@@ -9,6 +9,12 @@ import { UpdateUserProfile } from '../../../../../application/usecases/UpdateUse
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from '../auth/auth.module';
+import { NestUserService } from './user.service';
+import { CreateUser } from '@application/usecases/CreateUser';
+import { UpdateUser } from '@application/usecases/UpdateUser';
+import { DeleteUser } from '@application/usecases/DeleteUser';
+import { GetUsers } from '@application/usecases/GetUsers';
+import { ValidateUserCredentials } from '@application/usecases/ValidateUserCredentials';
 
 @Module({
   imports: [
@@ -37,7 +43,16 @@ import { AuthModule } from '../auth/auth.module';
       useClass: PostgresUserRepository,
     },
     UpdateUserProfile,
+    {
+      provide: 'UserService',
+      useClass: NestUserService,
+    },
+    CreateUser,
+    UpdateUser,
+    DeleteUser,
+    GetUsers,
+    ValidateUserCredentials,
   ],
-  exports: ['IUserRepository', 'UserRepository'],
+  exports: ['IUserRepository', 'UserRepository', 'UserService'],
 })
 export class UserModule {}

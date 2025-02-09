@@ -6,6 +6,7 @@ import { BikeEntity } from '../entities/bike.entity';
 import { DriverEntity } from '../entities/driver.entity';
 import { TrialService } from '@application/ports/services/TrialService';
 import { NestTrialService } from './trial.service';
+import { TRIAL_SERVICE } from './trial.constants';
 
 @Module({
   imports: [
@@ -13,11 +14,12 @@ import { NestTrialService } from './trial.service';
   ],
   controllers: [TrialController],
   providers: [
+    NestTrialService,
     {
-      provide: 'TrialService',
+      provide: TRIAL_SERVICE,
       useClass: NestTrialService,
     }
   ],
-  exports: ['TrialService'],
+  exports: [TRIAL_SERVICE, NestTrialService],
 })
 export class TrialModule {} 

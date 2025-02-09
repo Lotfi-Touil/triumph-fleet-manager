@@ -3,11 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { IncidentEntity } from '../entities/incident.entity';
 import { v4 as uuidv4 } from 'uuid';
-import { CreateIncidentDTO, IncidentDTO, UpdateIncidentDTO } from '../../../../../application/ports/services/IncidentService';
+import { CreateIncidentDTO, IncidentDTO, UpdateIncidentDTO, IncidentService } from '../../../../../application/ports/services/IncidentService';
 import { Driver } from '../../../../../domain/entities/Driver';
 
 @Injectable()
-export class IncidentService {
+export class NestIncidentService implements IncidentService {
   constructor(
     @InjectRepository(IncidentEntity)
     private incidentRepository: Repository<IncidentEntity>,
