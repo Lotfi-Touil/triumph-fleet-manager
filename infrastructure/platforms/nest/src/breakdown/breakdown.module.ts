@@ -12,6 +12,7 @@ import { GetBreakdowns } from '@application/usecases/GetBreakdowns';
 import { DeleteBreakdown } from '@application/usecases/DeleteBreakdown';
 import { BIKE_REPOSITORY, BREAKDOWN_REPOSITORY } from './breakdown.constants';
 import { SparePartsModule } from '../spare-parts/spare-parts.module';
+import { NestBreakdownService } from './breakdown.service';
 
 @Module({
   imports: [
@@ -58,6 +59,11 @@ import { SparePartsModule } from '../spare-parts/spare-parts.module';
       provide: DeleteBreakdown,
       useFactory: (breakdownRepo) => new DeleteBreakdown(breakdownRepo),
       inject: [BREAKDOWN_REPOSITORY],
+    },
+    NestBreakdownService,
+    {
+      provide: 'BreakdownService',
+      useExisting: NestBreakdownService,
     },
   ],
   exports: [BREAKDOWN_REPOSITORY],

@@ -139,7 +139,7 @@
     <div v-if="showCreateModal || showEditModal" class="fixed inset-0 z-50 overflow-y-auto">
       <div class="fixed inset-0 bg-background/80 backdrop-blur-sm" @click="closeModal" />
       <div class="fixed inset-0 flex items-center justify-center p-4">
-        <div class="relative bg-card rounded-lg shadow-lg w-full max-w-2xl" @click.stop>
+        <div class="relative bg-card rounded-lg shadow-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto" @click.stop>
           <div class="p-6">
             <h2 class="text-xl font-bold mb-4 text-foreground">
               {{ showCreateModal ? 'Signaler une panne' : 'Modifier la panne' }}
@@ -283,20 +283,21 @@
                   Sous garantie
                 </label>
               </div>
-              <div class="flex justify-end space-x-2 mt-6">
-                <button
+              <div class="flex gap-4">
+                <Button
                   type="button"
+                  variant="destructive"
                   @click="closeModal"
-                  class="px-4 py-2 bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-colors"
+                  :disabled="isSubmitting"
                 >
                   Annuler
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit"
-                  class="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+                  :disabled="isSubmitting"
                 >
-                  {{ showCreateModal ? 'Créer' : 'Mettre à jour' }}
-                </button>
+                  {{ isSubmitting ? 'Enregistrement...' : (showCreateModal ? 'Créer' : 'Enregistrer') }}
+                </Button>
               </div>
             </form>
           </div>
@@ -481,6 +482,7 @@ import type { Breakdown, SparePartRequest, SparePart } from '../services/breakdo
 import { BreakdownType, BreakdownStatus } from '../services/breakdown.service'
 import { Eye, Pencil, Trash2, Plus, X } from 'lucide-vue-next'
 import { useSparePartsStore } from '../stores/spareParts'
+import { Button } from '../components/ui/button'
 
 const breakdownStore = useBreakdownStore()
 const bikeStore = useBikeStore()
@@ -498,6 +500,7 @@ const showDeleteModal = ref(false)
 const showViewModal = ref(false)
 const selectedBreakdownId = ref<string>('')
 const selectedBreakdown = ref<Breakdown | null>(null)
+const isSubmitting = ref(false)
 
 const breakdownTypes = Object.values(BreakdownType)
 const breakdownStatuses = Object.values(BreakdownStatus)
@@ -638,28 +641,38 @@ function confirmDelete(breakdown: Breakdown) {
 }
 
 async function handleSubmit() {
+  if (isSubmitting.value) return;
+  
   try {
+    isSubmitting.value = true;
+    // Filtrer les pièces détachées valides (avec un ID et une quantité)
+    const validSpareParts = form.value.spareParts.filter(part => part.sparePartId && part.quantity > 0);
+    
     if (showCreateModal.value) {
       await breakdownStore.createBreakdown({
         bikeId: form.value.bikeId,
         description: form.value.description,
         type: form.value.type,
         warrantyApplied: form.value.warrantyApplied,
-        spareParts: form.value.spareParts,
+        ...(validSpareParts.length > 0 && { spareParts: validSpareParts }),
       })
     } else {
       await breakdownStore.updateBreakdown(selectedBreakdownId.value, {
         status: form.value.status,
         repairActions: form.value.repairActions,
         technicalRecommendations: form.value.technicalRecommendations,
-        spareParts: form.value.spareParts,
+        ...(validSpareParts.length > 0 && { spareParts: validSpareParts }),
         warrantyApplied: form.value.warrantyApplied,
       })
     }
     await fetchData()
     closeModal()
-  } catch {
+  } catch (err: any) {
+    console.error('Error submitting breakdown:', err)
     error.value = "Erreur lors de l'enregistrement"
+    closeModal()
+  } finally {
+    isSubmitting.value = false
   }
 }
 
