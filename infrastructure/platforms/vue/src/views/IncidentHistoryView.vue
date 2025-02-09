@@ -25,13 +25,13 @@
         </thead>
         <tbody class="bg-card divide-y divide-border">
           <tr v-for="incident in incidents" :key="incident.id">
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-card-foreground">
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
               {{ new Date(incident.date).toLocaleDateString() }}
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-card-foreground">
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
               {{ incident.driver?.firstName }} {{ incident.driver?.lastName }}
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-card-foreground">
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
               {{ incident.type }}
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
@@ -39,9 +39,9 @@
                 :class="{
                   'px-2 py-1 text-xs font-semibold rounded-full': true,
                   'bg-destructive/20 text-destructive': incident.severity === 'Critique',
-                  'bg-warning/20 text-warning': incident.severity === 'Élevé',
-                  'bg-yellow-100 text-yellow-800': incident.severity === 'Moyen',
-                  'bg-muted text-foreground': incident.severity === 'Faible'
+                  'bg-orange-100 text-orange-700': incident.severity === 'Élevé',
+                  'bg-amber-100 text-amber-700': incident.severity === 'Moyen',
+                  'bg-blue-100 text-blue-700': incident.severity === 'Faible'
                 }"
               >
                 {{ incident.severity }}
@@ -51,10 +51,10 @@
               <span
                 :class="{
                   'px-2 py-1 text-xs font-semibold rounded-full': true,
-                  'bg-success/20 text-success': incident.status === 'Résolu',
-                  'bg-primary/20 text-primary': incident.status === 'En cours',
-                  'bg-warning/20 text-warning': incident.status === 'En attente',
-                  'bg-muted text-muted-foreground': incident.status === 'Archivé'
+                  'bg-green-100 text-green-700': incident.status === 'Résolu',
+                  'bg-blue-100 text-blue-700': incident.status === 'En cours',
+                  'bg-orange-100 text-orange-700': incident.status === 'En attente',
+                  'bg-slate-100 text-slate-700': incident.status === 'Archivé'
                 }"
               >
                 {{ incident.status }}
@@ -305,7 +305,11 @@ const handleSubmit = async () => {
       });
       const index = incidents.value.findIndex(i => i.id === updated.id);
       if (index !== -1) {
-        incidents.value[index] = updated;
+        const driver = drivers.value.find(d => d.id === form.value.driverId);
+        incidents.value[index] = {
+          ...updated,
+          driver
+        };
       }
       notifications.showSuccess('Incident mis à jour avec succès');
     } else {
@@ -313,7 +317,11 @@ const handleSubmit = async () => {
         ...form.value,
         date: new Date(form.value.date)
       });
-      incidents.value.push(created);
+      const driver = drivers.value.find(d => d.id === form.value.driverId);
+      incidents.value.push({
+        ...created,
+        driver
+      });
       notifications.showSuccess('Incident créé avec succès');
     }
     closeDialog();
