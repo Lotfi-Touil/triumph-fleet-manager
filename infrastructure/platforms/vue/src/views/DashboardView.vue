@@ -228,9 +228,11 @@
             }}
           </h1>
           <div class="flex items-center gap-4">
-            <div v-if="authStore.user?.role === 'admin'" class="flex items-center px-2 py-0.5 rounded-full bg-amber-100">
-              <Shield class="h-3 w-3 text-amber-600" />
-              <span class="ml-1 text-xs font-medium text-amber-600">ADMIN</span>
+            <div :class="getRoleStyles(authStore.user?.role || '').badge">
+              <Shield :class="getRoleStyles(authStore.user?.role || '').icon" />
+              <span :class="getRoleStyles(authStore.user?.role || '').text">
+                {{ translateRole(authStore.user?.role || '') }}
+              </span>
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -400,6 +402,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useMaintenanceStore } from '../stores/maintenance'
 import { useNotificationStore } from '../stores/notifications'
+import { useToast } from '../components/ui/toast/use-toast'
 import { UserRole } from '../types/auth'
 import type { Maintenance } from '../services/maintenance.service'
 import { hasRoutePermission } from '../config/routePermissions'
@@ -438,6 +441,7 @@ const maintenanceStore = useMaintenanceStore()
 const notificationStore = useNotificationStore()
 const isSidebarOpen = ref(false)
 const dueMaintenances = ref<Maintenance[]>([])
+const { toast } = useToast()
 
 const checkRoutePermission = computed(() => {
   return (routeName: string) => {
@@ -462,8 +466,52 @@ onUnmounted(() => {
 
 const handleLogout = () => {
   authStore.logout()
-  router.push('/')
+  router.push('/login')
+  toast({
+    title: 'Déconnexion réussie',
+    description: 'À bientôt !',
+    variant: 'default',
+  })
 }
+
+const translateRole = (role: string): string => {
+  const translations: Record<string, string> = {
+    'admin': 'Administrateur',
+    'fleet_manager': 'Gestionnaire de flotte',
+    'client_partner': 'Partenaire client',
+    'technician': 'Technicien',
+    'driver': 'Conducteur'
+  }
+  return translations[role] || role
+}
+
+type RoleStyle = {
+  bg: string;
+  text: string;
+}
+
+type RoleColorMap = {
+  [key in UserRole]: RoleStyle;
+}
+
+const getRoleStyles = computed(() => {
+  const colorMap: RoleColorMap = {
+    [UserRole.ADMIN]: { bg: 'bg-amber-100', text: 'text-amber-600' },
+    [UserRole.FLEET_MANAGER]: { bg: 'bg-blue-100', text: 'text-blue-600' },
+    [UserRole.TECHNICIAN]: { bg: 'bg-green-100', text: 'text-green-600' },
+    [UserRole.CLIENT_PARTNER]: { bg: 'bg-purple-100', text: 'text-purple-600' },
+    [UserRole.DRIVER]: { bg: 'bg-gray-100', text: 'text-gray-600' }
+  }
+
+  return (role: string) => {
+    const style = colorMap[role as UserRole] || { bg: '', text: '' }
+    return {
+      badge: `flex items-center px-2 py-0.5 rounded-full ${style.bg}`,
+      icon: `h-3 w-3 ${style.text}`,
+      text: `ml-1 text-xs font-medium ${style.text}`
+    }
+  }
+})
 </script>
 
 <style scoped>

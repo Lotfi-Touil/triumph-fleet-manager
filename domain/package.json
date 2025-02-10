@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "@bookstore/domain",
-  "description": "Domain for Bookstore",
+  "name": "@triumph-fleet-manager/domain",
+  "description": "Domain for Triumph Fleet Manager",
   "version": "0.1.0"
 }

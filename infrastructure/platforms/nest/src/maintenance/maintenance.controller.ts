@@ -58,6 +58,11 @@ class CreateMaintenanceDto {
   nextRecommendedMaintenanceDate?: string;
 }
 
+class UpdateKilometersDto {
+  @IsNumber()
+  newKilometers: number;
+}
+
 interface MaintenanceResponse {
   id: string;
   bike: {
@@ -200,6 +205,18 @@ export class MaintenanceController {
   @Put('notifications/:id/acknowledge')
   async acknowledgeNotification(@Param('id') id: string): Promise<void> {
     await this.maintenanceService.acknowledgeMaintenanceNotification(id);
+  }
+
+  @Put('update-kilometers/:id')
+  async updateKilometers(
+    @Param('id') id: string,
+    @Body() data: UpdateKilometersDto,
+  ) {
+    await this.maintenanceService.updateMaintenanceKilometers({
+      maintenanceId: id,
+      newKilometers: data.newKilometers,
+    });
+    await this.checkAndEmitNotifications(id);
   }
 
   private toResponse(maintenance: any): MaintenanceResponse {

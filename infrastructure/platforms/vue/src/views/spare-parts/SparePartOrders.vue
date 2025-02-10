@@ -156,7 +156,7 @@
 
     <!-- New/Edit Order Dialog -->
     <Dialog v-model:open="showNewOrderDialog">
-      <DialogContent class="sm:max-w-[425px]">
+      <DialogContent class="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle class="text-2xl font-bold text-primary">{{
             editingOrder ? 'Modifier la commande' : 'Nouvelle commande'

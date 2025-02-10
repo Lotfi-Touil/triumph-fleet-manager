@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "@bookstore/adapters",
-  "description": "Adapters for Bookstore",
+  "name": "@triumph-fleet-manager/adapters",
+  "description": "Adapters for Triumph Fleet Manager",
   "version": "0.1.0"
 }

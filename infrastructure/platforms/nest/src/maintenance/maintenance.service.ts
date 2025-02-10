@@ -1,5 +1,5 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { MaintenanceService, CreateMaintenanceDTO, UpdateMaintenanceDTO } from '@application/ports/services/MaintenanceService';
+import { MaintenanceService, CreateMaintenanceDTO, UpdateMaintenanceDTO, UpdateMaintenanceKilometersDTO } from '@application/ports/services/MaintenanceService';
 import { Maintenance, MaintenanceStatus } from '@domain/entities/Maintenance';
 import { MaintenanceNotification } from '@domain/entities/MaintenanceNotification';
 import { CreateMaintenance } from '@application/usecases/CreateMaintenance';
@@ -88,5 +88,30 @@ export class NestMaintenanceService implements MaintenanceService {
 
   async acknowledgeMaintenanceNotification(id: string): Promise<void> {
     await this.acknowledgeMaintenanceNotificationUseCase.execute(id);
+  }
+
+  async updateMaintenanceKilometers(dto: UpdateMaintenanceKilometersDTO): Promise<void> {
+    const maintenance = await this.maintenanceRepository.findById(dto.maintenanceId);
+    if (!maintenance) {
+      throw new Error("Maintenance not found");
+    }
+
+    const updatedMaintenance = new Maintenance(
+      maintenance.getId(),
+      maintenance.getBike(),
+      maintenance.getMaintenanceDate(),
+      maintenance.getLastMaintenanceKilometers(),
+      dto.newKilometers,
+      maintenance.getTechnician(),
+      maintenance.getStatus(),
+      maintenance.getType(),
+      maintenance.getReplacedParts(),
+      maintenance.getCost(),
+      maintenance.getTechnicalRecommendations(),
+      maintenance.getWorkDescription(),
+      maintenance.getNextRecommendedMaintenanceDate()
+    );
+
+    await this.maintenanceRepository.save(updatedMaintenance);
   }
 } 

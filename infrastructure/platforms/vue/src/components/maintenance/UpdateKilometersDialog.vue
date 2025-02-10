@@ -1,7 +1,7 @@
 <template>
   <Dialog>
     <DialogTrigger asChild>
-      <Button variant="outline" size="sm" class="text-primary">
+      <Button variant="outline" size="sm" class="text-primary hidden">
         Mettre à jour le kilométrage
         <Gauge class="ml-2 h-4 w-4" />
       </Button>

@@ -27,9 +27,15 @@ export interface UpdateMaintenanceDTO {
   nextRecommendedMaintenanceDate?: Date;
 }
 
+export interface UpdateMaintenanceKilometersDTO {
+  maintenanceId: string;
+  newKilometers: number;
+}
+
 export interface MaintenanceService {
   createMaintenance(dto: CreateMaintenanceDTO): Promise<string>;
   updateMaintenance(dto: UpdateMaintenanceDTO): Promise<void>;
+  updateMaintenanceKilometers(dto: UpdateMaintenanceKilometersDTO): Promise<void>;
   deleteMaintenance(id: string): Promise<void>;
   getAllMaintenances(): Promise<Maintenance[]>;
   getMaintenancesByBikeId(bikeId: string): Promise<Maintenance[]>;

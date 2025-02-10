@@ -1,5 +1,5 @@
-import { Maintenance } from "../entities/Maintenance";
-import { Kilometers } from "../value-objects/Kilometers";
+import { Maintenance } from "../../../domain/entities/Maintenance";
+import { Kilometers } from "../../../domain/value-objects/Kilometers";
 
 export class MaintenanceCalculator {
   private static readonly UPCOMING_DAYS_THRESHOLD = 15;

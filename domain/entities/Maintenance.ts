@@ -1,5 +1,5 @@
 import { Bike } from "./Bike";
-import { MaintenanceCalculator } from "../services/MaintenanceCalculator";
+import { MaintenanceCalculator } from "../../application/ports/services/MaintenanceCalculator";
 import { User } from "./User";
 
 export enum MaintenanceStatus {

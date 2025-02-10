@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "@bookstore/application",
-  "description": "Application for Bookstore",
+  "name": "@triumph-fleet-manager/application",
+  "description": "Application for Triumph Fleet Manager",
   "version": "0.1.0"
 }
